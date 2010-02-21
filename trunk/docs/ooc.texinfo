@@ -1,0 +1,915 @@
+\input texinfo   @c -*-texinfo-*-
+@comment $Id: GNU-Sample-Texts.html,v 1.6 2008/04/20 15:45:00 karl Exp $
+@comment %**start of header
+@setfilename ooc.info
+@include version.texi
+@settitle Object Oriented C (ooc) toolkit @value{VERSION}
+@comment @syncodeindex pg cp
+@comment %**end of header
+@copying
+This manual is for Object Oriented C (ooc) toolkit (version @value{VERSION}, @value{UPDATED}),
+which is a lightweight collection of tools for Object Oriented programming approach in ANSI-C.
+
+Copyright @copyright{Tibor Miseta} 2008-2010 Free Software Foundation, Inc.
+
+@quotation
+Permission is granted to copy, distribute and/or modify this document
+  under the terms of the GNU Free Documentation License, Version 1.2
+  or any later version published by the Free Software Foundation;
+  with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
+  Texts.  A copy of the license is included in the section entitled ``GNU
+  Free Documentation License''.
+
+(a) The FSF's Back-Cover Text is: ``You have the freedom to
+copy and modify this GNU manual.  Buying copies from the FSF
+supports it in developing GNU and promoting software freedom.''
+@end quotation
+@end copying
+
+@titlepage
+@title Object Oriented C (ooc) toolkit
+@subtitle for version @value{VERSION}, @value{UPDATED}
+@author Tibor Miseta (@email{Tibor Miseta at gmail dot com})
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@contents
+
+@ifnottex
+@node Top
+@top Object Oriented C (ooc) toolkit
+@insertcopying
+@end ifnottex
+
+@menu
+* Introduction::
+* Objects and Classes::
+* Exception handling::
+* Using Classes::
+* Implementing Classes::
+* Memory handling::
+* Copying This Manual: GNU Free Documentation License
+* Table of Figures::
+* Index: Indices
+@end menu
+
+
+@node Introduction
+@chapter Introduction
+
+Object Oriented C toolkit, or shortly @strong{ooc} has been created with the intention to enable to write object oriented code easily using standard @strong{ANSI-C}, with all the possible type checks. It is very important being ANSI-C compliant, because the main goal was the portability even for systems that lack a C++ compiler. 
+@sp 1
+The other goal was keeping it lightweight, being able to port it onto small computers as well, like embedded systems.
+The implementation has a C++ like approach, using @emph{classes}, @emph{objects}, and @emph{exceptions}.
+The ooc also incorporates @emph{single inheritance}. 
+@sp 1
+There are many similar kits out there, but I found most of them either too complicated for writing a fully controllable, really @emph{portable} code, or inconvenient to use it for writing readable programs. So I have started from scratch.
+@sp 1
+In this manual I will cover only issues related to the implementation and use of @strong{ooc}, I assume that the reader is familiar with the Object Oriented Programming and has a good knowledge about C and C++ and their most common internal implementation.
+
+@node Objects and Classes
+@chapter Objects and Classes
+
+Class is the type of an Object instance. It specifies its data and function members and methods. We use the same terminology as in C++ here.
+@sp 1
+Before an Object could be used, it must be instantiated. 
+@sp 1
+The Classes and Objects are located in the memory, as the following section describes.
+
+@section Underlying data structure
+
+@float Figure,fig:ex1
+@center
+@image{ooc_doc_data}
+@caption{Underlying data structure}
+@end float
+@sp 1
+
+The Class description table and the Virtual table are allocated statically in compilation time while the Object instances are allocated dynamically on the heap in run time. The Class allocation table is fully initialized at compilation time, while the Virtual Table must be initialized in run time before the Class is used. Due to this limitation it is not possible allocating Objects statically on the heap.
+@sp 1
+There is always a Virtual table, even if the class does not have a virtual function. In this case it is just a single pointer to the Class description table.
+@sp 1
+
+
+@section Inheritance
+
+In ooc single inheritance is supported. The physical implementation of inheritance is embedding the parent class members into the beginning of the instantiated object.
+
+Multiple inheritances is not supported because of considering run time effectiveness on slower computers; plus trying to avoid complex inheritance problems that may occur in case of multiple inheritance, and a good solution for them would require more support from the compiler.
+
+In every class definition macros we use two parameters:
+@itemize @bullet
+@item
+First parameter is the name of the class, while the
+@item
+Second parameter is the name of the parent class.
+@end itemize
+
+If a class is a base class (has no parent class), we shall mark it as it parent class was @code{Base}. Therefore @code{Base} is a reserved class name in @strong{ooc}!
+
+@example
+
+DeclareClass( String, Base );       /* String is a Base class */
+
+DeclareClass( Utf8, String );       /* Utf8 is a class inherited from String */
+
+@end example
+
+@section Class data members
+
+Class definitions are basically nested struct definitions. That means that you can access data members via their names, as they were accessed as struct members. There is an important rule, that accessing the parent class's data members requires a prefix with the parent class's name before the data member name. This is because the standard ANSI C does not allow the use of unnamed struct, and I wanted to be ANSI compliant for better portability.
+
+@example
+
+ClassMembers( String, Base )
+        
+    char *    cstr;
+    int       length;
+
+EndOfClassMembers;
+
+ClassMembers( Utf8, String )
+        
+     int       num_of_chars;
+
+EndOfClassMembers;
+
+/**********************************
+ *  Accessing data members
+ */
+
+    String my_string;
+    Utf8   my_utf8;
+    int i;
+
+    i =  my_string->length;        /* Accessing a class member */        
+
+    i =  my_utf8->num_of_chars;    /* Accessing a class member */
+
+    i =  my_utf8->String.length;   /* Accessing class member inherited from the parent class */
+
+@end example
+
+@section Member functions
+
+A class member function is a normal C function, but there is a very important rule: the first function parameter of a member function is always a class instance object, and this first parameter can not be omitted.
+
+@example
+
+void   str_upper( String ); /* Declaring a member function */
+
+void   str_upper( String self ) /* Defining a member function */
+@{
+    int i;
+    assert( ooc_isInstanceOf( self, String ) );
+
+    for( i=0; i<self->length; i++ )
+        self->cstr[i] = cupper( self->cstr[i] );
+@}  
+
+str_upper( my_string );   /* Calling a member function */
+
+@end example
+
+As a naming convention it is a good idea to start all class member function's name with the name of the class, or with a meaningful abbreviation.
+
+
+@section Virtual functions
+
+Virtual functions have the same requirement: their mandatory first parameter is an object instance pointer.@*
+Virtual functions are implemented as static functions in the class implementation file, and the class's virtual table holds pointers to these static functions.@*
+Virtual functions are called via their function pointers in the vtable. 
+@sp 1
+The vtable itself is basically a struct holding function pointers to the implemented static functions. The calling via these function pointers provides us the capability for compilation time type and parameter checking.
+@sp 1
+For virtual function calls we use the macros and inline functions. @*
+For those compilers that the inline functions are not supported there is a function version for virtual function calls, but that is slower of course. This is the price for the better type safety.
+
+@example
+
+/* Defining a virtual function */
+Virtuals( String, Base )
+        
+    int (* str_get_tokens)( String );
+
+EndOfVirtuals;
+
+/* Calling a virtual function; from the user point of view */
+int len;
+String my_string;
+
+len = StringVirtual( my_string )->str_get_tokens( my_string );
+
+/* Implementing the virtual function in the class implementation file */
+
+static int virtual_str_get_tokens( String self )
+@{
+    /* doing some important here with self */
+    return result;
+@}
+
+/* Initializing the virtual table in the class initialization handler */
+
+static void String_init( )
+@{
+    StringVtableInstance.str_get_tokens   =   virtual_str_get_token;
+@}
+
+@end example
+
+@subsection Overridden virtual functions
+
+Overriding the parent class's virtual functions is very easy in the class implementation file. It can be done in the class initialization code.
+
+@example
+
+/* Defining the virtual table */
+Virtuals( Utf8, String )
+                                  /* In this case there are no new Virtual functions, only the parent's ones */
+EndOfVirtuals;
+
+/* Implementing the virtual function in the class implementation file */
+
+static int utf8_get_tokens( String self )
+@{
+    /* doing some important here with self */
+    return result;
+@}
+
+/* Overriding the parent's virtual function pointer in the virtual table in the class initialization handler */
+
+static void Utf8_init( Class class )
+@{
+    Utf8VtableInstance.String.str_get_tokens   =   utf8_get_token;
+@}
+
+/* In the class's user code you can call the virtual in the same way: */
+
+len = Utf8Virtual( my_utf8 )->String.str_get_tokens( (String) my_utf8 );
+
+@end example
+
+@subsection Calling parent's virtual functions
+
+If you would like to call the parent class's virtual function (this may be necessary in the implementation code when you would like to chain the new class's virtual function to the parent's one, you can use other macro accessing the original (non-overridden) function:
+
+@example
+
+static int utf8_get_tokens( String self )
+@{
+    /* doing some important here with self, then chaining to the original parent's function: */
+        
+    return Utf8ParentVirtual( self )->str_get_tokens( self );
+@}
+
+@end example
+
+
+@section Class description table
+
+The Class description table is completely hidden from the user of the class. It is a static struct in the heap, created and initialized at compilation time.
+The identifier of the class is the address of this class description table, so you must refer to the class with the "address of" operator and the class name.
+
+You can allocate the class description table, the virtual table and some other helpers with a single macro:
+
+@example
+
+AllocateClass( String, Base );
+
+AllocateClass( Utf8, String );
+
+@end example
+
+@node Exception handling
+@chapter Exception handling
+
+However the exception handling from the user's point of view is very similar to the exception handling in C++, there are very significant differences that you must keep in mind!
+In @strong{ooc} the key differences are:
+@itemize @bullet
+@item
+There is @emph{no} stack unwinding!
+@item
+You must consider the side effects of optimizing compilers.
+@item
+There is an additional @code{finalize} option.
+@item
+You must close the section with an @code{end_try} statement.
+@item
+Every executed @code{try} must have an executed @code{end_try}!
+@end itemize
+
+@section Throwing an exception
+
+Throwing an exception is very easy with the @code{ooc_throw()} instruction. The parameter of the @code{ooc_throw()} is any @code{Object}. The object is "owned" by the exception handling mechanism and will be deleted by it, so never delete it yourself, and never throw an object, that you would like to use later.
+In practice I recommend throwing newly created objects of @code{Exception} class or its subclasses, like:
+
+@example
+if( error )
+    ooc_throw( str_exception_new( str_error_code ));
+@end example
+
+You can use @code{ooc_rethrow()} as well for passing the actual exception to the caller, but only inside a @code{catch()} or in a @code{catch_any} block.
+
+@section Catching an exception
+
+You can catch the thrown exceptions with the @code{catch()} or @code{catch_any} blocks.
+
+The @code{catch( Class )} block catches the objects of the specified class or its parent (super-) classes. The caught object is stored in a variable called @code{Object exception}, that is automatically defined and can be used only within the @code{catch} block.
+@sp 1
+The @code{catch_any} block catches all exceptions that were not handled by the earlier @code{catch} blocks. It is typically used for cleanup and rethrow of exception that could not be handled locally.
+You can use as many @code{cath()} blocks, as many you need, plus one @code{catch_any} block as the last one. Be careful with the ordering of the @code{catch()} blocks: catching a class means catching @emph{all of the parent classes} as well.
+@section Finalize the exception handling
+
+You can notice, that there is a @code{finalize} option as well, that will run in every case. It is very important that codes in the @code{finalize} block can not fail (can not throw any exception)! This section will run in every case, regardless of the existence of an exception, or if it was caught or not.
+The finalize block must be the last section of a @code{try ... end_try} block.
+
+@section Closing the @code{try} block
+
+You must close the @code{try} block sequence with an @code{end_try;} statement.
+You don't have to use all of the possible blocks in the @code{try ... end_try} block, however at least one @code{catch} or @code{catch_any} or @code{finalize} block must be used.
+Every executed @code{try} must have an executed @code{end_try}! In practice this means that you can NOT @code{return} from within the @code{try} block!
+
+@section Protecting dynamic memory blocks and objects
+
+Unlike C++ there is no stack unwinding during the exception handling! Consequently you must pay extra attention on memory handling in your routines: make sure that every temporarily allocated memory block is freed in case of an exception rises in the routine or in routines called. The simplest solution is a @code{try ... finalize ... end_try} block. It is relatively not computationally expensive, and is effective.
+For example the code below will lead to memory leak if there would arise an exception:
+
+@example
+void my_func( void )
+@{
+    char * mem;
+
+    mem = ooc_malloc( 1000 );
+
+    do_a_risky_call();    /* If this code throws an exception, then   */
+                          /* the mem will never be freed, causing a   */
+    ooc_free( mem );      /* memory leak!                             */
+@}
+@end example
+
+The correct solution is protecting the sensible variables like follows:
+
+@example
+void my_func( void )
+@{
+    char * volatile mem = NULL;
+
+    try @{
+        mem = ooc_malloc( 1000 );
+
+        do_a_risky_call();
+        @}
+    finalize @{
+        ooc_free( mem );
+        @}
+    end_try;
+@}
+@end example
+
+Listen to the followings in the above code:
+
+@itemize @bullet
+@item
+Use @code{volatile} storage class specifier for those variables that change their value in the @code{try} code section, and you would like to use this new value in any of the @code{catch} or @code{finalize} blocks, or after the @code{end_try} statement!
+This is necessary, because the @code{try} solution is based on @code{setjmp/longjmp},  that may change the register values, so we must prevent optimizing compilers using registers for these variables. Forgetting setting @code{volatile} typically brings you in a situation where the debugged code works properly, but the optimized release compilation fails.
+@sp 1
+@item
+Initialize the pointer variable with @code{NULL}!
+This is necessary because the local variable is located on the stack, and gets a random starting value. If you forget the initialization, and the memory allocation would fail, then freeing this pointer in the @code{finalize} section would refer to an undefined memory block, and most probably would cause a segmentation fault.
+@end itemize
+@sp 1
+If you carefully read the above, you will realize that the following code is still correct:
+
+@example
+void my_func( void )
+@{
+    char * mem = NULL;
+
+    mem = ooc_malloc( 1000 );
+
+    try 
+        do_a_risky_call();
+
+    finalize
+        ooc_free( mem );
+
+    end_try;
+@}
+@end example
+We did not had to mark the @code{mem} memory pointer as @code{volatile}, because the code section in the @code{try} block did not modified the value of @code{mem}.
+@sp 1
+In most cases you do not need protect your variables, think it over when it is really required.
+
+
+
+
+@node Using Classes
+@chapter Using Classes
+
+@section Initializing the class
+
+Before you can use your class, you must initialize it! Initializing a class will automatically initialize its superclasses, so if you have inherited your class from occ system classes (like RefCounted), you do not have to initialize them separately. However, because @strong{ooc} uses the @code{Exception} class internally, you must initialize it before calling any ooc function.
+
+@example
+
+int
+main( int argc, char * argv[] )
+@{
+    ooc_init_class( Exception );
+    ooc_init_class( MyClass );
+
+    do_my_program();
+
+    return 0;
+@}
+
+@end example
+
+@section Creating an object of a class
+
+Creating an object is easy with the @code{ooc_new} marco, or with the equivalent @code{ooc_new_classptr} function.
+@sp 1
+The @code{ooc_new( classname, void * param )} macro converts the Class name to the appropriate class description table address, and calls the @code{ooc_new_classptr} function. Use @code{ooc_new} when you create your class from a statically known class (you know the class name). The second parameter is passed to the class constructor code without any modification or check. You can parameterize your constructor this way, it is advisable passing a variable or struct pointer here. The variable or the struct must exist until the constructor returns!
+@sp 1
+The @code{ooc_new_classptr( Class class_ptr, void * param )} function creates an object of the class pointed by the first parameter. Use this function when you know only the class description table's address! This is very rare situation, and I guess it is mainly useful inside the @strong{ooc} code. The second parameter is passed to the class constructor code without any modification or check.
+@sp 1
+The above methods return objects of @code{Object} type.
+@sp 1
+Although using the @code{ooc_new} macro for object creation is easy, it is advisable to define a parameterized @code{..._new()} function for each class, because that way you can control the parameter checking, as well as the automatic conversion of return type (@code{ooc_new} returns @code{Object} that you must cast to the desired type).
+
+@example
+
+String str_new( char * initial )
+@{
+    return (String) ooc_new( String, initial );
+@}
+
+@end example
+
+@section Deleting an object
+The created objects must be deleted with one of the deletion functions. They @emph{must not} be freed with the standard memory handling functions, like @code{free} or @code{ooc_free}!
+
+@subsection Deleting an object directly
+Deleting an object can be done with the @code{ooc_delete( Object )} function. It calls the class destructors on the object, and frees the allocated memory. Any pointer to this object will not be usable after deleting the object!
+Use this way an object destruction when you would like to destroy objects that you did allocate temporarily in your C functions as local variables.
+
+@subsection Deleting object via pointer
+In many cases it is important to mark that the object has been deleted by nulling the pointer. But this operation rises some issues regarding circular object references, destroying non-complete ojects and multi-threading.
+@sp 1
+For your convenience there is the object deletion function via its pointer, @code{ooc_delete_and_null( Object *)}, which does exactly the same in a thread-safe (or at least reentrant) way.
+
+@example
+
+void String_destructor( Object _self )
+@{
+    String self = (String) _self;
+
+    /* Deletes the member object and nulls the pointer */
+    ooc_delete_and_null( & self->other );
+@}
+
+@end example
+
+Always use this way a object destruction when you would like to destroy objects that you did allocate globally or as members of other classes! Especially it is important in class destructor codes!
+
+@section Accessing class members
+The class members can be accessed via the object pointer if they are made public, although it is not an advisable method. It is recommended accessing the class members only via the class methods.
+
+@section Finalizing a class
+A class can be finalized when no longer needed, although it is not necessarily required. If your class has reserved some global resources, then you can release them in the class' finalize code.
+One may neglect finalizing, if known, that the class did not allocate any global resources. However it is a good practice to finalize the classes that are not needed in the future, especially in dinamically loadable modules.
+
+You can finalize all initialized classes:
+
+@example
+    ooc_finalize_all( );
+@end example
+as the last executed line in your code. In case of @code{ooc_finalize_all()} the class finalization is done in the reverse order of initialization.
+
+However @code{ooc_finalize_all()} is the preferred way, you can finalize a given class, like:
+
+@example
+    ooc_finalize_class( String );
+@end example
+
+But be very carefull, here! If you finalize a class that would be required for using or finalizing an other class then your code will crash! @code{ooc_finalize_all()} keeps track of class dependencies, so this problem does not exist that case.
+
+@node Implementing Classes
+@chapter Implementing Classes
+
+Implementing a new class is relatively simple. You have to create three (or two if you prefer) source files, preferably with the class name. Then you can use the class implementation macros defined in @code{ooc.h}, and must define the predefined mandatory class methods. 
+
+@section Naming conventions
+Although it is totally up to you, and has no effect on the operation of the @strong{ooc} toolkit, I recommend using the following naming conventions:
+@itemize @bullet
+@item
+The class name should be relatively short, let's say maximum eight-twelve characters.
+@item
+For file names use only lower case letters, like @code{foo.h}
+@item
+Use capital first letter for class names and as the object type, like @code{Foo}.
+@item
+Use a lower case initial for every class member function, making evident that this member function belongs to this class, like @code{foo_new}.
+@item
+You should not apply any initials for the class member names and virtual function names. They will be accessed unambigously.
+@end itemize
+
+@section Source files
+
+The following files must be created for implementing class Foo that is a subclass (child) of Parent:
+
+@itemize @bullet
+@item
+Class user header file. This contains the declarations of class Foo that are used by the users of the class.
+@item
+Class Implementation header file. This file contains all declarations that are protected for class Foo.
+@item
+Class implementation file. This file contains the declarations private to class foo and the class methods.
+@end itemize
+@section Class user header file
+This file should be named as @code{foo.h}.
+@sp 1
+In @code{foo.h} you must decalare the class and its virtual functions, plus the public methods of the class. @*
+You always have to use the virtual function definition block, even you class do not have any virtual function. In this case just leave this block empty.
+
+@example
+
+#ifndef FOO_H
+#define FOO_H 1
+
+#include "parent.h"
+
+DeclareClass( Foo, Parent );
+
+Virtuals( Foo, Parent )
+             
+EndOfVirtuals;
+
+/* Foo methods */
+
+Foo foo_new( int initial_value );
+
+int foo_get_value( void );
+
+#endif
+
+@end example
+Please note that there is no semicolon after the @code{Virtuals}.
+
+@section Class implementation header file
+The class implementation header file contains the definitions for data members of the class @code{Foo}.
+It is your choice if you creat a separate class implementation header, or you include this section in the @code{foo.h} as weel.
+@sp 1
+Including the implementation related definitions in the class user header file you make all class members public; in other word the user of class @code{foo} can access all data members simple via pointers.
+@sp 1
+Including the implementation related definition in a separeted class implementation header (e.g. called @code{impl_foo.h}) you make all data members protected; in other words the user of the class can not access it, but the subclasses always can.
+@sp 1
+Making really private members would be a bit complicated, and not supported by the macros.
+@sp 1
+The content of @code{impl_foo.h} should look like:
+
+@example
+
+#ifndef IMPLEMENT_FOO_H
+#define IMPLEMENT_FOO_H 1
+
+#include "impl_parent.h"
+#include "foo.h"
+
+ClassMembers( Foo, Parent )
+
+    int    data;
+    void * data_ptr;
+
+EndOfClassMembers;
+
+#endif
+
+@end example
+
+@section Class implementation file
+
+In the class implementation file you must allocate the class description table and the virtual table of the class. Then you must implement the mandatory class member functions as below. After this mandatory section you can implement your class methods.
+@sp 1
+The class implementation file may be called e.g. @code{foo.c}, but it can consist multiple files if necessary, of course.
+
+@subsection Class allocation
+
+@example
+
+#include "impl_foo.h"
+
+AllocateClass( Foo, Parent );
+
+@end example
+
+@subsection Class initialization
+
+The most of the class properties are initialized in compilation time. However the vtable can not be initialized perfectly, so initializing a class means building up the class's virtual table.
+@sp 1
+You must initialize the virtual table only if your class defines @emph{new} virtual functions; or you would like to override any virtual function of the parent class! If you don't have to do anything in the class initialization, just leave its body empty!
+@sp 1
+The mandatory function name for the class initialization function is the class name + the suffix of "_initialize".
+@sp 1
+This function has got a pointer to the class description table as parameter. You can access the class's virtual table via this pointer. The virtual table address is stored in the @code{vtable} field of the class description table, and the type of the virtual table is the class name concatenated with @code{Vtable}.
+@sp 1
+Example: overriding the parent's @code{print} virtual function:
+
+@example
+
+static
+void
+Foo_initialize( Class this )
+@{
+    FooVtable virtuals = (FooVtable) this->vtable;
+
+    virtuals->Parent.print = virtual_foo_print;
+@}
+
+@end example
+
+@sp 1
+Example: aquiring some global resources in the class initialization code:
+
+@example
+
+static List foo_list = NULL;
+
+static
+void
+Foo_initialize( Class this )
+@{
+    ooc_init_class( List ); /* make sure, that List has been initialized */
+
+    foo_list = list_new( ooc_delete );
+@}
+
+@end example
+
+You can call @code{ooc_init_class( ClassName )} as many times, you need, the @code{ClassName_initialize( Class )} function will be called only once. (Until @code{ooc_finalize_class( ClassName )} is not called.)
+
+You can throw exception in @code{ClassName_initialize( Class )} function.
+
+@subsection Class finalization
+
+If you have aquired some global resources during class initialization, you may want to release them before exiting your program. The class finalization method is there for this purpose.
+The class finalization must not throw an exception!
+
+@example
+
+static
+void
+Foo_finalize( Class this )
+@{
+    ooc_delete_and_null( & foo_list );
+@}
+
+@end example
+
+It is guaranteed, that @code{ClassName_finalize( Class )} is called only once for each @code{ClassName_initialize( Class )}.
+In most cases the class finalization is just a simple empty function, doing nothing.
+
+@subsection Constructor definition
+
+The constructor is responsible for building up an object of the class. The constructor has a fix name: the class name concatenated with @code{_constructor}.
+@sp 1
+In the constructor you can be sure, that all data members are set to 0 (or NULL in case of a pointer) prior calling the constructor.
+@sp 1
+If your class has a parent class (other than @code{Base}) then the @emph{first thing in a constructor is calling the parent class's constructor} using the @code{chain_constructor()} macro! It is advisable putting the @code{chain_constructor()} macro always at the begining of your constructor, because this practice makes the task of changing the inheritance more easy. The @code{chain_constructor()} macro has three parameters:
+
+@itemize
+@item
+Name of your @emph{actual} class,
+@item
+The actual object pointer,
+@item
+Parameters for the parent constructor.
+@end itemize
+
+The class constructor has two parameters: the address of the object itself as an @code{Foo} object, and a pointer to the parameters. This parameter pointer was the second parameter of the @code{ooc_new()} function, or was assigned by the subclass constructor by the @code{chain_constructor()} macro.
+
+@example
+
+static
+void
+Foo_constructor( Foo self, const void * params )
+@{
+    assert( ooc_isInitialized( Foo ) );       /* It is advisable checking if the class has
+                                                 been initialized before the first use */
+    chain_constructor( Foo, self, NULL );     /* Call parent's constructor first! */
+
+    self->data = * ( (int*) params );
+@}
+
+@end example
+
+If you encounter any problem in the construction code, you can throw an exception here.
+@sp 1
+It is advisable defining a convenient wrapper around the @code{ooc_new()} call to make the parameter type checking perfect and being able to aggregate multiple parameters into a single parameter struct, that can be forwarded to the @code{ooc_new()} as the second parameter, and not less importantly converting the returned @code{Object} type automatically to your specific object type.
+
+@example
+
+Foo
+Foo_new( int initial_value )
+@{
+    return (Foo) ooc_new( Foo, & initial_value );
+@}
+
+@end example
+
+@subsection Copy constructor definition
+
+The copy constructor creates a second object of your class. The @code{ooc_duplicate} uses this constructor when creating a duplicate of the class.
+@sp 1
+The copy constructor has a fix name: the class name concatenated with @code{_copy}. @*
+The copy constructor has two parameters: a pointer to the new object, and a pointer to the object that is copied.@*
+The copy constructor must return:
+@itemize @bullet
+@item
+TRUE, if you have copied the object succesfully,
+@item
+FALSE, if you have not copied anything, and the default copy must be applied.
+@end itemize
+When entering into the copy constructor you can be sure that all the parent class' members are already copied succesfully, and all class members are set to 0 or NULL.
+@sp 1
+If you encounter any problem in the construction code, you can throw an exception here.
+
+@subsubsection Using the default copy constructor
+
+If your class do not require any special action when it is copied (the bit-by-bit copy is OK) then you can leave all the task to the class manager, by simply returning FALSE:
+
+@example
+
+static
+int
+Foo_copy( Foo self, const Foo from )
+@{
+    /* makes the default object copying (bit-by-bit) */
+    return FALSE;
+@}
+
+@end example
+
+But be careful with the default copying! Copying pointers may lead unexpected double frees of memory block and may crash! Make your own copy, if you have pointers, reference counted pointers, etc.!
+@sp 1
+An other aspect is the performance. Because the default copy uses the @code{memcpy()} for completing the copy of an object, it is a bit "expensive", it has too much overhead. If your program is using @code{ooc_duplicate()} extensively, it is recommended creating your own copy constructor for smaller objects.
+
+@subsubsection Creating your own copy constructor
+
+Creating your own copy constructor is simply, and mostly self-explanatory. 
+
+@example
+
+static
+int
+Foo_copy( Foo self, const Foo from )
+@{
+    self->data  =  from->data;
+
+    return TRUE;
+@}
+
+@end example
+
+Do not forget to @emph{return TRUE}, otherwise the default copy will run and will overwrite everything that you made!
+
+@subsubsection Disabling the copy constructor
+
+Unfortunately it is not possible disabling the copy constructor in compilation time, like in C++. (In C++ this is the technique making the mandatory copy constructor @code{private: Foo::Foo( Foo& )}, so noone will be able to access it.)@*
+However you can prevent copying the object in runtime, simply by throwing an @code{Exception} with the @code{err_can_not_be_duplicated} error code.
+
+@example
+
+static
+int
+Foo_copy( Foo self, const Foo from )
+@{
+    ooc_throw( exception_new( err_can_not_be_duplicated ) );
+
+    return TRUE; /* just to make the compiler happy */
+@}
+
+@end example
+
+@subsection Destructor definition
+
+The destructor destroys the object of your class before releasing the allocated memory. The @code{ooc_delete} uses this constructor when deleting an object.
+@sp 1
+The destructor has a fix name: the class name concatenated with @code{_destructor}. @*
+The destructor has a single parameter: a pointer to the object to be detroyed.
+@sp 1
+Within the destructor you can @emph{not} throw any exception! You should use only @code{ooc_delete_and_null()} @code{and ooc_free_and_null()} in destructors.
+
+@example
+
+static
+void
+Foo_destructor( Foo self )
+@{
+    ooc_free_and_null( &data_ptr );
+@}
+
+@end example
+
+Be carefull, that your code in the destructor must be reentrant! This is important because in case of circular references, the destructor may be invoked multiple times for the same object. And the destructor must work with partially complete object as well!
+
+
+@subsection Implementing class methods
+
+The class methods are normal C functions with the first parameter as a pointer to the object.
+@sp 1
+Because there is no real parameter type checking in C when calling this class method, it is possible to pass @emph{anything} to the class method as its first parameter! This is error prone, so it is a good practice to always check the first parameter within the class method!
+
+@subsubsection Non-virtual methods
+
+Non-virtual methods are global C functions.
+
+@example
+
+void
+foo_add_data( Foo self, int size )
+@{
+    assert( ooc_isInstanceOf( self, Foo ) );
+
+    self->data_ptr = ooc_malloc( size );
+@}
+
+@end example
+
+
+@subsubsection Virtual methods
+
+Virtual methods are static C functions, that are accessed via pointers in the virtual table.
+@sp 1
+See section "Virtual Functions" for more information!
+
+@node Memory handling
+@chapter Memory handling
+
+There are basic memory handling wrappers around the standard C library memory handling routines. The key difference is, that the @strong{ooc} memory handling throws exceptions in case of a system failure, and performs some tasks that are necessary for multi-threaded or reentrant programming.
+
+@section Memory allocation
+
+You can allocate memory with the following routines:
+
+@code{void * ooc_malloc( size_t size );} @*@*
+
+The same to the standard @code{malloc}, except that throws an exception on failure, thus never returns @code{NULL}.
+@sp 1
+
+@code{void * ooc_calloc( size_t num, size_t size );} @*@*
+
+The same to the standard @code{calloc}, except that throws an exception on failure, thus never returns @code{NULL}.
+@sp 1
+
+@code{void * ooc_realloc( void *ptr, size_t size );} @*@*
+
+The same to the standard @code{realloc}, except that throws an exception on failure, thus never returns @code{NULL}.
+@sp 1
+
+@code{void * ooc_memdup( const void * ptr, size_t size );} @*@*
+
+Duplicates a memory block using the standard @code{memcpy}, and throws an exception on failure, thus never returns @code{NULL}.
+
+@section Freeing the allocated memory
+
+Deallocate the memory with one of the following methods:
+
+@code{void ooc_free( void * mem );} @*@*
+
+Frees a memory block allocated with one of the above allocation codes. Never failes, @code{mem} can be @code{NULL};
+@sp 1
+
+@code{void ooc_free_and_null( void ** mem_ptr );} @*@*
+
+Frees a memory block via a memory pointer and nulls the pointer simultaneously. It is very important for thread-safe or reentrant codes. It is also very important for freeing memory blocks with circular references. @code{mem_ptr} can point to a NULL pointer.
+@sp 1
+Always use this, if your class has a memory pointer as a class member, for example in a class destructor!
+
+@section Thread safety
+@emph{Important!} @strong{ooc} is thread safe @emph{only} if the underlying standard C library (malloc, calloc, realloc, setjmp/longjmp) is thread-safe too!
+@sp 1
+The thread safety of @strong{ooc} does not mean that your code will be thread safe automatically! You must take care about the proper thread-safe implementation of your classes!
+@sp 1
+The @code{ooc_init_class()}, @code{ooc_finalize_class()} and @code{ooc_finalize_all()} functions are @emph{not} thread safe! It is advisable calling @code{ooc_init_class()} from the main thread before the fork and @code{ooc_finalize_all()} after the join.
+
+@node GNU Free Documentation License
+@appendix GNU Free Documentation License
+
+@include fdl.texi
+
+@node Table of Figures
+@unnumbered Table of Figures
+
+@listoffloats Figure
+
+@node Indices
+@unnumbered Index
+
+@printindex cp
+
+@bye
+
+

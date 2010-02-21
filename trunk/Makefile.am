@@ -1,0 +1,1 @@
+SUBDIRS = libs docs tools
