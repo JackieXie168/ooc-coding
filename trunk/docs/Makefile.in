@@ -408,7 +408,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic mostlyclean-am
+clean-am: clean-generic clean-local mostlyclean-am
 
 distclean: distclean-am
 	-rm -f Makefile
@@ -535,15 +535,15 @@ ps: ps-am
 ps-am: $(PSS)
 
 uninstall-am: uninstall-dvi-am uninstall-html-am uninstall-info-am \
-	uninstall-pdf-am uninstall-ps-am
+	uninstall-local uninstall-pdf-am uninstall-ps-am
 
 .MAKE: install-am install-strip
 
-.PHONY: all all-am check check-am clean clean-generic dist-info \
-	distclean distclean-generic distdir dvi dvi-am html html-am \
-	html-local info info-am install install-am install-data \
-	install-data-am install-dvi install-dvi-am install-exec \
-	install-exec-am install-html install-html-am \
+.PHONY: all all-am check check-am clean clean-generic clean-local \
+	dist-info distclean distclean-generic distdir dvi dvi-am html \
+	html-am html-local info info-am install install-am \
+	install-data install-data-am install-dvi install-dvi-am \
+	install-exec install-exec-am install-html install-html-am \
 	install-html-local install-info install-info-am install-man \
 	install-pdf install-pdf-am install-ps install-ps-am \
 	install-strip installcheck installcheck-am installdirs \
@@ -551,16 +551,23 @@ uninstall-am: uninstall-dvi-am uninstall-html-am uninstall-info-am \
 	maintainer-clean-generic maintainer-clean-vti mostlyclean \
 	mostlyclean-aminfo mostlyclean-generic mostlyclean-vti pdf \
 	pdf-am ps ps-am uninstall uninstall-am uninstall-dvi-am \
-	uninstall-html-am uninstall-info-am uninstall-pdf-am \
-	uninstall-ps-am
+	uninstall-html-am uninstall-info-am uninstall-local \
+	uninstall-pdf-am uninstall-ps-am
 
 
 html-local:
 	cp *.png $(HTMLS)
 	doxygen Doxyfile.linux
 
+clean-local:
+	rm -rf api
+
 install-html-local:
-	cp -r api ${docdir}
+	mkdir -p $(DESTDIR)${docdir}
+	cp -r api $(DESTDIR)${docdir}
+
+uninstall-local:
+	rm -rf $(DESTDIR)${docdir}/api
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
