@@ -29,7 +29,7 @@ supports it in developing GNU and promoting software freedom.''
 @titlepage
 @title Object Oriented C (ooc) toolkit
 @subtitle for version @value{VERSION}, @value{UPDATED}
-@author Tibor Miseta (@email{Tibor Miseta at gmail dot com})
+@author Tibor Miseta
 @page
 @vskip 0pt plus 1filll
 @insertcopying
@@ -808,7 +808,7 @@ static
 void
 Foo_destructor( Foo self )
 @{
-    ooc_free_and_null( &data_ptr );
+    ooc_free_and_null( & self->data_ptr );
 @}
 
 @end example

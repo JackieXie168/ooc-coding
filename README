@@ -25,6 +25,12 @@ Read the tutorials, (usually) installed here:
 The API doc can be found (usually) here:
 	usr/local/share/doc/ooc/api/html/index.html
 
+Use the ooc tool:
+	ooc --help
+
+Compile your own code:
+	gcc `pkg-config --cflags --libs ooc' my_program.c
+
 Install on Windows or other platforms:
 ======================================
 

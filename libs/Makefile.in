@@ -56,7 +56,8 @@ AR = ar
 ARFLAGS = cru
 libooc_a_AR = $(AR) $(ARFLAGS)
 libooc_a_LIBADD =
-am_libooc_a_OBJECTS = *.$(OBJEXT)
+am_libooc_a_OBJECTS = ooc.$(OBJEXT) exception.$(OBJEXT) list.$(OBJEXT) \
+	vector.$(OBJEXT) refcounted.$(OBJEXT) signal.$(OBJEXT)
 libooc_a_OBJECTS = $(am_libooc_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -161,7 +162,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CPPFLAGS = -DNDEBUG
 pkglib_LIBRARIES = libooc.a
-libooc_a_SOURCES = *.c
+libooc_a_SOURCES = ooc.c exception.c list.c vector.c refcounted.c signal.c
 nobase_pkginclude_HEADERS = *.h implement/*.h
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = ooc.pc
@@ -240,7 +241,12 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/*.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exception.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/list.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ooc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/refcounted.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/signal.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vector.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
