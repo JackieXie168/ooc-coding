@@ -1,0 +1,4 @@
+0.9.b
+Adding type safe cast, ooc_cast functionality.
+Adding ooc_use and ooc_release functionality.
+

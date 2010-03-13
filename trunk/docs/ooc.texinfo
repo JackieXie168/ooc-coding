@@ -259,7 +259,8 @@ If you would like to call the parent class's virtual function (this may be neces
 
 static int utf8_get_tokens( String self )
 @{
-    /* doing some important here with self, then chaining to the original parent's function: */
+    /* doing some important stuff here with self,
+       then chaining to the original parent's function: */
         
     return Utf8ParentVirtual( self )->str_get_tokens( self );
 @}
@@ -343,9 +344,9 @@ void my_func( void )
 
     mem = ooc_malloc( 1000 );
 
-    do_a_risky_call();    /* If this code throws an exception, then   */
-                          /* the mem will never be freed, causing a   */
-    ooc_free( mem );      /* memory leak!                             */
+    do_a_risky_call(); /* If this code throws an exception then  */
+                       /* the mem will never be freed, causing a */
+    ooc_free( mem );   /* memory leak!                           */
 @}
 @end example
 
@@ -373,7 +374,7 @@ Listen to the followings in the above code:
 @itemize @bullet
 @item
 Use @code{volatile} storage class specifier for those variables that change their value in the @code{try} code section, and you would like to use this new value in any of the @code{catch} or @code{finalize} blocks, or after the @code{end_try} statement!
-This is necessary, because the @code{try} solution is based on @code{setjmp/longjmp},  that may change the register values, so we must prevent optimizing compilers using registers for these variables. Forgetting setting @code{volatile} typically brings you in a situation where the debugged code works properly, but the optimized release compilation fails.
+This is necessary, because the @code{try} solution is based on @code{setjmp/longjmp},  that may change the register values, so we must prevent optimizing compilers using registers for these variables. Forgetting setting @code{volatile} typically brings you in a situation where the debugged code works properly, but the optimized release fails while handling exceptions.
 @sp 1
 @item
 Initialize the pointer variable with @code{NULL}!
@@ -484,17 +485,70 @@ One may neglect finalizing, if known, that the class did not allocate any global
 You can finalize all initialized classes:
 
 @example
-    ooc_finalize_all( );
+ooc_finalize_all( );
 @end example
 as the last executed line in your code. In case of @code{ooc_finalize_all()} the class finalization is done in the reverse order of initialization.
 
 However @code{ooc_finalize_all()} is the preferred way, you can finalize a given class, like:
 
 @example
-    ooc_finalize_class( String );
+ooc_finalize_class( String );
 @end example
 
 But be very carefull, here! If you finalize a class that would be required for using or finalizing an other class then your code will crash! @code{ooc_finalize_all()} keeps track of class dependencies, so this problem does not exist that case.
+
+@section Dynamic type checking
+
+@strong{ooc} provides dynamic type safety for your objects, because the object types are known in run time. You can safely cast @code{Object}s using the @code{ooc_cast} macro. If the cast fails then @code{err_bad_cast} exception is thrown. An example of using the dynamic cast in ooc:
+
+@example
+DeclareClass( String, Base );
+DeclareClass( Utf8, String );
+DeclareClass( Something, Base );
+
+Something something = something_new();
+Utf8   my_utf8_string = utf8_new( "This is an utf8 string." );
+String my_string;
+
+my_string = ooc_cast( my_utf8_string, String ); /* Correct */
+my_string = ooc_cast( something, String );      /* Can not be cast,
+                                                   exception is thrown */
+@end example
+
+You can also retrieve the type of an @code{Object}. The @code{ooc_get_type} function returns the type of an object in run time (actually returns a pointer to the class description table). If the parameter is not a valid @code{Object} then @code{err_bad_cast} exception is thrown. An example of retriving of the object type in ooc:
+
+@example
+String my_string = string_new( "Test string." );
+
+printf( "The type of my_string is: %s\n", ooc_get_type( my_string )->name );
+@end example
+This example prints @code{The type of my_string is: String} on the display.
+@sp 1
+You can use this function for comparing object types, like
+@example
+if( ooc_get_type( my_object ) == StringClass )
+    ... process my_object as a String object here
+else if ( ooc_get_type( my_object ) == SomeOtherClass )
+        ... process my_object as a SomeOther object here
+@end example
+Please note the @code{Class} suffix to the object's typename. This pointer to the static class description table is defined for each class.
+@sp 1
+But there is a more convenient way for dynamic type checking in ooc, that handles the class inheritance correctly. The @code{ooc_isInstanceOf} macro returns @code{TRUE} if the object is an instance of a given class or of any of its superclasses, @code{FALSE} otherwise. The typical use of this kind type checking is at the very beginning of the class methods, to make sure that the parameter object is of the right type. Because this is a bit computationally "expensive" operation, it is usually placed into an @code{assert} macro, that lets you some control distinguishing debug and release versions.
+
+@example
+void
+string_example_method( String self )
+@{
+    assert( ooc_isInstanceOf( self, String ) );
+
+    /* Do your method here!
+       You can be sure, that self is a valid
+       instance of String class.
+       (At least in the debug version!)
+    */
+@}
+@end example
+
 
 @node Implementing Classes
 @chapter Implementing Classes
@@ -844,6 +898,65 @@ foo_add_data( Foo self, int size )
 Virtual methods are static C functions, that are accessed via pointers in the virtual table.
 @sp 1
 See section "Virtual Functions" for more information!
+
+@section Classes that have other classes
+
+You can have classes that embody other classes. You may implement them as normal objects, and use @code{ooc_new()} in the outer objects constructor, to allocate and build the related object, like:
+
+@example
+ClassMembers( Foo, Base )
+    Bar    bar;
+EndOfClassMembers;
+
+    ....
+
+static
+void
+Foo_constructor( Foo self, const void * params )
+@{
+    chain_constructor( Foo, self, NULL );
+
+    bar = ooc_new( Bar, params );
+@}
+
+static
+void
+Foo_destructor( Foo self )
+@{
+    ooc_delete_and_null( (Object*) & self->bar );
+@}
+@end example
+
+In this example Foo object can be considered, that it @emph{has} a Bar object as a member. But this way of constructing the Foo object is not effective, because there are two memory allocations: one for Foo and the other for Bar in Foo's constructor. This requires more time, and leads to more fragmented memory. It would be a better idea to include the body of the Bar object completly into the Foo object. You can do it, but must take care, that you must use @code{ooc_use} and @code{ooc_release} instead of @code{ooc_new} and @code{ooc_delete} respectively, because there is no need for additional memory allocation and deallocation for the Bar object!@*
+The above example rewritten:
+
+@example
+ClassMembers( Foo, Base )
+    struct BarObject    bar;
+EndOfClassMembers;
+
+    ....
+
+static
+void
+Foo_constructor( Foo self, const void * params )
+@{
+    chain_constructor( Foo, self, NULL );
+
+    ooc_use( & self->bar, Bar, params );
+@}
+
+static
+void
+Foo_destructor( Foo self )
+@{
+    ooc_release( (Object) & self->bar );
+@}
+@end example
+Less malloc(), better performance!@*
+Of course, in this case you can access the member of the included Bar objects a bit different: instead of @code{self->bar->data} you must reference as @code{self->bar.data}.@*
+
+Never use either the object inclusion, nor @code{ooc_release()} for reference counted objects! The reference counting will not work for included objects!
 
 @node Memory handling
 @chapter Memory handling
