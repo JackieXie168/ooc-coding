@@ -130,6 +130,33 @@ ooc_finalize_all( void )
 /*	Creating a new Object
  */
 
+STIN
+void
+ooc_build_object( Object object, const Class type, const void * params )
+{
+	/* Building the Object header */
+	object->_vtab = type->vtable;		/* Vtable pointer */
+	
+		assert( sizeof( struct BaseObject ) == sizeof( struct BaseVtable * ) );
+		/* If struct BaseObject has been changed, additional initialization might be missing here! */
+
+	/* Constructs the object instance, that may fail */
+	type->ctor( object, params );	
+}
+
+void
+ooc_use_classptr( void * mem, const Class type, const void * params )
+{
+	Object object = (Object) mem;
+	
+	/* The class type must be initialized already! */
+	assert( _ooc_isInitialized( type ) );
+	
+	memset( object, 0, type->size );  /* the constructor expects everything to be zeroed */
+	
+	ooc_build_object( object, type, params );
+}
+	
 Object
 ooc_new_classptr( const Class type, const void * params )
 {
@@ -142,13 +169,7 @@ ooc_new_classptr( const Class type, const void * params )
 		/* Allocates a memory block for the object instance, and initializes it with zeros */
 		object = ooc_calloc(  1, type->size );
 
-		/* Initializes the Object header */
-		object->_vtab = type->vtable;		/* Vtable pointer */
-			assert( sizeof( struct BaseObject ) == sizeof( struct BaseVtable * ) );
-			/* If struct BaseObject has been changed, additional initialization is missing here! */
-
-		/* Constructs the object instance, that may fail */
-		type->ctor( object, params );	
+		ooc_build_object( object, type, params );
 		}
 	catch_any {
 		/* If the allocation or the constructor failed, frees the object */
@@ -214,6 +235,32 @@ ooc_duplicate( const Object from )
 /*	Deletes an object
  */
 
+STIN
+void
+ooc_destroy_object( Object self )
+{
+	Class type;
+
+	assert( self != NULL );
+	
+	type = self->_vtab->_class;
+
+	/* destruct first */
+	type->dtor( self );
+
+	/* destruct the parents */
+	while( has_parent( type ) ) {
+		type = type->parent;
+		type->dtor( self );
+		}	
+}
+
+void
+ooc_release( Object self )
+{
+	ooc_destroy_object( self );
+}
+
 void
 ooc_delete( Object self )
 {
@@ -234,21 +281,8 @@ static
 void
 Base_delete( Object self )
 {
-	Class type;
-
-	assert( self != NULL );
+	ooc_destroy_object( self );
 	
-	type = self->_vtab->_class;
-
-	/* destruct first */
-	type->dtor( self );
-
-	/* destruct the parents */
-	while( has_parent( type ) ) {
-		type = type->parent;
-		type->dtor( self );
-		}
-
 	free( self );
 }
 
@@ -302,11 +336,25 @@ _ooc_isInstanceOf( const void * _self, const Class base )
 	return ooc_isClassChildOf( self->_vtab->_class, base );
 }
 
-Class
-ooc_get_type( const Object obj )
+void *
+_ooc_check_cast( void * _self, const Class target )
 {
-	return (Class ) ( obj->_vtab->_class );
+	if( ! _ooc_isInstanceOf( _self, target ) )
+		ooc_throw( exception_new( err_bad_cast ) );
+		
+	return _self;
 }
+
+
+Class
+ooc_get_type( const Object self )
+{
+	if( (! self) || (! self->_vtab) || (! self->_vtab->_class) )
+		ooc_throw( exception_new( err_bad_cast ) );
+
+	return ( Class ) ( self->_vtab->_class );
+}
+
 
 /* Implementation of memory handling
  *

@@ -56,14 +56,20 @@ Object		ooc_duplicate( const Object );				/* Copy constructor */
 void		ooc_delete( Object );						/* Deletes an Object */
 void		ooc_delete_and_null( Object * );			/* Deletes an Object via a pointer, and NULL the pointer thread safely */
 
+#define		ooc_use( mem, pClass, pPar ) ooc_use_classptr( mem, & pClass ## Class, pPar ) /* Creates a new object from class */
+void		ooc_use_classptr( void * mem, const Class, const void * );	
+void		ooc_release( Object );
+
 /*	Type checking helpers
  */
 
 #define     ooc_isInitialized( pClass ) _ooc_isInitialized( & pClass ## Class )
 #define     ooc_isInstanceOf( pObj, pClass )  _ooc_isInstanceOf( pObj, & pClass ## Class )
+#define     ooc_cast( pObj, pClass )  ( (pClass) _ooc_check_cast( pObj, & pClass ## Class ) )
 Class		ooc_get_type( const Object );
 int			_ooc_isInitialized( const Class );
 int			_ooc_isInstanceOf( const void * _self, const Class base );
+void *		_ooc_check_cast( void * _self, const Class target );
 
 /*	Memory handling
  */
