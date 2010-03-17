@@ -11,6 +11,7 @@ ClassMembers( List, Base )
     ListIterator		first;
     ListIterator		last;
     
+    Class				type;
     list_item_destroyer	destroy;
 
 EndOfClassMembers;

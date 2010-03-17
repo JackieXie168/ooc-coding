@@ -1,1 +1,1 @@
-SUBDIRS = libs docs tools
+SUBDIRS = libs docs tools tests

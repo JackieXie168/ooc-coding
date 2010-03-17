@@ -65,6 +65,30 @@ typedef int (*	list_item_checker) ( void * item, void * param );
 
 List            list_new( list_item_destroyer destroyer );
 
+/** Creates a new List of a given type.
+ * Creates an empty typed List.
+ * @param	type		The type of the List. It is guaranteed, that the list holds this type of Objects only.
+ * 						Trying to put different Object into the List will cause throwing an @c Exception with 
+ * 						@c err_bad_cast error code.
+ * @param	manage		@c TRUE if the List must manage the Objects put in the List, @c FALSE if not.
+ * @return	The List.
+ * @see 	list_new_type()
+ */
+
+List            _list_new_type( Class type, int manage );
+
+/** @def list_new_type( pClass, manage )
+ *  @brief	Convenient macro for creating typed List.
+ *  @param	 pClass		The type of the List. It is guaranteed, that the list holds this type of Objects only.
+ * 						Trying to put different Object into the List will cause throwing an @c Exception with 
+ * 						@c err_bad_cast error code.
+ * @param	manage		@c TRUE if the List must manage the Objects put in the List, @c FALSE if not.
+ * @return	The List.
+ * @see 	_list_new_type()
+ */
+ 
+#define			list_new_type( pClass, manage ) _list_new_type( & pClass ## Class, manage )
+
 /** Appends an item to the end of the list.
  * @param	list	The list
  * @param	item	The item to be appended. The list takes over the ownership of the item

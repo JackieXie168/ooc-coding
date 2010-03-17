@@ -8,6 +8,9 @@
 <tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.946824829" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug"/>
 <tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1092761254" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug">
 <option id="gnu.c.compiler.option.misc.other.1332398387" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0 `pkg-config --cflags glib-2.0`" valueType="string"/>
+<option id="gnu.c.compiler.option.preprocessor.def.symbols.1695187287" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+<listOptionValue builtIn="false" value="VERSION=&quot;\&quot;NO release\&quot;&quot;"/>
+</option>
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1526092090" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug">
 <option id="gnu.c.link.option.libs.1167956335" superClass="gnu.c.link.option.libs"/>
@@ -23,29 +26,6 @@
 <tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1092761254./ooc_tools/template/sample.c" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1092761254"/>
 </resourceConfiguration>
 <resourceConfiguration exclude="true" id="cdt.managedbuild.config.gnu.exe.debug.2118225604./ooc_tools/template/sample.h" name="sample.h" rcbsApplicability="disable" resourcePath="/tools/template/sample.h" toolsToInvoke=""/>
-</configuration>
-<configuration artifactName="ooc" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.config.gnu.exe.release.1690756687" name="Release" parent="cdt.managedbuild.config.gnu.exe.release">
-<toolChain id="cdt.managedbuild.toolchain.gnu.exe.release.52488185" name="GCC Tool Chain" superClass="cdt.managedbuild.toolchain.gnu.exe.release">
-<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.1479139504" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release"/>
-<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.release.2067501255" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.release">
-<option id="gnu.c.compiler.option.misc.other.1286710944" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0 `pkg-config --cflags glib-2.0`" valueType="string"/>
-<option id="gnu.c.compiler.option.preprocessor.def.symbols.304379800" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
-<listOptionValue builtIn="false" value="NDEBUG"/>
-</option>
-</tool>
-<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.release.463018917" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.release">
-<option id="gnu.c.link.option.libs.1378893900" superClass="gnu.c.link.option.libs"/>
-<option id="gnu.c.link.option.ldflags.870874244" superClass="gnu.c.link.option.ldflags" value="`pkg-config --libs glib-2.0`" valueType="string"/>
-</tool>
-<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.688865393" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.release"/>
-<tool id="cdt.managedbuild.tool.gnu.assembler.exe.release.1015659931" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.release"/>
-<macros/>
-</toolChain>
-<resourceConfiguration exclude="true" id="cdt.managedbuild.config.gnu.exe.release.1690756687./ooc_tools/template/implement/sample.h" name="sample.h" rcbsApplicability="disable" resourcePath="/tools/template/implement/sample.h" toolsToInvoke=""/>
-<resourceConfiguration exclude="true" id="cdt.managedbuild.config.gnu.exe.release.1690756687./ooc_tools/template/sample.c" name="sample.c" rcbsApplicability="disable" resourcePath="/tools/template/sample.c" toolsToInvoke="cdt.managedbuild.tool.gnu.c.compiler.exe.release.2067501255./ooc_tools/template/sample.c">
-<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.release.2067501255./ooc_tools/template/sample.c" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.release.2067501255"/>
-</resourceConfiguration>
-<resourceConfiguration exclude="true" id="cdt.managedbuild.config.gnu.exe.release.1690756687./ooc_tools/template/sample.h" name="sample.h" rcbsApplicability="disable" resourcePath="/tools/template/sample.h" toolsToInvoke=""/>
 </configuration>
 <macros/>
 </project>

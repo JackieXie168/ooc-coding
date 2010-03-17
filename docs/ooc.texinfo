@@ -782,9 +782,11 @@ The copy constructor has two parameters: a pointer to the new object, and a poin
 The copy constructor must return:
 @itemize @bullet
 @item
-TRUE, if you have copied the object succesfully,
+@code{OOC_COPY_DONE}, if you have copied the object succesfully,
 @item
-FALSE, if you have not copied anything, and the default copy must be applied.
+@code{OOC_COPY_DEFAULT}, if you have not copied anything, and the default copy must be applied,
+@item
+@code{OOC_NO_COPY}, if this object can not be copied.
 @end itemize
 When entering into the copy constructor you can be sure that all the parent class' members are already copied succesfully, and all class members are set to 0 or NULL.
 @sp 1
@@ -792,7 +794,7 @@ If you encounter any problem in the construction code, you can throw an exceptio
 
 @subsubsection Using the default copy constructor
 
-If your class do not require any special action when it is copied (the bit-by-bit copy is OK) then you can leave all the task to the class manager, by simply returning FALSE:
+If your class do not require any special action when it is copied (the bit-by-bit copy is OK) then you can leave all the task to the class manager, by simply returning @code{OOC_COPY_DEFAULT}:
 
 @example
 
@@ -801,7 +803,7 @@ int
 Foo_copy( Foo self, const Foo from )
 @{
     /* makes the default object copying (bit-by-bit) */
-    return FALSE;
+    return OOC_COPY_DEFAULT;
 @}
 
 @end example
@@ -822,17 +824,17 @@ Foo_copy( Foo self, const Foo from )
 @{
     self->data  =  from->data;
 
-    return TRUE;
+    return OOC_COPY_DONE;
 @}
 
 @end example
 
-Do not forget to @emph{return TRUE}, otherwise the default copy will run and will overwrite everything that you made!
+Do not forget to @emph{return OOC_COPY_DONE}, otherwise the default copy will run and will overwrite everything that you made!
 
 @subsubsection Disabling the copy constructor
 
 Unfortunately it is not possible disabling the copy constructor in compilation time, like in C++. (In C++ this is the technique making the mandatory copy constructor @code{private: Foo::Foo( Foo& )}, so noone will be able to access it.)@*
-However you can prevent copying the object in runtime, simply by throwing an @code{Exception} with the @code{err_can_not_be_duplicated} error code.
+However you can prevent copying the object in runtime, simply returning @code{OOC_NO_COPY}, that forces throwing an @code{Exception} with the @code{err_can_not_be_duplicated} error code.
 
 @example
 
@@ -840,9 +842,7 @@ static
 int
 Foo_copy( Foo self, const Foo from )
 @{
-    ooc_throw( exception_new( err_can_not_be_duplicated ) );
-
-    return TRUE; /* just to make the compiler happy */
+    return OOC_NO_COPY;
 @}
 
 @end example
@@ -967,22 +967,22 @@ There are basic memory handling wrappers around the standard C library memory ha
 
 You can allocate memory with the following routines:
 
-@code{void * ooc_malloc( size_t size );} @*@*
+@code{void * ooc_malloc( size_t size );} @*
 
 The same to the standard @code{malloc}, except that throws an exception on failure, thus never returns @code{NULL}.
 @sp 1
 
-@code{void * ooc_calloc( size_t num, size_t size );} @*@*
+@code{void * ooc_calloc( size_t num, size_t size );} @*
 
 The same to the standard @code{calloc}, except that throws an exception on failure, thus never returns @code{NULL}.
 @sp 1
 
-@code{void * ooc_realloc( void *ptr, size_t size );} @*@*
+@code{void * ooc_realloc( void *ptr, size_t size );} @*
 
 The same to the standard @code{realloc}, except that throws an exception on failure, thus never returns @code{NULL}.
 @sp 1
 
-@code{void * ooc_memdup( const void * ptr, size_t size );} @*@*
+@code{void * ooc_memdup( const void * ptr, size_t size );} @*
 
 Duplicates a memory block using the standard @code{memcpy}, and throws an exception on failure, thus never returns @code{NULL}.
 
@@ -990,12 +990,12 @@ Duplicates a memory block using the standard @code{memcpy}, and throws an except
 
 Deallocate the memory with one of the following methods:
 
-@code{void ooc_free( void * mem );} @*@*
+@code{void ooc_free( void * mem );} @*
 
 Frees a memory block allocated with one of the above allocation codes. Never failes, @code{mem} can be @code{NULL};
 @sp 1
 
-@code{void ooc_free_and_null( void ** mem_ptr );} @*@*
+@code{void ooc_free_and_null( void ** mem_ptr );} @*
 
 Frees a memory block via a memory pointer and nulls the pointer simultaneously. It is very important for thread-safe or reentrant codes. It is also very important for freeing memory blocks with circular references. @code{mem_ptr} can point to a NULL pointer.
 @sp 1

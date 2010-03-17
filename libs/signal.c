@@ -96,7 +96,7 @@ static
 int
 SignalItem_copy( SignalItem self, const SignalItem from )
 {
-	return FALSE;
+	return OOC_COPY_DEFAULT;
 }
 
 static
@@ -191,7 +191,7 @@ static
 int
 Signal_copy( Signal self, const Signal from )
 {
-	return FALSE;
+	return OOC_COPY_DEFAULT;
 }
 
 static

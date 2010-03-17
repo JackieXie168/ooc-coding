@@ -64,10 +64,12 @@ void		ooc_release( Object );
  */
 
 #define     ooc_isInitialized( pClass ) _ooc_isInitialized( & pClass ## Class )
+#define     ooc_isClassOf( pClass, pSuperClass )  _ooc_isClassOf( & pClass ## Class, & pSuperClass ## Class )
 #define     ooc_isInstanceOf( pObj, pClass )  _ooc_isInstanceOf( pObj, & pClass ## Class )
 #define     ooc_cast( pObj, pClass )  ( (pClass) _ooc_check_cast( pObj, & pClass ## Class ) )
 Class		ooc_get_type( const Object );
 int			_ooc_isInitialized( const Class );
+int			_ooc_isClassOf( const Class this, const Class base );
 int			_ooc_isInstanceOf( const void * _self, const Class base );
 void *		_ooc_check_cast( void * _self, const Class target );
 
@@ -118,6 +120,8 @@ typedef		  struct BaseVtable_stru * BaseVtable;
 
 typedef              BaseVtable    Vtable;
 
+enum ooc_CopyMode { OOC_COPY_DEFAULT = 0, OOC_COPY_DONE, OOC_NO_COPY };
+
 struct ClassTable
 {
 	const size_t		size;				/* size of the object */
@@ -125,11 +129,12 @@ struct ClassTable
 	const Class		 	parent;				/* parent of the class */
 	Vtable			    vtable;				/* the pointer to the virtual function's table */
 	const size_t		vtab_size;			/* the size of the vtable */
-	void	(* init) ( Class this );        /* class initializer */
-	void	(* finz) ( Class this );		/* class finalizer */
-	void	(* ctor) (Object self, const void * params );	/* constructor */
-	void	(* dtor) (Object self);			/* destructor */
-	int  	(* copy) (Object self, const Object from); /* copy constructor */
+	
+	void				(* init) ( Class this );        				/* class initializer */
+	void				(* finz) ( Class this );						/* class finalizer */
+	void				(* ctor) (Object self, const void * params );	/* constructor */
+	void				(* dtor) (Object self);							/* destructor */
+	int				  	(* copy) (Object self, const Object from); 		/* copy constructor */
 };
 
 struct BaseVtable_stru
@@ -241,11 +246,11 @@ extern const struct ClassTable BaseClass;
 		& pParent ## Class,	                                \
 		(Vtable) & pClass ## VtableInstance,				\
 		sizeof( struct pClass ## Vtable_stru ),				\
-		pClass ## _initialize,	                            \
-		pClass ## _finalize,	                            \
-		(void (*)( Object, const void *)) pClass ## _constructor,	\
-		(void (*)( Object))               pClass ## _destructor,	\
-		(int  (*)( Object, const Object)) pClass ## _copy	        \
+											pClass ## _initialize,	\
+											pClass ## _finalize,	\
+		(void (*)( Object, const void *)) 	pClass ## _constructor,	\
+		(void (*)( Object))               	pClass ## _destructor,	\
+		(int  (*)( Object, const Object)) 	pClass ## _copy	        \
 		}
 		
 /* Parent constructor macro
@@ -253,6 +258,7 @@ extern const struct ClassTable BaseClass;
 
 #define chain_constructor( pClass, pSelf, pParam ) \
 	if( pClass ## Class.parent != &BaseClass ) pClass ## Class.parent->ctor( (Object) pSelf, pParam )
+
 	
 /*  Function marchaler types
  */

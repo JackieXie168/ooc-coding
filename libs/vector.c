@@ -6,6 +6,26 @@
 
 #include "vector.h"
 
+/** @class Vector
+ *  @brief Vector class - a standard ooc container.
+ * 	@see vector.h
+ */
+
+/** @file vector.h
+ * @brief Vector class - a standard ooc container.
+ * Vector is a container class, that can hold pointers to any kind of data.
+ * Every item stored in the list must work perfectly with the supplied list item destroyer!
+ * In practice this means, that you can only store items in the vector that has the same 
+ * deletion method.
+ * There are two types of Vector: typed and non-typed vector. Typed Vector can hold items
+ * of a given type or its subtype only, while non-typed Vector can hold any type of data,
+ * that conforms to the supplied object destructor. 
+ * When creating a Vector, a given amount of space, the chunk size (n*sizeof(void*)) is allocated.
+ * If the Vector grows above this size, the Vector automatically reallocates the store, increasing
+ * by the chunk size.
+ * @warning	Vector implementation is not thread safe!
+ */
+
 #include <string.h>
 
 /* Private virtuals
@@ -27,6 +47,7 @@ ClassMembers( Vector, Base )
 	VectorItem *	items;
 	VectorIndex		number_of_items;
 	
+	Class					type;
 	vector_item_destroyer	destroy;
 
 EndOfClassMembers;
@@ -65,8 +86,9 @@ Vector_finalize( Class this )
 
 struct vector_const_params
 {
-	VectorIndex		size;
-	vector_item_destroyer destroy;
+	VectorIndex				size;
+	vector_item_destroyer	destroy;
+	Class					type;
 };
 
 static
@@ -81,6 +103,7 @@ Vector_constructor( Vector self, const void * params )
 	
 	self->allocation_chunks	= p->size;
 	self->destroy = p->destroy;
+	self->type = p->type;
 	
 	self->allocated = self->allocation_chunks;
 	
@@ -110,9 +133,7 @@ static
 int
 Vector_copy( Vector self, const Vector from )
 {
-	ooc_throw( exception_new( err_can_not_be_duplicated ) );
-	
-	return TRUE;
+	return OOC_NO_COPY;
 }
 
 /*	=====================================================
@@ -127,6 +148,25 @@ vector_new( VectorIndex size, vector_item_destroyer destroy )
 	
 	p.size = size;
 	p.destroy = destroy;
+	p.type = NULL;
+	
+	return (Vector) ooc_new( Vector, & p );
+}
+
+Vector
+_vector_new_type( VectorIndex size, Class type, int manage )
+{
+	struct vector_const_params p;
+	
+	if( ! _ooc_isClassOf( type, & BaseClass ) )
+		ooc_throw( exception_new( err_bad_cast ) );
+	
+	p.size = size;
+	p.type = type;
+	if( manage )
+		p.destroy = (vector_item_destroyer) ooc_delete;
+	else
+		p.destroy = NULL;
 	
 	return (Vector) ooc_new( Vector, & p );
 }
@@ -141,6 +181,7 @@ vector_new_from_table( void * table, size_t record_size, VectorIndex num_of_reco
 	
 	p.size = num_of_records;
 	p.destroy = NULL;
+	p.type = NULL;
 	
 	vector = (Vector) ooc_new( Vector, & p );
 	
@@ -169,6 +210,9 @@ vector_push_back( Vector self, void * data )
 {
 	assert( ooc_isInstanceOf( self, Vector ) );
 	
+	if( self->type )
+		_ooc_check_cast( data, self->type );
+	
 	vector_realloc_if_needed( self );
 	
 	self->items[ self->number_of_items ++ ] = data;
@@ -180,6 +224,9 @@ VectorIndex
 vector_insert( Vector self, VectorIndex position, void * data )
 {
 	assert( ooc_isInstanceOf( self, Vector ) );
+	
+	if( self->type )
+		_ooc_check_cast( data, self->type );
 	
 	if( self->number_of_items < position )
 		ooc_throw( exception_new( err_wrong_position ) );	

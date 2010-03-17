@@ -89,16 +89,15 @@ int
 Sample_copy( Sample self, const Sample from )
 {
 	/* makes the default object copying (bit-by-bit) */
-	return FALSE;
+	return OOC_COPY_DEFAULT;
 	
 	/* Copies data by hand */
 	self->data = from->data;
 	...
-	return TRUE
+	return OOC_COPY_DONE;
 	
 	/* Prevent object duplication */
-	ooc_throw( exception_new( err_can_not_be_duplicated ) );
-	return TRUE;
+	return OOC_NO_COPY;
 }
 
 /*	=====================================================

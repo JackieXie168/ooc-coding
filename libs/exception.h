@@ -4,27 +4,34 @@
 
 #include "ooc.h"
 
+/** Exception class declaration
+ */
+ 
 DeclareClass( Exception, Base );
 
+/** Error codes.
+ * These error codes are included in the Exceptions thorwn by the ooc core.
+ */
+ 
 enum
 error_codes
 {
-	err_no_error		= 0,
-	err_out_of_memory,					/* no memory for allocating an object */
-	err_bad_throw,						/* bad use of throw (rethow whithout try, wrong code, etc.) */
-	err_bad_cast,						/* bad cast of an object */
-	err_undefined_virtual,				/* calling of an undefined virtual function */
-	err_can_not_be_duplicated,			/* duplication of an object is invalid */
-	err_wrong_position,					/* insertion at wrong position into a container */
+	err_no_error		= 0,			/**< no error */
+	err_out_of_memory,					/**< no memory for allocating an object */
+	err_bad_throw,						/**< bad use of throw (rethow whithout try, wrong code, etc.) */
+	err_bad_cast,						/**< bad cast of an object */
+	err_undefined_virtual,				/**< calling of an undefined virtual function */
+	err_can_not_be_duplicated,			/**< duplication of an object is invalid */
+	err_wrong_position,					/**< insertion at wrong position into a container */
 
-	err_user_code						/* Firts code available for the users */
+	err_user_code						/**< Non ooc core exception == user defined exception */
 };
 
 /* Class methods */
 
 Object	exception_new( enum error_codes );
 int		exception_get_error_code( const Exception );
-int		exception_get_subcode( const Exception );
+int		exception_get_user_code( const Exception );
 
 /* Virtual function definitions
  */
