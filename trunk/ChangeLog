@@ -1,3 +1,12 @@
+0.9.c
+Adding ooc_isClassOf() type checking.
+Bug fix in ooc_finalize().
+Simplification of the copy constructor return values.
+Adding typed Vector.
+Adding typed List.
+Test suites: Vector, 
+More docs: Vector, 
+
 0.9.b
 Adding type safe cast, ooc_cast functionality.
 Adding ooc_use and ooc_release functionality.

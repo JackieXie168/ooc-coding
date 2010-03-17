@@ -9,7 +9,12 @@
 
 #include "exception.h"
 
-/*	Base Class address
+/** @file ooc.h
+ * @brief Object Oriented C - macros and definitions.
+ */
+ 
+/**	Base Class.
+ * Used for root Class in ooc. It must be a superclass for every classes.
  */
 
 const struct ClassTable BaseClass;
@@ -79,7 +84,7 @@ inherit_vtable_from_parent( const Class self )
 		}
 }
 
-static Class class_register = NULL;
+static Class class_register = NULL;		/* Points to the most recently initialized Class */
 
 void
 _ooc_init_class( const Class self )
@@ -109,14 +114,18 @@ _ooc_finalize_class( const Class self )
 {
 	if( self->vtable->_class != NULL ) {
 
-		self->vtable->_class = NULL;
+		self->vtable->_class = NULL;		/* Class is marked uninitalized */
 		
-		if( self->vtable->_class_register_prev )
-			self->vtable->_class_register_prev->vtable->_class_register_next = self->vtable->_class_register_next;
-		else
-			class_register = self->vtable->_class_register_next;
+		if( class_register == self )		/* Move class register pointer if necessary */
+			class_register = self->vtable->_class_register_prev;
 
-		self->finz( self );			
+		if( self->vtable->_class_register_prev )	/* Unchain the current class I. */
+			self->vtable->_class_register_prev->vtable->_class_register_next = self->vtable->_class_register_next;
+			
+		if( self->vtable->_class_register_next )	/* Unchain the current class II. */
+			self->vtable->_class_register_next->vtable->_class_register_prev = self->vtable->_class_register_prev;
+			
+		self->finz( self );					/* Finalize the current class */
 	}	
 }
 
@@ -188,18 +197,26 @@ static
 void
 copy_object_members( Object to, const Object from, const Class type )
 {
+	size_t offset, length;
+							
 	if( has_parent( type ) )
 		copy_object_members( to, from, type->parent );
-
-	if( ! type->copy( to, from ) ) {	/* If there is no copy constructor, we do a default copy */
-
-			size_t offset, length;
-			offset = has_parent( type ) ?  type->parent->size : sizeof( struct BaseObject );
-			length = type->size - offset; 
-
-			if( length )
-				memcpy( ((char*)to)+offset, ((char*)from)+offset, length );
-		}
+		
+	switch( type->copy( to, from ) ) {
+		
+		case OOC_COPY_DONE:		break;
+		
+		case OOC_COPY_DEFAULT:	offset = has_parent( type ) ?  type->parent->size : sizeof( struct BaseObject );
+								length = type->size - offset; 
+					
+								if( length )
+									memcpy( ((char*)to)+offset, ((char*)from)+offset, length );
+								break;
+							
+		case OOC_NO_COPY:
+		default:				ooc_throw( exception_new( err_can_not_be_duplicated ) );
+								break;
+		};
 }
 
 Object
@@ -302,11 +319,11 @@ ooc_isClassChildOf( const Class checkable, const Class base )
 {
 	Class actual = checkable;
 	
-	while( has_parent(actual) ) {
+	do {
 		if( actual->parent == base )
 			return TRUE;
 		actual = actual->parent;
-		}
+		} while( actual );
 
 	return FALSE;
 }
@@ -335,6 +352,16 @@ _ooc_isInstanceOf( const void * _self, const Class base )
 
 	return ooc_isClassChildOf( self->_vtab->_class, base );
 }
+
+int
+_ooc_isClassOf( const Class this, const Class base )
+{
+	if( this == base )
+		return TRUE;
+	else
+		return ooc_isClassChildOf( this, base );
+}
+
 
 void *
 _ooc_check_cast( void * _self, const Class target )

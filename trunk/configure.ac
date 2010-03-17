@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.61)
 
-AC_INIT([Object Oriented C], [0.9.b], [old-fashioned@users.sourceforge.net], [ooc], [http://ooc-coding.sourceforge.net])
+AC_INIT([Object Oriented C], [0.9.c], [old-fashioned@users.sourceforge.net], [ooc], [http://ooc-coding.sourceforge.net])
 
 AC_CONFIG_SRCDIR([libs/ooc.c])
 AC_CONFIG_HEADER([config.h])
@@ -28,11 +28,12 @@ AC_C_VOLATILE
 # Checks for library functions.
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
-AC_CHECK_FUNCS([memmove])
+AC_CHECK_FUNCS([memmove memset])
 
 AC_CONFIG_FILES([Makefile
                  libs/Makefile
                  libs/ooc.pc
                  docs/Makefile
-                 tools/Makefile])
+                 tools/Makefile
+                 tests/Makefile])
 AC_OUTPUT

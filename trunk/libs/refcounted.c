@@ -81,7 +81,7 @@ int
 RefCounted_copy( RefCounted self, const RefCounted from )
 {
     self->counter = 1;  /* The new object has a new counter as well */
-    return TRUE;
+    return OOC_COPY_DONE;
 }
 
 

@@ -105,9 +105,7 @@ static
 int
 List_copy( List self, const List from )
 {
-	ooc_throw( exception_new( err_can_not_be_duplicated ) );
-	
-	return TRUE;
+	return OOC_NO_COPY;
 }
 
 /*	=====================================================
@@ -200,9 +198,25 @@ unchain( List self, ListIterator location )
 List
 list_new( list_item_destroyer destroyer )
 {
-	assert( destroyer != NULL );
-	
 	return (List) ooc_new( List, destroyer );
+}
+
+List
+_list_new_type( Class type, int manage )
+{
+	list_item_destroyer destroyer;
+	List self;
+	
+	if( ! _ooc_isClassOf( type, & BaseClass ) )
+		ooc_throw( exception_new( err_bad_cast ) );
+		
+	destroyer = manage ? (list_item_destroyer) ooc_delete : NULL ;
+	
+	self = list_new( destroyer );
+	
+	self->type = type;
+	
+	return self;
 }
 
 ListIterator
@@ -210,6 +224,9 @@ list_append( List self, void * new_item )
 {
 	assert( ooc_isInstanceOf( self, List ) );
 	 
+	if( self->type )
+		_ooc_check_cast( new_item, self->type );
+		
 	if( self->last == NULL )
 	
 		return chain_first_item( self, create_new_item( new_item ) );
@@ -225,6 +242,9 @@ list_prepend( List self, void * new_item )
 {
 	assert( ooc_isInstanceOf( self, List ) );
 	 
+	if( self->type )
+		_ooc_check_cast( new_item, self->type );
+		
 	if( self->first == NULL )
 	
 		return chain_first_item( self, create_new_item( new_item ) );
@@ -239,6 +259,9 @@ list_insert_before( List self, ListIterator location, void * new_item )
 {
 	assert( ooc_isInstanceOf( self, List ) );
 	 
+	if( self->type )
+		_ooc_check_cast( new_item, self->type );
+		
 	if( location == NULL )
 		ooc_throw( exception_new( err_wrong_position ) );
 	 
@@ -256,6 +279,9 @@ list_insert_after( List self, ListIterator location, void * new_item )
 {
 	assert( ooc_isInstanceOf( self, List ) );
 	
+	if( self->type )
+		_ooc_check_cast( new_item, self->type );
+		
 	if( location == NULL )
 		ooc_throw( exception_new( err_wrong_position ) );
 	 
