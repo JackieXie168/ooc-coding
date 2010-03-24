@@ -4,8 +4,12 @@ Bug fix in ooc_finalize().
 Simplification of the copy constructor return values.
 Adding typed Vector.
 Adding typed List.
-Test suites: Vector, 
-More docs: Vector, 
+Addind List of ListNode objects.
+Test suites: Vector, Signal
+More docs: Vector,
+Restructured Exception handling, easier use of exceptions
+More templates for the ooc tool.
+
 
 0.9.b
 Adding type safe cast, ooc_cast functionality.

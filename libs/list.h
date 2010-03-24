@@ -9,7 +9,11 @@
 DeclareClass( List, Base );
  
 Virtuals( List, Base )
+EndOfVirtuals;
 
+DeclareClass( ListNode, Base );
+
+Virtuals( ListNode, Base )
 EndOfVirtuals;
 
 
@@ -19,7 +23,7 @@ EndOfVirtuals;
  * @see list_next(), list_previous()
  */
  
-typedef struct ListNode * ListIterator;
+typedef ListNode ListIterator;
 
 /** Destroy function prototype for the list items.
  * This function must clean up the item that was stored in the list and must free all 
@@ -65,6 +69,18 @@ typedef int (*	list_item_checker) ( void * item, void * param );
 
 List            list_new( list_item_destroyer destroyer );
 
+/** @def list_new_type( pClass, manage )
+ *  @brief	Convenient macro for creating typed List.
+ *  @param	 pClass		The type of the List. It is guaranteed, that the list holds this type of Objects only.
+ * 						Trying to put different Object into the List will cause throwing an @c Exception with 
+ * 						@c err_bad_cast error code.
+ * @param	manage		@c TRUE if the List must manage the Objects put in the List, @c FALSE if not.
+ * @return	The List.
+ * @see 	_list_new_type()
+ */
+ 
+#define			list_new_type( pClass, manage ) _list_new_type( & pClass ## Class, manage )
+
 /** Creates a new List of a given type.
  * Creates an empty typed List.
  * @param	type		The type of the List. It is guaranteed, that the list holds this type of Objects only.
@@ -77,17 +93,33 @@ List            list_new( list_item_destroyer destroyer );
 
 List            _list_new_type( Class type, int manage );
 
-/** @def list_new_type( pClass, manage )
- *  @brief	Convenient macro for creating typed List.
- *  @param	 pClass		The type of the List. It is guaranteed, that the list holds this type of Objects only.
+/** @def list_new_of_nodes( pNode, manage )
+ *  @brief	Convenient macro for creating a List of a given type of ListNodes.
+ *  @param	 pNode		The type of the ListNodes. It is guaranteed, that the list holds this type of Objects only.
  * 						Trying to put different Object into the List will cause throwing an @c Exception with 
  * 						@c err_bad_cast error code.
+ * 						pNode must be a sublass of ListNode.
  * @param	manage		@c TRUE if the List must manage the Objects put in the List, @c FALSE if not.
  * @return	The List.
- * @see 	_list_new_type()
+ * @see 	_list_new_of_nodes()
+ * @note	The List created with this method is more powerful, than a normal typed list, because the chaining information
+ * is held by the stored object itself.
  */
  
-#define			list_new_type( pClass, manage ) _list_new_type( & pClass ## Class, manage )
+#define			list_new_of_nodes( pNode, manage ) _list_new_of_nodes( & pNode ## Class, manage )
+
+/** Creates a new List of a given type of ListNodes.
+ * Creates an empty List of listNodes.
+ * @param	node		The type of the ListNodes. It is guaranteed, that the list holds this type of Objects only.
+ * 						Trying to put different Object into the List will cause throwing an @c Exception with 
+ * 						@c err_bad_cast error code.
+ * 						node must be a sublass of ListNode.
+ * @param	manage		@c TRUE if the List must manage the Objects put in the List, @c FALSE if not.
+ * @return	The List.
+ * @see 	list_new_of_nodes()
+ */
+
+List            _list_new_of_nodes( Class node, int manage );
 
 /** Appends an item to the end of the list.
  * @param	list	The list
@@ -174,6 +206,8 @@ void *          list_get_item( ListIterator listiterator );
  * @param	listiterator	The position of the current item in the list. It must be a valid list iterator,
  * 							passing @c NULL will throw @c err_wrong_position exception.
  * @return	The ListIterator of the next item in the list, or @c NULL if there are no more items.
+ * @note	For "noded" Lists (those that was made by list_new_of_nodes()) this function just returns
+ * 			the listiterator itself. Noded Lists consider the ListNodes as items.
  */
 
 ListIterator    list_next( ListIterator listiterator );
@@ -246,4 +280,4 @@ ListIterator	list_find_item( ListIterator position,  list_item_checker criteria,
  
 ListIterator	list_find_item_reverse( ListIterator position,  list_item_checker criteria, void * param);
 
-#endif  /*LIST_H_*/
+#endif /* LIST_H_ */

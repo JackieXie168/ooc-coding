@@ -25,21 +25,106 @@
 
 AllocateClass( List, Base );
 
-/* Class virtual function prototypes
+
+/** @class ListNode
+ *  @brief ListNode class - brief description.
+ * The ListNode objects forms the chain of the List. It has two pointers: one for the previous and one 
+ * for the next ListNode in the List.
+ * You can create a more effective List, if your items are subclasses of ListNode class, and you create
+ * the List with list_new_of_nodes(). In this case your data are stored whithin the node, thus less @c malloc()
+ * is called, and less space is used.
+ * Unlike "noded" Lists, normal Lists hold only a pointer in the ListNode to the data you put in the List, that 
+ * needs an additional memory allocation for the ListNode.
+ * 	@see listnode.h
  */
 
-/*  Defining ListNode struct
- */
+AllocateClass( ListNode, Base );
 
-struct ListNode
+static
+void
+ListNode_initialize( Class this )
 {
+}
 
-    struct ListNode *		previous;
-    struct ListNode *		next;
-    
-    void *					item;
-};
+static
+void
+ListNode_finalize( Class this )
+{
+}
+
+static
+void
+ListNode_constructor( ListNode self, const void * params )
+{
+}
+
+static
+void
+ListNode_destructor( ListNode self )
+{
+}
+
+static
+int
+ListNode_copy( ListNode self, const ListNode from )
+{
+	/* This ListNode is not a member of any List! */
+	/* both chain pointers get to be zeroed */
+	return OOC_COPY_DONE;
+}
+
+/* ListNode for general list items
+ */
  
+DeclareClass( _ListNodeVoidp, ListNode );
+
+Virtuals( _ListNodeVoidp, ListNode )
+EndOfVirtuals;
+
+ClassMembers( _ListNodeVoidp, ListNode )
+
+	void *		item;
+	
+EndOfClassMembers;
+
+#define get_item_ptr(x) (((_ListNodeVoidp)x)->item)
+
+AllocateClass( _ListNodeVoidp, ListNode  );
+
+static
+void
+_ListNodeVoidp_initialize( Class this )
+{
+}
+
+static
+void
+_ListNodeVoidp_finalize( Class this )
+{
+}
+
+static
+void
+_ListNodeVoidp_constructor( _ListNodeVoidp self, const void * params )
+{
+}
+
+static
+void
+_ListNodeVoidp_destructor( _ListNodeVoidp self )
+{
+	/* We do not destroy the item here, because we do not know
+	 * the destroyer for the item here!
+	 * Only List knows it, so List manages the item as well! */
+}
+
+static
+int
+_ListNodeVoidp_copy( _ListNodeVoidp self, const _ListNodeVoidp from )
+{
+	return OOC_COPY_DEFAULT;
+}
+
 /************************************************
  * List class preparation
  */
@@ -48,6 +133,7 @@ static
 void
 List_initialize( Class this )
 {
+	ooc_init_class( _ListNodeVoidp );
 }
 
 /* Class finalizing
@@ -91,10 +177,10 @@ List_destructor( List self )
 		p = next;
 		next = next->next;
 		
-		if( self->destroy )
-			self->destroy( p->item );
-
-		ooc_free( p );
+		if( (! self->list_of_nodes) && self->destroy )
+			self->destroy( get_item_ptr(p) );
+		
+		ooc_delete( (Object) p );
 		}	
 }
 
@@ -113,14 +199,17 @@ List_copy( List self, const List from )
  */
 
 static
-ListIterator
-create_new_item( const void * new_item )
+ListNode
+create_new_item( List self, const void * new_item )
 {
-	ListIterator tmp;
+	ListNode tmp;
 
-	tmp = (ListIterator) ooc_malloc( sizeof( struct ListNode )/sizeof(char) );
-	
-	tmp->item = (void * ) new_item;
+	if( self->list_of_nodes )
+		tmp = (ListNode) new_item;
+	else {
+		tmp = (ListNode) ooc_new( _ListNodeVoidp, NULL );
+		get_item_ptr(tmp) = (void * ) new_item;
+		}
 
 	return tmp;	
 }
@@ -219,6 +308,22 @@ _list_new_type( Class type, int manage )
 	return self;
 }
 
+List
+_list_new_of_nodes( Class node, int manage )
+{
+	List self;
+	
+	if( ! _ooc_isClassOf( node, & ListNodeClass ) )
+		ooc_throw( exception_new( err_bad_cast ) );
+		
+	self = _list_new_type( node, manage );
+	
+	self->list_of_nodes = TRUE;
+	
+	return self;
+}
+
+
 ListIterator
 list_append( List self, void * new_item )
 {
@@ -229,11 +334,11 @@ list_append( List self, void * new_item )
 		
 	if( self->last == NULL )
 	
-		return chain_first_item( self, create_new_item( new_item ) );
+		return chain_first_item( self, create_new_item( self, new_item ) );
 		
 	else
 	
-		return chain_after( self, self->last, create_new_item( new_item ) );
+		return chain_after( self, self->last, create_new_item( self, new_item ) );
 		
 }
 
@@ -247,11 +352,11 @@ list_prepend( List self, void * new_item )
 		
 	if( self->first == NULL )
 	
-		return chain_first_item( self, create_new_item( new_item ) );
+		return chain_first_item( self, create_new_item( self, new_item ) );
 		
 	else
 	
-		return chain_before( self, self->first, create_new_item( new_item ) );	
+		return chain_before( self, self->first, create_new_item( self, new_item ) );	
 }
 
 ListIterator
@@ -267,11 +372,11 @@ list_insert_before( List self, ListIterator location, void * new_item )
 	 
 	if( self->first == NULL )
 	
-		return chain_first_item( self, create_new_item( new_item ) );
+		return chain_first_item( self, create_new_item( self, new_item ) );
 		
 	else
 	
-		return chain_before( self, location, create_new_item( new_item ) );
+		return chain_before( self, location, create_new_item( self, new_item ) );
 }
 
 ListIterator
@@ -287,17 +392,17 @@ list_insert_after( List self, ListIterator location, void * new_item )
 	 
 	if( self->first == NULL )
 	
-		return chain_first_item( self, create_new_item( new_item ) );
+		return chain_first_item( self, create_new_item( self, new_item ) );
 		
 	else
 	
-		return chain_after( self, location, create_new_item( new_item ) );
+		return chain_after( self, location, create_new_item( self, new_item ) );
 }
 
 void *
 list_remove_item( List self, ListIterator location )
 {
-	ListIterator	removed;
+	ListNode		removed_node;
 	void *			item;
 
 	assert( ooc_isInstanceOf( self, List ) );
@@ -305,9 +410,14 @@ list_remove_item( List self, ListIterator location )
 	if( location == NULL || self->first == NULL )
 		ooc_throw( exception_new( err_wrong_position ) );
 
-	removed = unchain( self, location );
-	item = removed->item;
-	ooc_free( removed );
+	removed_node = unchain( self, location );
+	
+	if( self->list_of_nodes )
+		item = removed_node;
+	else {
+		item = get_item_ptr( removed_node );
+		ooc_delete( (Object) removed_node );
+		}
 
 	return item;
 }
@@ -347,8 +457,11 @@ list_get_item( ListIterator node )
 {
 	if( node  == NULL )
 		ooc_throw( exception_new( err_wrong_position ) );
-		
-	return node->item;
+	
+	if( node->Base._vtab->_class == & _ListNodeVoidpClass )
+		return get_item_ptr(node);
+	else
+		return node;
 }
 
 ListIterator
@@ -372,14 +485,17 @@ list_previous( ListIterator node )
 void
 list_swap( ListIterator node1, ListIterator node2 )
 {
-	void * tmp;
+	ListNode tmp_next, tmp_prev;
 	
 	if( node1 == NULL || node2 == NULL )
 		ooc_throw( exception_new( err_wrong_position ) );
 	
-	tmp = node1->item;
-	node1->item = node2->item;
-	node2->item = tmp;
+	tmp_next 		= node1->next;
+	tmp_prev 		= node1->previous;
+	node1->next 	= node2->next;
+	node1->previous = node2->previous;
+	node2->next 	= tmp_next;
+	node2->previous = tmp_prev;
 }
 
 void
@@ -389,8 +505,8 @@ list_foreach( List self, list_item_executor func, void * param )
 	
 	assert( ooc_isInstanceOf( self, List ) );
 
-	for( p = self->first; p; p = p->next )
-		func( p->item, param ); 
+	for( p = self->first; p; p = p->next ) 
+		func( list_get_item( p ), param ); 
 }
 
 ListIterator
@@ -401,7 +517,7 @@ list_foreach_until_true( List self, ListIterator from, list_item_checker func, v
 	assert( ooc_isInstanceOf( self, List ) );
 
 	for( p = from ? from : self->first; p; p = p->next )
-		if( func( p->item, param ) )
+		if( func( list_get_item( p ), param ) )
 			break;
 			 
 	return p;
@@ -420,7 +536,7 @@ list_foreach_delete_if( List self, list_item_checker func, void * param )
 
 		next = list_next( act );
 
-		if( func( act, param ) )
+		if( func( list_get_item( act ), param ) )
 			list_delete_item( self, act );
 		}
 }
@@ -431,11 +547,8 @@ list_find_item( ListIterator node, list_item_checker fn_match, void * param )
 {
 	ListIterator p;
 	
-	if( node  == NULL )
-		ooc_throw( exception_new( err_wrong_position ) );
-		
 	for( p = node; p; p = p->next )
-		if( fn_match( p->item, param ) )
+		if( fn_match( list_get_item( p ), param ) )
 			break;
 			
 	return p;
@@ -446,11 +559,8 @@ list_find_item_reverse( ListIterator node,  list_item_checker fn_match, void * p
 {
 	ListIterator p;
 	
-	if( node  == NULL )
-		ooc_throw( exception_new( err_wrong_position ) );
-
 	for( p = node; p; p = p->previous )
-		if( fn_match( p->item, param ) )
+		if( fn_match( list_get_item( p ), param ) )
 			break;
 			
 	return p;

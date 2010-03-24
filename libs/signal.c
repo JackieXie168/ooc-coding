@@ -369,16 +369,18 @@ signal_destroy_notify( Object object )
 void
 signal_connect( void * source, Signal * signal_p, void * target, SignalHandler handler )
 {
-	struct SignalItemObject	si;
+	SignalItem	si;
 	
 	if( * signal_p == NULL )
 		* signal_p = (Signal) ooc_new( Signal, NULL );
 	
-	si.source	= source;
-	si.target	= target;
-	si.handler	= handler;
+	si = (SignalItem) ooc_new( SignalItem, NULL );
 	
-	list_append( (List) *signal_p, ooc_duplicate( (Object) & si ) );
+	si->source	= source;
+	si->target	= target;
+	si->handler	= handler;
+	
+	list_append( (List) *signal_p, si );
 	
 	signal_register_signal( signal_p );
 }
@@ -404,6 +406,8 @@ signal_disconnect( void * source, Signal self, void * target, SignalHandler hand
 	if( self ) {
 		
 		assert( ooc_isInstanceOf( self, Signal ) );
+		
+		ooc_use( & si, SignalItem, NULL );
 		
 		si.source	= source;
 		si.target	= target;
