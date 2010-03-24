@@ -46,12 +46,14 @@
  * static void MyException_destructor( MyException self ) {}
  * static void MyException_copy( MyException self, MyException other ) { return OOC_COPY_DEFAULT; }
  * 
- * Object myexception_new( int myerror_code ) 
+ * Exception myexception_new( int myerror_code ) 
  * { 
  * 		ooc_init_class( MyException );
- * 		return ooc_new( MyException, & myerror_code );
+ * 		return (Exception) ooc_new( MyException, & myerror_code );
  * }
  * 
+ * ...
+ *
  * try {
  * 		ooc_throw( myexception_new( 5 ) );
  * 	   }
@@ -136,10 +138,10 @@ Exception_copy( Exception self, const Exception from )
  */
 
 
-Object
+Exception
 exception_new( enum error_codes err_code )
 {
-	return ooc_new( Exception, &err_code );
+	return (Exception) ooc_new( Exception, &err_code );
 }
 
 int
@@ -158,3 +160,123 @@ exception_get_user_code( const Exception self )
 	return self->user_code;
 }
 
+/* Implementation of exception handling
+ *
+ ***********************************************************/
+
+TLS struct ooc_try_block * try_pt = NULL;
+
+/* status values */
+#define	CAUGHT		001
+#define RETHROWN	002
+
+
+void
+ooc_link_try_block( struct ooc_try_block * block )
+{
+	block->exc_obj	 = NULL;
+	block->status    = 0;
+	block->previous  = try_pt;
+	try_pt = block;
+}
+
+
+static
+void
+ooc_rewind_jmp_buf( void )
+{
+	if( try_pt ) {
+		ooc_delete( (Object) try_pt->exc_obj );
+		try_pt = try_pt->previous;
+		}
+	return;
+};
+
+void
+ooc_throw( Exception exc_obj_ptr )
+{
+	/* if we are in an exception handling, then it is a nesting, that is not allowed */
+	if( try_pt )
+		if( try_pt->exc_obj != NULL ) {
+			ooc_rewind_jmp_buf();
+			ooc_delete( (Object) exc_obj_ptr );
+			exc_obj_ptr = NULL;		/* Will generate an err_bad_throw */
+			}
+
+	if( exc_obj_ptr == NULL )
+		exc_obj_ptr = exception_new( err_bad_throw );
+
+	if( try_pt ) {
+		try_pt->exc_obj = exc_obj_ptr;
+		longjmp( try_pt->buffer, !0 );
+		}
+	else {
+		/* if no error handler was set, we call the system to handle the error */
+		/*
+		fprintf(stderr, "*** Unhandled exception! Exception object is:\n\n" );
+		//dump_item( exc_obj_ptr, 128 );
+		//dump_item( exc_obj_ptr->_vtab->_class, 16 );
+		//dump_item( exc_obj_ptr->_vtab->_class->name, 16 );
+		*/
+		abort();
+		}
+}
+
+Exception
+ooc_exception_caught( const Class exc_class )
+{
+	Exception ret_exc;
+
+	if( try_pt == NULL )
+		ooc_throw( exception_new( err_bad_throw ) );
+	
+	if( try_pt->exc_obj == NULL )
+		ooc_throw( exception_new( err_bad_throw ) );
+
+	if( try_pt->status & CAUGHT )	/* Every exception can be caught only once */
+		return NULL;
+
+	if( exc_class )
+		/* check if the actual exception is of the desired class */
+		ret_exc = _ooc_isInstanceOf( try_pt->exc_obj, exc_class ) ? try_pt->exc_obj : NULL;
+	else
+		/* Parameter is NULL: catch anything, let's return the Exception pointer */
+		ret_exc = try_pt->exc_obj;
+
+	if( ret_exc )
+		try_pt->status |= CAUGHT;
+
+	return ret_exc;
+}
+
+void
+ooc_rethrow( void )
+{
+	if( try_pt && (try_pt->status & CAUGHT) )
+		try_pt->status |= RETHROWN;
+	else
+		ooc_throw( exception_new( err_bad_throw ) );
+}
+
+void
+ooc_end_try( void )
+{
+	if( try_pt ) {
+
+		if( try_pt->exc_obj != NULL ) {	/* If there was an exception */
+
+			if ( !( try_pt->status & CAUGHT ) || ( try_pt->status & RETHROWN ) ) {
+				/* if we have not caught the exception or has been rethrown, then rethrow it again */
+				Exception tmp = try_pt->exc_obj;
+				try_pt = try_pt->previous;
+				ooc_throw( tmp );
+				}
+			else
+				/* if we have caught, and handled, just rewind the buffer stack */
+				ooc_rewind_jmp_buf();
+
+			}
+		else /* If there was no exception, we simply unlink the try block pointer */
+			try_pt = try_pt->previous;
+	}
+}

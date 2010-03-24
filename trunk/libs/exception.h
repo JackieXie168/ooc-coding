@@ -29,9 +29,36 @@ error_codes
 
 /* Class methods */
 
-Object	exception_new( enum error_codes );
-int		exception_get_error_code( const Exception );
-int		exception_get_user_code( const Exception );
+Exception	exception_new( enum error_codes );
+int			exception_get_error_code( const Exception );
+int			exception_get_user_code( const Exception );
+
+/*	Exception handling
+ */
+
+void		ooc_throw( Exception );
+void		ooc_rethrow( void ); 
+
+struct ooc_try_block {
+	Exception				exc_obj;
+	int						status;
+	struct ooc_try_block *	previous;
+	jmp_buf					buffer;
+	};
+
+#define		try			{ struct ooc_try_block TryContext;		\
+						Exception exception;					\
+						ooc_link_try_block( &TryContext );		\
+						if( ! setjmp(TryContext.buffer) )
+#define		catch(ec)	else if( (exception = ooc_exception_caught( & ec ## Class ))) 
+#define		catch_any	else if( (exception = ooc_exception_caught( NULL )))
+#define		finalize	exception = NULL;	/* Only for supressing "unused variable warning" with a pure try .. finalize ..end_try block */
+#define		end_try		ooc_end_try(); }
+
+void		ooc_link_try_block( struct ooc_try_block * );
+Exception	ooc_exception_caught( const Class );
+void		ooc_end_try( void );
+
 
 /* Virtual function definitions
  */

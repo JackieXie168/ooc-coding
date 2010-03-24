@@ -86,33 +86,6 @@ void 		ooc_free_and_null( void ** mem );			/* Frees memory via a pointer, and NU
 
 void * 		ooc_ptr_read_and_null( void ** ptr_ptr );	/* Reads a pointer via a pointer, and nulls, atomic operation */ 
 
-/*	Exception handling
- */
-
-void		ooc_throw( Object );
-void		ooc_rethrow( void ); 
-
-struct ooc_try_block {
-	Object					exc_obj;
-	int						status;
-	struct ooc_try_block *	previous;
-	jmp_buf					buffer;
-	};
-
-#define		try			{ struct ooc_try_block TryContext;		\
-						Object exception;						\
-						ooc_link_try_block( &TryContext );		\
-						if( ! setjmp(TryContext.buffer) )
-#define		catch(ec)	else if( (exception = ooc_exception_caught( & ec ## Class ))) 
-#define		catch_any	else if( (exception = ooc_exception_caught( NULL )))
-#define		finalize	exception = NULL;	/* Only for supressing "unused variable warning" with a pure try .. finalize ..end_try block */
-#define		end_try		ooc_end_try(); }
-
-void	ooc_link_try_block( struct ooc_try_block * );
-Object	ooc_exception_caught( const Class );
-void	ooc_end_try( void );
-
-
 /* Class components definitions
  */
 

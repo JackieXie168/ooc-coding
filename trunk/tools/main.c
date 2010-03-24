@@ -210,7 +210,9 @@ get_args( int argc, char * argv[] )
 				g_printerr( "Missing source file name\n" );
 				return OOC_TOOL_ERROR_FEW_PARAMETERS;
 				}
-			settings.input_dir  = g_path_get_dirname( argv[ ++ i ] );
+			++i;
+			if( g_path_is_absolute ( argv[ i ] ) )
+				settings.input_dir  = g_path_get_dirname( argv[ i ] );
 			settings.input_file = g_path_get_basename( argv[ i ] );
 			}
 			
@@ -412,39 +414,38 @@ replace_templates( Settings set )
 		input_filename = g_build_filename( set->input_dir, set->subfolder, str->str, NULL );
 		file_processing = input_filename;
 		input = g_io_channel_new_file( input_filename, "r", & error );
-		if( not input ) goto Error;
+		if( input ) {
 		
-		g_string_assign( str, set->output_file );
-		g_string_append( str, ".h" );
+			g_string_assign( str, set->output_file );
+			g_string_append( str, ".h" );
+			
+			output_filename = g_build_filename( set->output_dir, set->subfolder, NULL );
+			g_mkdir_with_parents ( output_filename, 0777 );
+			g_free( output_filename );
+			
+			output_filename = g_build_filename( set->output_dir, set->subfolder, str->str, NULL );
+			file_processing = output_filename;
+			output = g_io_channel_new_file( output_filename, "a", & error );
+			if( not output ) goto Error;
+			
+			result = replace_file( input, output, set );
 		
-		output_filename = g_build_filename( set->output_dir, set->subfolder, NULL );
-		g_mkdir_with_parents ( output_filename, 0777 );
-		g_free( output_filename );
+			g_io_channel_shutdown( input, TRUE, &error );
+			g_io_channel_unref( input );
+			input = NULL;
+			
+			g_io_channel_shutdown( output, TRUE, &error );
+			g_io_channel_unref( output );
+			output = NULL;
 		
-		output_filename = g_build_filename( set->output_dir, set->subfolder, str->str, NULL );
-		file_processing = output_filename;
-		output = g_io_channel_new_file( output_filename, "a", & error );
-		if( not output ) goto Error;
-		
-		result = replace_file( input, output, set );
-	
-		g_io_channel_shutdown( input, TRUE, &error );
-		g_io_channel_unref( input );
-		input = NULL;
-		
-		g_io_channel_shutdown( output, TRUE, &error );
-		g_io_channel_unref( output );
-		output = NULL;
-	
+			g_free( output_filename );
+			output_filename = NULL;
+			
+			if( result != OOC_TOOL_OK ) goto Error;
+		}
 		g_free( input_filename );
 		input_filename = NULL;
-		g_free( output_filename );
-		output_filename = NULL;
-		
-		if( result != OOC_TOOL_OK ) goto Error;
 	}
-	
-	
 
 	g_string_free ( str, TRUE );
 
