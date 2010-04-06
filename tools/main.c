@@ -131,7 +131,7 @@ print_help( void )
 {
 	char * help_msg = \
 			"ooc tool - Helper for Object Oriented C programming - version %s\n"
-			"(c) Tibor Miseta,  this software is licensed under GNU LGPL 2\n"
+			"(c) Tibor Miseta,  this software is licensed under GNU GPL 3\n"
 			"Use: ooc OPERATION [ MODIFIERS ]\n"
 			"OPERATION can be:\n"
 			"    -n ClassName\n"
@@ -275,7 +275,20 @@ replace_names( GString * line, struct ClassNameStruct * what, struct ClassNameSt
 void
 replace_line( GString * line, Settings set )
 {
-	replace_names( line, & set->from_class, & set->new_class );
+	if( g_strstr_len( line->str, line->len, "#include" ) == NULL
+		|| g_strcmp0( set->output_file, set->new_class.lowercase ) == 0 )
+		
+		replace_names( line, & set->from_class, & set->new_class );
+		
+	else {
+		struct ClassNameStruct filename;
+		
+		filename.lowercase = set->output_file;
+		filename.original  = set->output_file;
+		filename.uppercase = set->output_file;
+
+		replace_names( line, & set->from_class, & filename );
+		}	
 	
 	if( set->process_parent )
 		replace_names( line, & set->from_parent, & set->new_parent );
@@ -371,43 +384,48 @@ replace_templates( Settings set )
 	
 	/* Converting the header file */
 	{
-		int result;
+		int result = OOC_TOOL_OK;
+		
+		g_clear_error( &error );
 		
 		g_string_assign( str, set->input_file );
 		g_string_append( str, ".h" );
 		input_filename = g_build_filename( set->input_dir, str->str, NULL );
 		file_processing = input_filename;
 		input = g_io_channel_new_file( input_filename, "r", & error );
-		if( not input ) goto Error;
+		if( input ) {
+			
+			g_string_assign( str, set->output_file );
+			g_string_append( str, ".h" );
+			output_filename = g_build_filename( set->output_dir, str->str, NULL );
+			file_processing = output_filename;
+			output = g_io_channel_new_file( output_filename, "a", & error );
+			if( not output ) goto Error;
+			
+			result = replace_file( input, output, set );
 		
-		g_string_assign( str, set->output_file );
-		g_string_append( str, ".h" );
-		output_filename = g_build_filename( set->output_dir, str->str, NULL );
-		file_processing = output_filename;
-		output = g_io_channel_new_file( output_filename, "a", & error );
-		if( not output ) goto Error;
+			g_io_channel_shutdown( input, TRUE, &error );
+			g_io_channel_unref( input );
+			input = NULL;
+			
+			g_io_channel_shutdown( output, TRUE, &error );
+			g_io_channel_unref( output );
+			output = NULL;
 		
-		result = replace_file( input, output, set );
-	
-		g_io_channel_shutdown( input, TRUE, &error );
-		g_io_channel_unref( input );
-		input = NULL;
-		
-		g_io_channel_shutdown( output, TRUE, &error );
-		g_io_channel_unref( output );
-		output = NULL;
-	
+			g_free( output_filename );
+			output_filename = NULL;
+			}
 		g_free( input_filename );
 		input_filename = NULL;
-		g_free( output_filename );
-		output_filename = NULL;
 		
 		if( result != OOC_TOOL_OK ) goto Error;
 	}
 	
 	/* Converting the implementation header file */
 	{
-		int result;
+		int result = OOC_TOOL_OK;
+		
+		g_clear_error( &error );
 		
 		g_string_assign( str, set->input_file );
 		g_string_append( str, ".h" );
@@ -440,11 +458,11 @@ replace_templates( Settings set )
 		
 			g_free( output_filename );
 			output_filename = NULL;
-			
-			if( result != OOC_TOOL_OK ) goto Error;
 		}
 		g_free( input_filename );
 		input_filename = NULL;
+		
+		if( result != OOC_TOOL_OK ) goto Error;
 	}
 
 	g_string_free ( str, TRUE );

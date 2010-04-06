@@ -24,6 +24,14 @@ ClassMembers( ListNode, Base )
 
 EndOfClassMembers;
 
+struct
+ListConstructorParams
+{
+	list_item_destroyer		destroyer;
+	Class					type;
+	int						list_of_nodes;
+};
+
 
 #endif /*IMPL_LIST_H_*/
 

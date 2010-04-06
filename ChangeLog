@@ -6,9 +6,10 @@ Adding typed Vector.
 Adding typed List.
 Addind List of ListNode objects.
 Test suites: Vector, Signal
-More docs: Vector,
+More docs: Vector
 Restructured Exception handling, easier use of exceptions
 More templates for the ooc tool.
+Adding ooc_manage() and ooc_pass() mechanism.
 
 
 0.9.b

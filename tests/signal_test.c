@@ -221,11 +221,12 @@ signal_test( void )
 			if( i % 7  == 0 )
 				signal_process_signals();
 			}
+		signal_process_signals();
 		}
 	catch_any {
 		printf( "Unexpected exception caught! Code = %d\n", exception_get_error_code( exception ) );
 		}
-	finalize {
+	finally {
 		ooc_delete( (Object) listener );
 		ooc_delete( (Object) test1 );
 		ooc_delete( (Object) test2 );

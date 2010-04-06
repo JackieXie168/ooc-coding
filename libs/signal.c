@@ -18,19 +18,19 @@
 /* This is a class implementation file
  */
  
-DeclareClass( SignalItem, Base );
+DeclareClass( SignalItem, ListNode );
 
 /* Virtual function definitions
  */
 
-Virtuals( SignalItem, Base )
+Virtuals( SignalItem, ListNode )
 
 EndOfVirtuals;
 
 /* Class members
  */
  
-ClassMembers( SignalItem, Base )
+ClassMembers( SignalItem, ListNode )
 
 	void *			source;
 	void *			target;
@@ -42,7 +42,7 @@ EndOfClassMembers;
 /* Allocating the class description table and the vtable
  */
 
-AllocateClass( SignalItem, Base );
+AllocateClass( SignalItem, ListNode );
 
 /* Class virtual function prototypes
  */
@@ -108,35 +108,53 @@ signalitem_compare( SignalItem self, const SignalItem other )
 			&&	( self->handler == other->handler ) );
 }
 
-/* Signal class
- */
- 
-ClassMembers( Signal, List )
-
-EndOfClassMembers;
-
-AllocateClass( Signal, List );
-
-/* Class virtual function prototypes
- */
-
 /* Signal Queue
  */
 
-struct SignalQueued {
+DeclareClass( SignalQueued, ListNode );
+
+ClassMembers( SignalQueued, ListNode )
+
 	Signal			emitted_signal;
 	void *			parameter;				/* managed by SignalQueued! */
 	void_fn_voidp	param_destroyer;
-	};
 	
-static void signal_queued_free( struct SignalQueued * sq );
- 
+EndOfClassMembers;
+
+Virtuals( SignalQueued, ListNode )
+EndOfVirtuals;
+
+AllocateClass( SignalQueued, ListNode );
+
+static	void	SignalQueued_initialize( Class this ) {}
+static	void	SignalQueued_finalize( Class this ) {}
+
+static	void	SignalQueued_constructor( SignalQueued self, const void * params ) {}
+static	void	SignalQueued_destructor( SignalQueued self )
+{
+	if( self->param_destroyer && self->parameter )
+		self->param_destroyer( ooc_ptr_read_and_null( & self->parameter ) );
+}
+
+static	int		SignalQueued_copy( SignalQueued self, const SignalQueued from ) { return OOC_NO_COPY; }
+
 static	List	signal_queue	= 	NULL; 	/* List of SignalQueued pointers */
 
 /* Signal register
  */
  
 static 	List 	signal_register =	NULL; 	/* List of Signal * pointers */
+
+/* Signal class
+ */
+ 
+ClassMembers( Signal, List )
+
+	Object		owner;
+
+EndOfClassMembers;
+
+AllocateClass( Signal, List );
 
 /* Class initializing
  */
@@ -145,10 +163,11 @@ static
 void
 Signal_initialize( Class this )
 {
-	ooc_init_class( SignalItem );
 	ooc_init_class( List );
+	ooc_init_class( SignalItem );
+	ooc_init_class( SignalQueued );
 	
-	signal_queue 	= list_new( ( list_item_destroyer ) signal_queued_free );
+	signal_queue 	= list_new_of_nodes( SignalQueued, TRUE );
 	signal_register = list_new( ( list_item_destroyer ) ooc_delete_and_null );
 }
 
@@ -170,9 +189,17 @@ static
 void
 Signal_constructor( Signal self, const void * params )
 {
+	struct ListConstructorParams p;
+	
 	assert( ooc_isInitialized( Signal ) );
 	
-	chain_constructor( Signal, self, ooc_delete );  /* Parent is a List of SignalItems */
+	self->owner = (Object) params;
+	
+	p.destroyer = (list_item_destroyer) ooc_delete;
+	p.type		= & SignalItemClass;
+	p.list_of_nodes = TRUE;
+	
+	chain_constructor( Signal, self, & p );  /* Parent is a List of SignalItems */
 }
 
 /* Destructor
@@ -194,16 +221,6 @@ Signal_copy( Signal self, const Signal from )
 	return OOC_COPY_DEFAULT;
 }
 
-static
-void
-signal_queued_free( struct SignalQueued * sq )
-{
-	if( sq->param_destroyer )
-		sq->param_destroyer( sq->parameter );
-		
-	ooc_free( sq );
-}
-
 /**	Emits a signal asynchronuosly. 
  * Asynchronuos signal emittion means, that the signal_emit() function returns immadiately, and the signal is buffered in the signal queue.
  * Signal is executed when the main eventloop reaches the signal emittion section.
@@ -217,26 +234,30 @@ signal_queued_free( struct SignalQueued * sq )
  */
 
 void
-signal_emit( Signal signal, void * parameter, void_fn_voidp param_destroy_fn )
+signal_emit( Signal signal, void * parameter, ooc_destroyer param_destroy_fn )
 {
-	struct SignalQueued sq;
-		
 	if( signal ) {
-		assert( ooc_isInstanceOf( signal, Signal ) );
-
-		sq.emitted_signal 	= signal;
-		sq.parameter	  	= parameter;
-		sq.param_destroyer	= param_destroy_fn;
+		SignalQueued sq;
 		
-		list_append( signal_queue, ooc_memdup( & sq, sizeof( struct SignalQueued ) ) );
+		assert( ooc_isInstanceOf( signal, Signal ) );
+		
+		ooc_manage( parameter, param_destroy_fn ); 
+
+		sq = (SignalQueued) ooc_new( SignalQueued, NULL );
+		
+		sq->emitted_signal 	= signal;
+		sq->parameter	  	= ooc_pass( parameter );
+		sq->param_destroyer	= param_destroy_fn;
+		
+		list_append( signal_queue, sq );
 		}
-	else if( param_destroy_fn )
+	else if( param_destroy_fn && parameter )
 		param_destroy_fn( parameter );
 }
 
 static
 int
-signal_queue_process_item( struct SignalQueued * sq )
+signal_queue_process_item( SignalQueued sq )
 {
 	signal_emit_sync( sq->emitted_signal, sq->parameter, NULL );
 	
@@ -271,7 +292,7 @@ signal_register_signal( Signal * signal_p )
 	assert( ooc_isInstanceOf( * signal_p, Signal ) );
 	assert( ooc_isInstanceOf( signal_register, List ) );
 	
-	if( ! list_find_item( list_first( signal_register ), (list_item_checker) signal_register_comparator, signal_p ) ) {
+	if( ! list_find_item( signal_register, NULL, (list_item_checker) signal_register_comparator, signal_p ) ) {
 		list_append( signal_register, signal_p );
 		};
 }
@@ -302,14 +323,12 @@ signal_is_hold_by( Signal * signal_p, Object holder )
 	assert( signal_p );
 	assert( ooc_isInstanceOf( * signal_p, Signal ) );
 	
-	SignalItem si = list_get_item( list_first( (List)* signal_p ) );
-	
-	return ( si->source == holder );
+	return ( (* signal_p)->owner == holder );
 }
 
 static
 int
-signal_queued_is_hold_by( struct SignalQueued * sq, Object holder )
+signal_queued_is_hold_by( SignalQueued sq, Object holder )
 {
 	return signal_is_hold_by( & sq->emitted_signal, holder );
 }
@@ -372,7 +391,12 @@ signal_connect( void * source, Signal * signal_p, void * target, SignalHandler h
 	SignalItem	si;
 	
 	if( * signal_p == NULL )
-		* signal_p = (Signal) ooc_new( Signal, NULL );
+		* signal_p = (Signal) ooc_new( Signal, source );
+	
+	assert( ooc_isInstanceOf( *signal_p, Signal ) );
+	
+	if( (*signal_p)->owner != source )
+		ooc_throw( exception_new( err_bad_connect ) );
 	
 	si = (SignalItem) ooc_new( SignalItem, NULL );
 	
@@ -413,7 +437,7 @@ signal_disconnect( void * source, Signal self, void * target, SignalHandler hand
 		si.target	= target;
 		si.handler	= handler;
 		
-		found = list_find_item( list_first( (List) self ), (list_item_checker) signalitem_compare, & si );
+		found = list_find_item( (List) self, NULL, (list_item_checker) signalitem_compare, & si );
 		
 		if( found )
 			list_delete_item( (List) self, found );
@@ -448,7 +472,7 @@ signalitem_emit_sync( SignalItem self, void * param )
  */
 
 void
-signal_emit_sync( Signal signal, void * parameter, void_fn_voidp param_destroy_fn )
+signal_emit_sync( Signal signal, void * parameter, ooc_destroyer param_destroy_fn )
 {
 	if( signal ) {
 		
@@ -463,7 +487,7 @@ signal_emit_sync( Signal signal, void * parameter, void_fn_voidp param_destroy_f
 
 /** @file signal.h 
 @details
-The use of the Signal class is optimized for the user's concenience, therefore it is a bit different then other ooc classes.
+The use of the Signal class is optimized for the user's convenience, therefore it is a bit different then other ooc classes.
 There are some rules that must be considered using Signals.
 The signaling system must be initilaized at the start and released at the end of your application.
 @code
@@ -483,4 +507,3 @@ int main( int argc, char argv[] )
 @warning	Signal handling is not thread safe!
 
  */ 
-

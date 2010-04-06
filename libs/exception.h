@@ -23,8 +23,9 @@ error_codes
 	err_undefined_virtual,				/**< calling of an undefined virtual function */
 	err_can_not_be_duplicated,			/**< duplication of an object is invalid */
 	err_wrong_position,					/**< insertion at wrong position into a container */
+	err_bad_connect,					/**< signal connection failure */
 
-	err_user_code						/**< Non ooc core exception == user defined exception */
+	err_user_code		= 0x100			/**< Non ooc core exception == user defined exception */
 };
 
 /* Class methods */
@@ -44,6 +45,7 @@ struct ooc_try_block {
 	int						status;
 	struct ooc_try_block *	previous;
 	jmp_buf					buffer;
+	struct ooc_Manageable * managed;
 	};
 
 #define		try			{ struct ooc_try_block TryContext;		\
@@ -52,13 +54,32 @@ struct ooc_try_block {
 						if( ! setjmp(TryContext.buffer) )
 #define		catch(ec)	else if( (exception = ooc_exception_caught( & ec ## Class ))) 
 #define		catch_any	else if( (exception = ooc_exception_caught( NULL )))
-#define		finalize	exception = NULL;	/* Only for supressing "unused variable warning" with a pure try .. finalize ..end_try block */
+#define		finally		exception = NULL;	/* Only for supressing "unused variable warning" with a pure try .. finallly ..end_try block */
 #define		end_try		ooc_end_try(); }
 
 void		ooc_link_try_block( struct ooc_try_block * );
 Exception	ooc_exception_caught( const Class );
 void		ooc_end_try( void );
 
+struct ooc_Manageable
+{
+	void *		target;
+	void		(* destroyer)( void * );
+	struct ooc_Manageable * previous;
+};
+
+void		ooc_chain_manageable( struct ooc_Manageable * );
+
+#define ooc_manage( target, destroyer ) \
+	{ struct ooc_Manageable manageable = { target, destroyer }; ooc_chain_manageable( & manageable ); }
+	
+#ifdef NDEBUG
+void		ooc_unchain_last_manageable( void );
+#define		ooc_pass( x )	( ooc_unchain_last_manageable(), x )
+#else
+void		ooc_unchain_manageable( void * target );
+#define		ooc_pass( x )	( ooc_unchain_manageable( x ), x )
+#endif
 
 /* Virtual function definitions
  */

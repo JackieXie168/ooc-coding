@@ -258,26 +258,30 @@ void			list_foreach_delete_if( List list, list_item_checker criteria, void * par
 
 /** Finds the first matching item in the list.
  * This is a forward search (in the direction from the first item to the last item.)
+ * @param	list		The list.
  * @param	position	The position from where to start the search. It must be a valid list iterator,
- * 						passing @c NULL will throw @c err_wrong_position exception.
+ * 						otherwise will throw @c err_wrong_position exception.
+ * 						Passing @c NULL will start from the beginning of the List.
  * @param	criteria	The method that is used to decide which items find. 
  * @param	param		The parameter to be passed for the executed method.
  * @return	The ListIterator of the first matching item in the list, or @c NULL if there was no match.
  * @note	This is a simple linear search, may take long for large lists.
  */
  
-ListIterator	list_find_item( ListIterator position,  list_item_checker criteria, void * param );
+ListIterator	list_find_item( List list, ListIterator position,  list_item_checker criteria, void * param );
 
 /** Finds the first matching item in the list in reverse order.
  * This is a backward search (in the direction from the last item to the first item.)
+ * @param	list		The list.
  * @param	position	The position from where to start the search. It must be a valid list iterator,
- * 						passing @c NULL will throw @c err_wrong_position exception.
+ * 						otherwise will throw @c err_wrong_position exception.
+ * 						Passing @c NULL will start from the end of the List.
  * @param	criteria	The method that is used to decide which items find. 
  * @param	param		The parameter to be passed for the executed method.
  * @return	The ListIterator of the first matching item in the list, or @c NULL if there was no match.
  * @note	This is a simple linear search, may take long for large lists.
  */
  
-ListIterator	list_find_item_reverse( ListIterator position,  list_item_checker criteria, void * param);
+ListIterator	list_find_item_reverse( List list, ListIterator position,  list_item_checker criteria, void * param);
 
 #endif /* LIST_H_ */
