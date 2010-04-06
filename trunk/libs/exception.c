@@ -177,6 +177,7 @@ ooc_link_try_block( struct ooc_try_block * block )
 	block->exc_obj	 = NULL;
 	block->status    = 0;
 	block->previous  = try_pt;
+	block->managed	 = NULL;
 	try_pt = block;
 }
 
@@ -192,16 +193,21 @@ ooc_rewind_jmp_buf( void )
 	return;
 };
 
+static void clear_managed_stack( void );
+
 void
 ooc_throw( Exception exc_obj_ptr )
 {
+	/* Throwing Exception clears the managed stack */
+	clear_managed_stack();
+	 
 	/* if we are in an exception handling, then it is a nesting, that is not allowed */
-	if( try_pt )
-		if( try_pt->exc_obj != NULL ) {
-			ooc_rewind_jmp_buf();
-			ooc_delete( (Object) exc_obj_ptr );
-			exc_obj_ptr = NULL;		/* Will generate an err_bad_throw */
-			}
+	if( try_pt && try_pt->exc_obj != NULL ) {
+		ooc_rewind_jmp_buf();
+		ooc_delete( (Object) exc_obj_ptr );
+		clear_managed_stack();
+		exc_obj_ptr = NULL;		/* Will generate an err_bad_throw */
+		}
 
 	if( exc_obj_ptr == NULL )
 		exc_obj_ptr = exception_new( err_bad_throw );
@@ -262,7 +268,9 @@ void
 ooc_end_try( void )
 {
 	if( try_pt ) {
-
+		
+		assert( try_pt->managed == NULL );
+		
 		if( try_pt->exc_obj != NULL ) {	/* If there was an exception */
 
 			if ( !( try_pt->status & CAUGHT ) || ( try_pt->status & RETHROWN ) ) {
@@ -279,4 +287,64 @@ ooc_end_try( void )
 		else /* If there was no exception, we simply unlink the try block pointer */
 			try_pt = try_pt->previous;
 	}
+}
+
+/* Managing objects
+ */
+ 
+TLS struct ooc_Manageable * managed = NULL;
+ 
+void
+ooc_chain_manageable( struct ooc_Manageable * manageable )
+{
+	if( try_pt ) {
+		manageable->previous = try_pt->managed;
+		try_pt->managed = manageable;
+		}
+	else {
+		manageable->previous = managed;
+		managed = manageable;
+		}
+}
+
+void
+ooc_unchain_last_manageable( void )
+{	
+	if( try_pt )
+		try_pt->managed = try_pt->managed->previous;
+	else
+		managed = managed->previous;
+}
+
+void
+ooc_unchain_manageable( void * target )
+{
+	if( try_pt ) {
+		assert( try_pt->managed );
+		assert( try_pt->managed->target == target );
+		}
+	else {
+		assert( managed );
+		assert( managed->target == target );
+		}
+	
+	ooc_unchain_last_manageable();
+}
+
+static
+void
+clear_managed_stack( void )
+{
+	struct ooc_Manageable * stack;
+	
+	if( try_pt )
+		stack = ooc_ptr_read_and_null( (void**) & try_pt->managed );
+	else
+		stack = ooc_ptr_read_and_null( (void**) & managed );
+	
+	while( stack ) {
+		if( stack->destroyer && stack->target )
+			stack->destroyer( stack->target );
+		stack = stack->previous;
+		}
 }

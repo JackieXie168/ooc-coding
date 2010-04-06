@@ -242,4 +242,6 @@ typedef	 int  (* int_fn_voidp_voidp  )( void *, void * );
 typedef	 void (* void_fn_Object_voidp)( void *, void * );
 typedef	 int  (* int_fn_Object_voidp )( void *, void * );
 
+typedef void_fn_voidp ooc_destroyer;
+
 #endif /* OOC_H */

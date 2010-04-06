@@ -16,8 +16,8 @@ void		signal_connect( void * source, Signal * signal_p, void * target, SignalHan
 
 void 		signal_disconnect( void * source, Signal, void * target, SignalHandler handler );
 
-void		signal_emit( Signal, void * parameter, void_fn_voidp param_destroy_fn );
-void		signal_emit_sync( Signal, void * parameter, void_fn_voidp param_destroy_fn );
+void		signal_emit( Signal, void * parameter, ooc_destroyer param_destroy_fn );
+void		signal_emit_sync( Signal, void * parameter, ooc_destroyer param_destroy_fn );
 
 void		signal_destroy_notify( Object object );
 

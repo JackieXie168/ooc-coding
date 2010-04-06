@@ -294,12 +294,14 @@ There is @emph{no} stack unwinding!
 @item
 You must consider the side effects of optimizing compilers.
 @item
-There is an additional @code{finalize} option.
+There is an additional @code{finally} option.
 @item
 You must close the section with an @code{end_try} statement.
 @item
 Every executed @code{try} must have an executed @code{end_try}!
 @end itemize
+@sp 1
+Being able to use the exceptions you must include the @code{exception.h} header file, and call @code{ooc_init_class( Exception );} at the very beginning of your code! Because @strong{ooc} uses the exceptions internally, you must always initialize the @code{Exception} class in your code before using any other @strong{ooc} features!
 
 @section Throwing an exception
 
@@ -317,24 +319,24 @@ You can use @code{ooc_rethrow()} as well for passing the actual exception to the
 
 You can catch the thrown exceptions with the @code{catch()} or @code{catch_any} blocks.
 
-The @code{catch( Class )} block catches the objects of the specified class or its parent (super-) classes. The caught object is stored in a variable called @code{Object exception}, that is automatically defined and can be used only within the @code{catch} block.
+The @code{catch( Class )} block catches the objects of the specified class or its parent (super-) classes. The caught object is stored in a variable called @code{Exception exception}, that is automatically defined and can be used only within the @code{catch} block.
 @sp 1
 The @code{catch_any} block catches all exceptions that were not handled by the earlier @code{catch} blocks. It is typically used for cleanup and rethrow of exception that could not be handled locally.
 You can use as many @code{cath()} blocks, as many you need, plus one @code{catch_any} block as the last one. Be careful with the ordering of the @code{catch()} blocks: catching a class means catching @emph{all of the parent classes} as well.
 @section Finalize the exception handling
 
-You can notice, that there is a @code{finalize} option as well, that will run in every case. It is very important that codes in the @code{finalize} block can not fail (can not throw any exception)! This section will run in every case, regardless of the existence of an exception, or if it was caught or not.
-The finalize block must be the last section of a @code{try ... end_try} block.
+You can notice, that there is a @code{finally} option as well, that will run in every case. It is very important that codes in the @code{finally} block can not fail (can not throw any exception)! This section will run in every case, regardless of the existence of an exception, or if it was caught or not.
+The finally block must be the last section of a @code{try ... end_try} block.
 
 @section Closing the @code{try} block
 
 You must close the @code{try} block sequence with an @code{end_try;} statement.
-You don't have to use all of the possible blocks in the @code{try ... end_try} block, however at least one @code{catch} or @code{catch_any} or @code{finalize} block must be used.
-Every executed @code{try} must have an executed @code{end_try}! In practice this means that you can NOT @code{return} from within the @code{try} block!
+You don't have to use all of the possible blocks in the @code{try ... end_try} block, however at least one @code{catch} or @code{catch_any} or @code{finally} block must be used.
+Every executed @code{try} must have an executed @code{end_try}! In practice this means that you must NOT @code{return} from within the @code{try} block! (Or jump out with @code{goto}, but who does use it? :-))
 
 @section Protecting dynamic memory blocks and objects
 
-Unlike C++ there is no stack unwinding during the exception handling! Consequently you must pay extra attention on memory handling in your routines: make sure that every temporarily allocated memory block is freed in case of an exception rises in the routine or in routines called. The simplest solution is a @code{try ... finalize ... end_try} block. It is relatively not computationally expensive, and is effective.
+Unlike C++ there is no stack unwinding during the exception handling! Consequently you must pay extra attention on memory handling in your routines: make sure that every temporarily allocated memory block is freed in case of an exception rises in the routine or in routines called. The simplest solution is a @code{try ... finally ... end_try} block. It is relatively not computationally expensive, and is effective.
 For example the code below will lead to memory leak if there would arise an exception:
 
 @example
@@ -362,7 +364,7 @@ void my_func( void )
 
         do_a_risky_call();
         @}
-    finalize @{
+    finally @{
         ooc_free( mem );
         @}
     end_try;
@@ -373,37 +375,78 @@ Listen to the followings in the above code:
 
 @itemize @bullet
 @item
-Use @code{volatile} storage class specifier for those variables that change their value in the @code{try} code section, and you would like to use this new value in any of the @code{catch} or @code{finalize} blocks, or after the @code{end_try} statement!
+Use @code{volatile} storage class specifier for those variables that change their value in the @code{try} code section, and you would like to use this new value in any of the @code{catch} or @code{finally} blocks, or after the @code{end_try} statement!
 This is necessary, because the @code{try} solution is based on @code{setjmp/longjmp},  that may change the register values, so we must prevent optimizing compilers using registers for these variables. Forgetting setting @code{volatile} typically brings you in a situation where the debugged code works properly, but the optimized release fails while handling exceptions.
 @sp 1
 @item
 Initialize the pointer variable with @code{NULL}!
-This is necessary because the local variable is located on the stack, and gets a random starting value. If you forget the initialization, and the memory allocation would fail, then freeing this pointer in the @code{finalize} section would refer to an undefined memory block, and most probably would cause a segmentation fault.
+This is necessary because the local variable is located on the stack, and gets a random starting value. If you forget the initialization, and the memory allocation would fail, then freeing this pointer in the @code{finally} section would refer to an undefined memory block, and most probably would cause a segmentation fault.
 @end itemize
-@sp 1
-If you carefully read the above, you will realize that the following code is still correct:
 
+@sp 1
+In most cases you want to prevent memory leak only, and do not necessarily need to get the control in the case of an exception. For those situations there is a simpler mechanism described in the next section.
+
+@section Managed pointers
+
+In @strong{ooc} you have an other option for preventing memory leaks in case of an exception: the managed pointers. Using managed pointers you will not get the program control in case of an exception, but it is guaranteed, that the memory is freed or the Object is deleted in case of an exception. (You may consider this as analogie for @code{std::auto_ptr<>} in C++.) @*
+Using managed pointers is faster than using the @code{try ... finally ... end_try} constructs, so it is more advisable if you do not need the program control in case of an exception.
+
+@subsection Managing a pointer
+Managing a pointer means that @strong{ooc} will take care of freeing the resouce in case of an exception. You can manage a pointer with the @code{ooc_manage()} macro. This macro pushes the pointer (and the corresponding destroyer function) to the top of the managed pointers stack.@*
+If there is an exception thrown, @strong{ooc} will continue the program execution at the next @code{catch} or @code{finally} statement, and takes care that all memory or Objects that are referenced by the managed pointers pushed onto the stack, are freed or deleted respectively till that point.@*
+If there was no exception thrown, you must remove the pointer from the stack with the @code{ooc_pass()} macro.@*
+Because the managed pointers' stack is a stack, you can remove the most recently pushed item only: you must use @code{ooc_pass()} always in the reverse order of using @code{ooc_manage()}!
+
+@subsubsection Manage a pointer: @code{ooc_manage()}
+Push a pointer onto the top of the managed pointers' stack.@*
+@code{ooc_manage()} requires two parameters: the pointer to the resource and the appropriate destroyer function for it (typically @code{ooc_delete} or @code{ooc_free}).@*
+@code{ooc_manage()} does not return anything.
+
+@subsubsection Pass the ownership: @code{ooc_pass()}
+Removes the most recently pushed pointer from the managed pointers' stack. Always use in the reverse order of using @code{ooc_manage()}!@*
+@code{ooc_pass()} requires one parameter: the pointer to be removed.@*
+Please note that since the most recently pushed pointer is removed, the parameter is used only for verification that the push an pop orders are correct! (In release versions this verification is skipped for gaining some speed.)@*
+@code{ooc_pass()} returns the pointer itself.@*
+The name is coming from passing the ownership of the pointer to an other object or function.
+
+
+@subsection Examples
+@subsubsection Protecting temporary memory allocation
+In the previous section we used @code{try ... finally ... end_try} to prevent memory leak for a temporary memory allocation. The same with managed pointer:
 @example
 void my_func( void )
 @{
-    char * mem = NULL;
+    char * mem;
 
     mem = ooc_malloc( 1000 );
 
-    try 
-        do_a_risky_call();
+    ooc_manage( mem, ooc_free );
 
-    finalize
-        ooc_free( mem );
+    do_a_risky_call();
 
-    end_try;
+    ooc_free( ooc_pass( mem ) );                      
 @}
 @end example
-We did not had to mark the @code{mem} memory pointer as @code{volatile}, because the code section in the @code{try} block did not modified the value of @code{mem}.
-@sp 1
-In most cases you do not need protect your variables, think it over when it is really required.
+Simplier, faster.
+@subsubsection Taking over the ownership of parameters
+@example
+void foo_add_bar( Foo self, Bar bar )
+@{
+    ooc_manage( bar, (ooc_destroyer) ooc_delete );
 
+    do_a_risky_call();
 
+    /* pass the ownership of bar to self  */
+    self->bar = ooc_pass( bar );                      
+@}
+
+Foo foo;
+
+foo = foo_new();
+
+foo_add_bar( foo, bar_new() ); /* this code is safe! */
+@end example
+If you we're not using managed pointers for taking over the ownership of the parameter then the parameter object would be leaked in case of an exception in the @code{do_a_risky_call()} method.
 
 
 @node Using Classes
@@ -526,9 +569,9 @@ This example prints @code{The type of my_string is: String} on the display.
 @sp 1
 You can use this function for comparing object types, like
 @example
-if( ooc_get_type( my_object ) == StringClass )
+if( ooc_get_type( my_object ) == & StringClass )
     ... process my_object as a String object here
-else if ( ooc_get_type( my_object ) == SomeOtherClass )
+else if ( ooc_get_type( my_object ) == & SomeOtherClass )
         ... process my_object as a SomeOther object here
 @end example
 Please note the @code{Class} suffix to the object's typename. This pointer to the static class description table is defined for each class.
@@ -620,7 +663,7 @@ Including the implementation related definitions in the class user header file y
 @sp 1
 Including the implementation related definition in a separeted class implementation header (e.g. called @code{impl_foo.h}) you make all data members protected; in other words the user of the class can not access it, but the subclasses always can.
 @sp 1
-Making really private members would be a bit complicated, and not supported by the macros.
+Making really private members would be a bit complicated, and not supported by the macros. (See "pimpl" or "fast pimpl" idioms for a possible solution!)
 @sp 1
 The content of @code{impl_foo.h} should look like:
 
@@ -854,7 +897,8 @@ The destructor destroys the object of your class before releasing the allocated 
 The destructor has a fix name: the class name concatenated with @code{_destructor}. @*
 The destructor has a single parameter: a pointer to the object to be detroyed.
 @sp 1
-Within the destructor you can @emph{not} throw any exception! You should use only @code{ooc_delete_and_null()} @code{and ooc_free_and_null()} in destructors.
+Within the destructor you can @emph{not} throw any exception!@*
+You should use only @code{ooc_delete_and_null()} @code{and ooc_free_and_null()} in destructors! This prevents crashes because of double freeing or deleting in case of circular references.
 
 @example
 
