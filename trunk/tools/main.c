@@ -3,9 +3,32 @@
 #include <string.h>
 #include <glib.h>
 
+#ifndef WIN32
+
 #ifdef HAVE_CONFIG_H
 	#include "config.h"
 #endif
+
+#ifndef NDEBUG
+	#undef TEMPLATE_DIR
+	#define	TEMPLATE_DIR	"../template"
+#endif	/* NDEBUG */
+
+#endif /* ndef WIN32 */
+
+#ifdef WIN32
+	#include "../config.h"
+
+#ifdef NDEBUG
+	char * template_dir;
+	#define	TEMPLATE_DIR	template_dir
+#else
+	#define	TEMPLATE_DIR	"template"
+#endif
+
+#endif /* WIN32 */
+
+
 
 enum
 ErrorCode
@@ -68,12 +91,6 @@ settings_set_defaults_I( Settings self )
 	self->subfolder				=	"implement";
 }
 
-#ifndef NDEBUG
-	#undef TEMPLATE_DIR
-	#define	TEMPLATE_DIR	"../template"
-#endif	
-
- 
 void
 settings_set_defaults_II( Settings self )
 {
@@ -124,6 +141,21 @@ settings_release( Settings self )
 	g_free( self->input_dir );
 	g_free( self->input_file );
 }
+
+#if defined( WIN32 ) && defined( NDEBUG )
+	char * win_template_dir( const char * executable )
+	{
+		char * td;
+
+		char * exec_dir	= g_path_get_dirname ( executable );
+
+		td = g_build_filename( exec_dir, "template", NULL );
+
+		g_free( exec_dir );
+
+		return td;
+	}
+#endif
 
 static 
 void
@@ -487,11 +519,16 @@ replace_templates( Settings set )
 		return OOC_TOOL_ERROR_CANT_OPEN_FILE;
 }
 
+
 int
 main( int argc, char * argv[] )
 {
 	int error = OOC_TOOL_OK;
 	
+#if defined( WIN32 ) && defined( NDEBUG )
+	template_dir = win_template_dir( argv[0] );
+#endif
+
 	error = get_args( argc, argv );
 	
 	if( operation == OPERATION_NEW ) {
@@ -501,6 +538,10 @@ main( int argc, char * argv[] )
 		};
 		
 	settings_release( & settings );
+
+#if defined( WIN32 ) && defined( NDEBUG )
+	g_free( template_dir );
+#endif
 	
 	return error;
 }
