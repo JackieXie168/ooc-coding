@@ -34,7 +34,21 @@ Compile your own code:
 Install on Windows or other platforms:
 ======================================
 
-There is no installer (yet). You can simply copy the source files into your project,
+Make sure, you have installed:
+	Visual C++ 2008 Express
+	glib for win32
+	(ftp://ftp.gnome.org/pub/GNOME/binaries/win32/glib/)
+
+Copy the source files in a project directory,
+then open the ooc.sln file with VC++.
+
+You can build ooc now.
+(You might need to modify the property sheets in the tools projetc, according
+to your glib installation.)
+
+There is no installer :-( (yet).
+
+An other possibility to copy the source files into your project directory
 compile and link them together with your project.
 For the ooc core functions (class and object management, exception handling) copy:
 	ooc.h
@@ -45,7 +59,6 @@ For the ooc core functions (class and object management, exception handling) cop
 
 If you'd like to use the other stuff as well, copy the rest.
 
-You must also compile the ooc_tool separately. There gonna be Windows .sln files sometimes ...
 
 ======================================
 

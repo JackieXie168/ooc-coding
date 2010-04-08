@@ -8,3 +8,5 @@ nobase_pkginclude_HEADERS= *.h implement/*.h
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = ooc.pc
+
+EXTRA_DIST = libooc.vcproj
