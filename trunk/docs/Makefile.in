@@ -374,7 +374,7 @@ distdir: $(DISTFILES)
 	done
 	$(MAKE) $(AM_MAKEFLAGS) \
 	  top_distdir="$(top_distdir)" distdir="$(distdir)" \
-	  dist-info
+	  dist-info dist-hook
 check-am: all-am
 check: check-am
 all-am: Makefile $(INFO_DEPS)
@@ -540,8 +540,8 @@ uninstall-am: uninstall-dvi-am uninstall-html-am uninstall-info-am \
 .MAKE: install-am install-strip
 
 .PHONY: all all-am check check-am clean clean-generic clean-local \
-	dist-info distclean distclean-generic distdir dvi dvi-am html \
-	html-am html-local info info-am install install-am \
+	dist-hook dist-info distclean distclean-generic distdir dvi \
+	dvi-am html html-am html-local info info-am install install-am \
 	install-data install-data-am install-dvi install-dvi-am \
 	install-exec install-exec-am install-html install-html-am \
 	install-html-local install-info install-info-am install-man \
@@ -568,6 +568,9 @@ install-html-local:
 
 uninstall-local:
 	rm -rf $(DESTDIR)${docdir}/api
+
+dist-hook:
+	zip -r ../ooc-doc-$(VERSION).zip ooc.pdf ooc.html api
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

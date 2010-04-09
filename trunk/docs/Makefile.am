@@ -15,3 +15,6 @@ uninstall-local:
 	rm -rf $(DESTDIR)${docdir}/api
 
 EXTRA_DIST = Doxyfile.linux ooc.html api ooc.pdf
+
+dist-hook:
+	zip -r ../ooc-doc-$(VERSION).zip ooc.pdf ooc.html api
