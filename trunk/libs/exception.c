@@ -182,39 +182,29 @@ ooc_link_try_block( struct ooc_try_block * block )
 }
 
 
-static
-void
-ooc_rewind_jmp_buf( void )
-{
-	if( try_pt ) {
-		ooc_delete( (Object) try_pt->exc_obj );
-		try_pt = try_pt->previous;
-		}
-	return;
-};
-
 static void clear_managed_stack( void );
 
 void
 ooc_throw( Exception exc_obj_ptr )
 {
-	/* Throwing Exception clears the managed stack */
-	clear_managed_stack();
-	 
-	/* if we are in an exception handling, then it is a nesting, that is not allowed */
-	if( try_pt && try_pt->exc_obj != NULL ) {
-		ooc_rewind_jmp_buf();
-		ooc_delete( (Object) exc_obj_ptr );
-		clear_managed_stack();
-		exc_obj_ptr = NULL;		/* Will generate an err_bad_throw */
-		}
-
 	if( exc_obj_ptr == NULL )
 		exc_obj_ptr = exception_new( err_bad_throw );
 
+	/* Throwing Exception clears the managed stack */
+	clear_managed_stack();
+	 
 	if( try_pt ) {
-		try_pt->exc_obj = exc_obj_ptr;
-		longjmp( try_pt->buffer, !0 );
+		
+		/* if we are in an exception handling, then its a rethrow with the new Exception */
+		if( try_pt->exc_obj != NULL ) {
+			ooc_delete( (Object) try_pt->exc_obj );
+			try_pt->exc_obj = exc_obj_ptr;
+			try_pt->status |= RETHROWN;
+			}
+		else {
+			try_pt->exc_obj = exc_obj_ptr;
+			longjmp( try_pt->buffer, !0 );
+			}
 		}
 	else {
 		/* if no error handler was set, we call the system to handle the error */
@@ -279,9 +269,11 @@ ooc_end_try( void )
 				try_pt = try_pt->previous;
 				ooc_throw( tmp );
 				}
-			else
+			else {
 				/* if we have caught, and handled, just rewind the buffer stack */
-				ooc_rewind_jmp_buf();
+				ooc_delete( (Object) try_pt->exc_obj );
+				try_pt = try_pt->previous;
+				}
 
 			}
 		else /* If there was no exception, we simply unlink the try block pointer */

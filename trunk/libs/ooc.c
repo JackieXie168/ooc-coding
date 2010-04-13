@@ -14,7 +14,7 @@
  */
  
 /**	Base Class.
- * Used for root Class in ooc. It must be a superclass for every classes.
+ * Used for root Class in ooc. It must be a superclass for all classes.
  */
 
 const struct ClassTable BaseClass;
@@ -169,25 +169,19 @@ ooc_use_classptr( void * mem, const Class type, const void * params )
 Object
 ooc_new_classptr( const Class type, const void * params )
 {
-	volatile Object object = NULL;
+	Object object;
 
 	/* The class type must be initialized already! */
 	assert( _ooc_isInitialized( type ) );
 
-	try {
-		/* Allocates a memory block for the object instance, and initializes it with zeros */
-		object = ooc_calloc(  1, type->size );
+	/* Allocates a memory block for the object instance, and initializes it with zeros */
+	object = ooc_calloc(  1, type->size );
 
-		ooc_build_object( object, type, params );
-		}
-	catch_any {
-		/* If the allocation or the constructor failed, frees the object */
-		ooc_delete( object );
-		ooc_rethrow();
-		}
-	end_try;
+	ooc_manage_object( object );
 
-	return object;
+	ooc_build_object( object, type, params );
+
+	return ooc_pass( object );
 }
 
 /*	Copying an existing object
@@ -222,30 +216,24 @@ copy_object_members( Object to, const Object from, const Class type )
 Object
 ooc_duplicate( const Object from )
 {
-	volatile Object	duplicate = NULL;
+	Object	duplicate;
 	Class	type = from->_vtab->_class;
 
-	try {
-		/* Allocates memory for the object instance */
-		duplicate = ooc_calloc( 1, type->size );
+	/* Allocates memory for the object instance */
+	duplicate = ooc_calloc( 1, type->size );
+	
+	ooc_manage_object( duplicate );
 
-		/* Initializes the Object header */
-		duplicate->_vtab = from->_vtab;
-			assert( sizeof( struct BaseObject ) == sizeof( struct BaseVtable * ) );
-			/* If struct BaseObject has been changed, additional copying is missing here!
-				memcpy( duplicate, from, sizeof(struct BaseObject)); would be a general solution, but much slover! */
+	/* Initializes the Object header */
+	duplicate->_vtab = from->_vtab;
+		assert( sizeof( struct BaseObject ) == sizeof( struct BaseVtable * ) );
+		/* If struct BaseObject has been changed, additional copying is missing here!
+			memcpy( duplicate, from, sizeof(struct BaseObject)); would be a general solution, but much slover! */
 
-		/* Calls the copy constructor */
-		copy_object_members( duplicate, from, type );
+	/* Calls the copy constructor */
+	copy_object_members( duplicate, from, type );
 
-		}
-	catch_any {
-		ooc_delete( duplicate );
-		ooc_rethrow();
-		}
-	end_try;
-
-	return duplicate;
+	return ooc_pass( duplicate );
 }
 
 
@@ -363,13 +351,13 @@ _ooc_isClassOf( const Class this, const Class base )
 }
 
 
-void *
-_ooc_check_cast( void * _self, const Class target )
+void
+ooc_check_cast( void * _self, const Class target )
 {
 	if( ! _ooc_isInstanceOf( _self, target ) )
 		ooc_throw( exception_new( err_bad_cast ) );
 		
-	return _self;
+	return;
 }
 
 

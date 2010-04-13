@@ -73,6 +73,9 @@ void		ooc_chain_manageable( struct ooc_Manageable * );
 #define ooc_manage( target, destroyer ) \
 	{ struct ooc_Manageable manageable = { target, destroyer }; ooc_chain_manageable( & manageable ); }
 	
+#define ooc_manage_object( target ) \
+	{ struct ooc_Manageable manageable = { target, (ooc_destroyer) ooc_delete }; ooc_chain_manageable( & manageable ); }
+	
 #ifdef NDEBUG
 void		ooc_unchain_last_manageable( void );
 #define		ooc_pass( x )	( ooc_unchain_last_manageable(), x )

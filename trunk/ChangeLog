@@ -1,3 +1,9 @@
+0.9.d
+It is allowed to throw an Exception in a catch() block.
+Adding ooc_manage_object() method
+Improved performance in ooc core (use of managed pointers instead of try...catch)
+Modified ooc_cast(), ooc_check_cast();
+
 0.9.c
 Adding ooc_isClassOf() type checking.
 Bug fix in ooc_finalize().
