@@ -213,7 +213,7 @@ vector_push_back( Vector self, void * data )
 	ooc_manage( data, self->destroy );
 	
 	if( self->type )
-		_ooc_check_cast( data, self->type );
+		ooc_check_cast( data, self->type );
 	
 	vector_realloc_if_needed( self );
 	
@@ -230,7 +230,7 @@ vector_insert( Vector self, VectorIndex position, void * data )
 	ooc_manage( data, self->destroy );
 	
 	if( self->type )
-		_ooc_check_cast( data, self->type );
+		ooc_check_cast( data, self->type );
 	
 	if( self->number_of_items < position )
 		ooc_throw( exception_new( err_wrong_position ) );	

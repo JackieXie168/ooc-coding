@@ -1,7 +1,6 @@
 #ifndef SIGNAL_H_
 #define SIGNAL_H_
 
-#include "ooc.h"
 #include "list.h"
 
 DeclareClass( Signal, List );

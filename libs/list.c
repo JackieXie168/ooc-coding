@@ -339,7 +339,7 @@ list_append( List self, void * new_item )
 	ooc_manage( new_item, self->destroy );
 	 
 	if( self->type )
-		_ooc_check_cast( new_item, self->type );
+		ooc_check_cast( new_item, self->type );
 		
 	if( self->last == NULL )
 	
@@ -359,7 +359,7 @@ list_prepend( List self, void * new_item )
 	ooc_manage( new_item, self->destroy );
 
 	if( self->type )
-		_ooc_check_cast( new_item, self->type );
+		ooc_check_cast( new_item, self->type );
 		
 	if( self->first == NULL )
 	
@@ -378,7 +378,7 @@ list_insert_before( List self, ListIterator location, void * new_item )
 	ooc_manage( new_item, self->destroy );
 	 
 	if( self->type )
-		_ooc_check_cast( new_item, self->type );
+		ooc_check_cast( new_item, self->type );
 		
 	if( ! ooc_isInstanceOf( location, ListNode ) )
 		ooc_throw( exception_new( err_wrong_position ) );
@@ -400,7 +400,7 @@ list_insert_after( List self, ListIterator location, void * new_item )
 	ooc_manage( new_item, self->destroy );
 
 	if( self->type )
-		_ooc_check_cast( new_item, self->type );
+		ooc_check_cast( new_item, self->type );
 		
 	if( ! ooc_isInstanceOf( location, ListNode ) )
 		ooc_throw( exception_new( err_wrong_position ) );
