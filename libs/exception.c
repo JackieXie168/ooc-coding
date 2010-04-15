@@ -39,9 +39,10 @@
  * static void MyException_finalize( Class this ) {}
  * static void MyException_constructor( MyException self, const void * params )
  * {
- *		self->code = err_user_code;
+ *		chain_constructor( MyException, self, NULL );
+ * 
  *		if( params )
- *	        self->user_code = * ( (int*) params );
+ *	        self->Exception.user_code = * ( (int*) params );
  * }
  * static void MyException_destructor( MyException self ) {}
  * static void MyException_copy( MyException self, MyException other ) { return OOC_COPY_DEFAULT; }
@@ -69,9 +70,7 @@
  *
  */
  
- /** @file implement/exception.h
-  */
- 
+  
 /* Allocating the class description table and the vtable
  */
 
@@ -109,6 +108,8 @@ Exception_constructor( Exception self, const void * params )
 {
 	if( params )
         self->code = * ( (int*) params );
+    else
+    	self->code = err_user_code;
 }
 
 /* Destructor
@@ -340,3 +341,42 @@ clear_managed_stack( void )
 		stack = stack->previous;
 		}
 }
+
+/** @name Exception handling.
+ * 
+ * @{
+ * 
+ * @def try
+ * Opens a try ... catch block.
+ * It must include exactly one statement, or group of statements in curly braces.
+ * @hideinitializer
+ * 
+ * @def catch( ec )
+ * Catches an exception of a given class.
+ * It must include exactly one statement, or group of statements in curly braces.
+ * @param	ec		The name of the exception class to be caought. Must be a subclass of Exception.
+ * @note	The predefined @c exception variable of Exception type can be used as the caught object.
+ * You must not delete the @c exception Object!
+ * @hideinitializer
+ * 
+ * @def catch_any
+ * Catches any thrown Exceptions.
+ * It must include exactly one statement, or group of statements in curly braces.
+ * @note	The predefined @c exception variable of Exception type can be used as the caught object.
+ * You must not delete the @c exception Object!
+ * @hideinitializer
+ * 
+ * @def finally
+ * Finally block.
+ * This block is executed in every case: either exception was thrown or not, caught or not.
+ * It must include exactly one statement, or group of statements in curly braces.
+ * @hideinitializer
+ * 
+ * @def end_try
+ * Closing mark for the try catch construct.
+ * This must be used to terminate the try catch finally constructs.
+ * @hideinitializer
+ * 
+ * @}
+ */
+ 
