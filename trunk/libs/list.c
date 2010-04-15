@@ -28,7 +28,7 @@ AllocateClass( List, Base );
 
 /** @class ListNode
  *  @brief ListNode class - brief description.
- * The ListNode objects forms the chain of the List. It has two pointers: one for the previous and one 
+ * The ListNode objects form the chain of the List. It has two pointers: one for the previous and one 
  * for the next ListNode in the List.
  * You can create a more effective List, if your items are subclasses of ListNode class, and you create
  * the List with list_new_of_nodes(). In this case your data are stored whithin the node, thus less @c malloc()

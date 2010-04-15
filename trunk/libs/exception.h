@@ -25,19 +25,56 @@ error_codes
 	err_wrong_position,					/**< insertion at wrong position into a container */
 	err_bad_connect,					/**< signal connection failure */
 
-	err_user_code		= 0x100			/**< Non ooc core exception == user defined exception */
+	err_user_code		= ~0			/**< Non ooc core exception == user defined exception */
 };
 
 /* Class methods */
 
-Exception	exception_new( enum error_codes );
-int			exception_get_error_code( const Exception );
-int			exception_get_user_code( const Exception );
+/** Creates a new ooc system Exception.
+ * Creates a new ooc Exception, that must have an error_code of a valid ooc system
+ * error code.
+ * @param	error	ooc system error code.
+ * @return	New Exception object.
+ */
+  
+Exception	exception_new( enum error_codes error );
+
+/** Gets the ooc core error code.
+ * Gets the ooc core error code for the Exception.
+ * @param	exception	The Exception Object.
+ * @return	ooc core error code.
+ * @note	For user defined exception (Objects inherited from Exception class) this function returns @c err_user_code.
+ */
+ 
+int			exception_get_error_code( const Exception exception );
+
+/** Gets the user error code.
+ * Gets the useer error code for the Exception.
+ * @param	exception	The Exception Object.
+ * @return	User error code.
+ * @note	For ooc core exceptions (Objects of Exception class) this function returns @c 0.
+ */
+
+int			exception_get_user_code( const Exception exception );
 
 /*	Exception handling
  */
 
-void		ooc_throw( Exception );
+/** Throws an exception.
+ * Exceptions can be thrown anywhere but in Object destructors and in @c finally blocks.
+ * @param	exception	The Object to be thrown. Must be a newly created object of Exception class
+ * 						or a derived class. ooc will manage this Exception object, you must not
+ * 						delete it yourself!
+ * @note An uncaught exception is caught by the ooc core, and aborts the program execution. 
+ */
+ 
+void		ooc_throw( Exception exception );
+
+/** Retrhows a caught exception.
+ * Can be used only within a @c catch() or a @c catch_any block.
+ * Must be the last statement in the block!
+ */
+ 
 void		ooc_rethrow( void ); 
 
 struct ooc_try_block {
@@ -61,6 +98,9 @@ void		ooc_link_try_block( struct ooc_try_block * );
 Exception	ooc_exception_caught( const Class );
 void		ooc_end_try( void );
 
+/* Managed pointers
+ */
+
 struct ooc_Manageable
 {
 	void *		target;
@@ -70,18 +110,64 @@ struct ooc_Manageable
 
 void		ooc_chain_manageable( struct ooc_Manageable * );
 
+/** @name Managed pointers, managed Objects
+ * Using managed pointers you will not get the program control in case of an exception, but it is guaranteed,
+ * that the memory is freed or the Object is deleted in case of an exception.
+ * (You may consider this as analogie for @c std::auto_ptr<> in C++.)
+ * Using managed pointers is faster than using the @c try...finally...end_try constructs, 
+ * so it is more advisable if you do not need the program control in case of an exception.
+ */
+
+/*@{ Managed pointers */
+
+/** Manage a pointer.
+ * Provides protection to a pointer, preventing memory leak in case of an exception.
+ * Pushes a pointer onto the top of the managed pointers' stack.
+ * @param	target		Pointer to the resource to be managed.
+ * @param	destroyer	Appropriate destroyer function for the target (typically @c ooc_delete or @c ooc_free).
+ * @return	Does not return anything.
+ * @see ooc_pass()
+ * @hideinitializer
+ */
+ 
 #define ooc_manage( target, destroyer ) \
 	{ struct ooc_Manageable manageable = { target, destroyer }; ooc_chain_manageable( & manageable ); }
 	
+/** Manage an Object.
+ * Provides protection to an Object, preventing memory leak in case of an exception.
+ * This is a comfortable shortcut for
+ * @code
+ * ooc_manage( my_object, (ooc_destroyer) ooc_delete );
+ * @endcode
+ * @param	target		Pointer to the @c Objcet to be managed.
+ * @see ooc_pass()
+ * @hideinitializer
+ */
+
 #define ooc_manage_object( target ) \
 	{ struct ooc_Manageable manageable = { target, (ooc_destroyer) ooc_delete }; ooc_chain_manageable( & manageable ); }
+
+/** @def ooc_pass( target )
+ * Removes the most recently pushed pointer from the managed pointers' stack.
+ * Always use in the reverse order of using @c ooc_manage()!
+ * The name is coming from passing the ownership of the pointer to an other object or function.
+ * @param	target	The pointer to be removed.
+ * @return	The pointer to the @c target itself.
+ * @note	Please note that since the most recently pushed pointer is removed, the parameter is used only for
+ * verifying that the push an pop orders are correct!
+ * @warning	In release versions this verification is skipped to gain some speed.
+ * @see ooc_manage(), ooc_manage_object()
+ * @hideinitializer
+ */
 	
+/*@} Managed pointers */
+
 #ifdef NDEBUG
 void		ooc_unchain_last_manageable( void );
-#define		ooc_pass( x )	( ooc_unchain_last_manageable(), x )
+#define		ooc_pass( target )	( ooc_unchain_last_manageable(), target )
 #else
 void		ooc_unchain_manageable( void * target );
-#define		ooc_pass( x )	( ooc_unchain_manageable( x ), x )
+#define		ooc_pass( target )	( ooc_unchain_manageable( target ), target )
 #endif
 
 /* Virtual function definitions

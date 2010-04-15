@@ -398,9 +398,13 @@ If there was no exception thrown, you must remove the pointer from the stack wit
 Because the managed pointers' stack is a stack, you can remove the most recently pushed item only: you must use @code{ooc_pass()} always in the reverse order of using @code{ooc_manage()}!
 
 @subsubsection Manage a pointer: @code{ooc_manage()}
-Push a pointer onto the top of the managed pointers' stack.@*
+Pushes a pointer onto the top of the managed pointers' stack.@*
 @code{ooc_manage()} requires two parameters: the pointer to the resource and the appropriate destroyer function for it (typically @code{ooc_delete} or @code{ooc_free}).@*
 @code{ooc_manage()} does not return anything.
+
+@subsubsection Manage an Object: @code{ooc_manage_object()}
+Manages an Object like @code{ooc_manage()}. @*
+This is shortcut for @code{ ooc_manage( my_object, (ooc_destroyer) ooc_delete );}.
 
 @subsubsection Pass the ownership: @code{ooc_pass()}
 Removes the most recently pushed pointer from the managed pointers' stack. Always use in the reverse order of using @code{ooc_manage()}!@*
