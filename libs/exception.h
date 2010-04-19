@@ -156,6 +156,8 @@ void		ooc_chain_manageable( struct ooc_Manageable * );
  * @note	Please note that since the most recently pushed pointer is removed, the parameter is used only for
  * verifying that the push an pop orders are correct!
  * @warning	In release versions this verification is skipped to gain some speed.
+ * @warning	Pass a pure pointer only! This macro has a side effect otherwise!
+ * (e.g. passing a function as a parameter that returns the object is called twice!) 
  * @see ooc_manage(), ooc_manage_object()
  * @hideinitializer
  */

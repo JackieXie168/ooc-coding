@@ -5,6 +5,20 @@
 
 #include "implement/refcounted.h"
 
+/** @class RefCounted
+ *  @brief RefCounted class - a reference counted Object.
+ * 	@see refcounted.h
+ */
+
+/** @file refcounted.h
+ * @brief RefCounted class - a reference counted Object.
+ * RefCounted serves as a base class for reference counted Objects.
+ * @note The initial value for the counter is one.
+ * @warning RefCounted overrides the delete operator: do not override the delete operator
+ * for inherited classes!
+ * @warning Current implementation of RefCounted is not thread safe.
+ */ 
+
 /* Allocating the class description table and the vtable
  */
 

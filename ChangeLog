@@ -3,6 +3,8 @@ It is allowed to throw an Exception in a catch() block.
 Adding ooc_manage_object() method
 Improved performance in ooc core (use of managed pointers instead of try...catch)
 Modified ooc_cast(), ooc_check_cast();
+Multi-target automake: libooc.a for release and libooc_d.a for debug version.
+Improve API docs.
 
 0.9.c
 Adding ooc_isClassOf() type checking.

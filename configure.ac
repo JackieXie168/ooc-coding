@@ -30,6 +30,9 @@ AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_CHECK_FUNCS([memmove memset])
 
+# Per-target compilation
+AM_PROG_CC_C_O
+
 AC_CONFIG_FILES([Makefile
                  libs/Makefile
                  libs/ooc.pc
