@@ -4,7 +4,7 @@
 
 #include "implement/sample.h"
 
-#include <exception.h>
+#include <ooc/exception.h>
 
 /** @class Sample
  *  @brief Sample class - brief description.

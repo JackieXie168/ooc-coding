@@ -1,3 +1,8 @@
+0.9.e
+Bugfix with nested managed pointers (unique name for each Manageables).
+To prevent possible name conflicts with other include files, templates are modified (adding ooc/ prefix).
+
+
 0.9.d
 It is allowed to throw an Exception in a catch() block.
 Adding ooc_manage_object() method

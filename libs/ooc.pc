@@ -6,6 +6,6 @@ includedir=${prefix}/include/ooc
 Name: ooc
 Description: Object oriented C library.
 Requires:
-Version: 0.9.d
+Version: 0.9.e
 Libs: -L${libdir} -looc
 Cflags: -I${includedir}
