@@ -2,7 +2,7 @@
 #ifndef SAMPLE_H
 #define SAMPLE_H
 
-#include <ooc.h>
+#include <ooc/ooc.h>
 
 DeclareClass( Sample, Base );
 

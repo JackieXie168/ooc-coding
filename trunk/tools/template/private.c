@@ -4,7 +4,7 @@
 
 #include "sample.h"
 
-#include <exception.h>
+#include <ooc/exception.h>
 
 #include "implement/base.h" !!! TODO !!! Remove if the class has Base as parent!
 
