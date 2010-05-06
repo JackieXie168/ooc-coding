@@ -119,6 +119,10 @@ void		ooc_chain_manageable( struct ooc_Manageable * );
  * (You may consider this as analogie for @c std::auto_ptr<> in C++.)
  * Using managed pointers is faster than using the @c try...finally...end_try constructs, 
  * so it is more advisable if you do not need the program control in case of an exception.
+ * @warning Use @c ooc_manage() / @c ooc_manage_object() and @c ooc_pass() always as a pair in the same 
+ * name scope! These macros use local variables, and the variable created by @c ooc_manage() must be 
+ * accessible by @c ooc_pass()! Never let @c ooc_manage() be executed more than once without executing
+ * the corresponding @c ooc_pass() before!
  */
 
 /*@{ Managed pointers */

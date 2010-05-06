@@ -395,7 +395,12 @@ Using managed pointers is faster than using the @code{try ... finally ... end_tr
 Managing a pointer means that @strong{ooc} will take care of freeing the resouce in case of an exception. You can manage a pointer with the @code{ooc_manage()} macro. This macro pushes the pointer (and the corresponding destroyer function) to the top of the managed pointers stack.@*
 If there is an exception thrown, @strong{ooc} will continue the program execution at the next @code{catch} or @code{finally} statement, and takes care that all memory or Objects that are referenced by the managed pointers pushed onto the stack, are freed or deleted respectively till that point.@*
 If there was no exception thrown, you must remove the pointer from the stack with the @code{ooc_pass()} macro.@*
-Because the managed pointers' stack is a stack, you can remove the most recently pushed item only: you must use @code{ooc_pass()} always in the reverse order of using @code{ooc_manage()}!
+Because the managed pointers' stack is a stack, you can remove the most recently pushed item only: you must use @code{ooc_pass()} always in the reverse order of using @code{ooc_manage()}!@*
+Use @code{ooc_manage()} / @code{ooc_manage_object()} and @code{ooc_pass()} always as a pair in the same 
+name scope! These macros use local variables, and the variable created by @code{ooc_manage()} must be 
+accessible by @code{ooc_pass()}! Never let @code{ooc_manage()} be executed more than once without executing
+the corresponding @code{ooc_pass()} before!
+
 
 @subsubsection Manage a pointer: @code{ooc_manage()}
 Pushes a pointer onto the top of the managed pointers' stack.@*
