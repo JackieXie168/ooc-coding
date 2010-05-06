@@ -42,7 +42,8 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
 am_test_OBJECTS = main.$(OBJEXT) testclass.$(OBJEXT) \
-	vector_test.$(OBJEXT) signal_test.$(OBJEXT)
+	vector_test.$(OBJEXT) signal_test.$(OBJEXT) \
+	manage_test.$(OBJEXT)
 test_OBJECTS = $(am_test_OBJECTS)
 test_DEPENDENCIES = ../libs/libooc.a
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
@@ -146,7 +147,7 @@ AM_LDFLAGS =
 AM_CFLAGS = 
 AM_CPPFLAGS = -DNDEBUG -I../libs
 test_LDADD = ../libs/libooc.a
-test_SOURCES = main.c tests.h testclass.c testclass.h vector_test.c signal_test.c signal_test.h
+test_SOURCES = main.c tests.h testclass.c testclass.h vector_test.c signal_test.c signal_test.h manage_test.c
 EXTRA_DIST = tests.vcproj
 all: all-am
 
@@ -195,6 +196,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/manage_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/signal_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testclass.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vector_test.Po@am__quote@

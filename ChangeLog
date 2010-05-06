@@ -1,6 +1,7 @@
 0.9.e
 Bugfix with nested managed pointers (unique name for each Manageables).
 To prevent possible name conflicts with other include files, templates are modified (adding ooc/ prefix).
+New test for managed pointers.
 
 
 0.9.d
