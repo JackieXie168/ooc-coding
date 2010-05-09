@@ -239,10 +239,10 @@ signal_emit( Signal signal, void * parameter, ooc_destroyer param_destroy_fn )
 	if( signal ) {
 		SignalQueued sq;
 		
-		assert( ooc_isInstanceOf( signal, Signal ) );
-		
 		ooc_manage( parameter, param_destroy_fn ); 
 
+		assert( ooc_isInstanceOf( signal, Signal ) );
+		
 		sq = (SignalQueued) ooc_new( SignalQueued, NULL );
 		
 		sq->emitted_signal 	= signal;

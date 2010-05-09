@@ -334,10 +334,10 @@ _list_new_of_nodes( Class node, int manage )
 ListIterator
 list_append( List self, void * new_item )
 {
-	assert( ooc_isInstanceOf( self, List ) );
-	
 	ooc_manage( new_item, self->destroy );
 	 
+	assert( ooc_isInstanceOf( self, List ) );
+
 	if( self->type )
 		ooc_check_cast( new_item, self->type );
 		
@@ -348,16 +348,15 @@ list_append( List self, void * new_item )
 	else
 	
 		return chain_after( self, self->last, create_new_node( self, ooc_pass( new_item ) ) );
-		
 }
 
 ListIterator
 list_prepend( List self, void * new_item )
 {
-	assert( ooc_isInstanceOf( self, List ) );
-	 
 	ooc_manage( new_item, self->destroy );
 
+	assert( ooc_isInstanceOf( self, List ) );
+	 
 	if( self->type )
 		ooc_check_cast( new_item, self->type );
 		
@@ -373,10 +372,10 @@ list_prepend( List self, void * new_item )
 ListIterator
 list_insert_before( List self, ListIterator location, void * new_item )
 {
-	assert( ooc_isInstanceOf( self, List ) );
-
 	ooc_manage( new_item, self->destroy );
 	 
+	assert( ooc_isInstanceOf( self, List ) );
+
 	if( self->type )
 		ooc_check_cast( new_item, self->type );
 		
@@ -395,10 +394,10 @@ list_insert_before( List self, ListIterator location, void * new_item )
 ListIterator
 list_insert_after( List self, ListIterator location, void * new_item )
 {
-	assert( ooc_isInstanceOf( self, List ) );
-	
 	ooc_manage( new_item, self->destroy );
 
+	assert( ooc_isInstanceOf( self, List ) );
+	
 	if( self->type )
 		ooc_check_cast( new_item, self->type );
 		

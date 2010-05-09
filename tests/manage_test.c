@@ -3,7 +3,7 @@
  */
 
 #include <stdio.h>
-#include <ooc/exception.h>
+#include <exception.h>
 
 
 DeclareClass( Foo, Base );
@@ -44,7 +44,7 @@ foo_new( void )
 /* This is a FooException class implementation file
  */
 
-#include <ooc/implement/exception.h>
+#include <implement/exception.h>
 
 DeclareClass( FooException, Exception );
 
@@ -85,17 +85,21 @@ manage_test_2( void )
 	Foo		foo2;
 	
 	foo1	= foo_new();
-	ooc_manage_object( foo1 );
-	
-	foo2	= foo_new();
-	ooc_manage_object( foo2 );
-	
-	printf( "Throwing FooException( 1 )\n" );
-	ooc_throw( foo_exception_new( 1 ) );
-	
-	ooc_delete( (Object) ooc_pass( foo2 ) );
-	
-	ooc_delete( (Object) ooc_pass( foo1 ) );
+	{
+		ooc_manage_object( foo1 );
+		
+		foo2	= foo_new();
+		{
+			ooc_manage_object( foo2 );
+			
+			printf( "Throwing FooException( 1 )\n" );
+			ooc_throw( foo_exception_new( 1 ) );
+			
+			ooc_delete( (Object) ooc_pass( foo2 ) );
+		}
+		
+		ooc_delete( (Object) ooc_pass( foo1 ) );
+	}
 }
 
 static
@@ -106,16 +110,19 @@ manage_test_1( void )
 	Foo		foo2;
 	
 	foo1	= foo_new();
-	ooc_manage_object( foo1 );
-	
-	foo2	= foo_new();
-	ooc_manage_object( foo2 );
-	
-	manage_test_2();
-	
-	ooc_delete( (Object) ooc_pass( foo2 ) );
-	
-	ooc_delete( (Object) ooc_pass( foo1 ) );
+	{
+		ooc_manage_object( foo1 );
+		
+		foo2	= foo_new();
+		{
+			ooc_manage_object( foo2 );
+			
+			manage_test_2();
+			
+			ooc_delete( (Object) ooc_pass( foo2 ) );
+		}
+		ooc_delete( (Object) ooc_pass( foo1 ) );
+	}
 }
 
 void
