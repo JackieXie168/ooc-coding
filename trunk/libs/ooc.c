@@ -177,11 +177,13 @@ ooc_new_classptr( const Class type, const void * params )
 	/* Allocates a memory block for the object instance, and initializes it with zeros */
 	object = ooc_calloc(  1, type->size );
 
+	{
 	ooc_manage_object( object );
 
 	ooc_build_object( object, type, params );
 
 	return ooc_pass( object );
+	}
 }
 
 /*	Copying an existing object
@@ -221,7 +223,7 @@ ooc_duplicate( const Object from )
 
 	/* Allocates memory for the object instance */
 	duplicate = ooc_calloc( 1, type->size );
-	
+	{
 	ooc_manage_object( duplicate );
 
 	/* Initializes the Object header */
@@ -234,6 +236,7 @@ ooc_duplicate( const Object from )
 	copy_object_members( duplicate, from, type );
 
 	return ooc_pass( duplicate );
+	}
 }
 
 

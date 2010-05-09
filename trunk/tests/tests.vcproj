@@ -182,11 +182,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\implement\testclass.h"
+				RelativePath=".\testclass.h"
 				>
 			</File>
 			<File
-				RelativePath=".\testclass.h"
+				RelativePath=".\implement\testclass.h"
 				>
 			</File>
 			<File
@@ -207,6 +207,10 @@
 			>
 			<File
 				RelativePath=".\main.c"
+				>
+			</File>
+			<File
+				RelativePath=".\manage_test.c"
 				>
 			</File>
 			<File

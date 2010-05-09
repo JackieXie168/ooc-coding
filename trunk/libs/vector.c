@@ -208,9 +208,9 @@ vector_realloc_if_needed( Vector self )
 VectorIndex
 vector_push_back( Vector self, void * data )
 {
-	assert( ooc_isInstanceOf( self, Vector ) );
-	
 	ooc_manage( data, self->destroy );
+	
+	assert( ooc_isInstanceOf( self, Vector ) );
 	
 	if( self->type )
 		ooc_check_cast( data, self->type );
@@ -225,9 +225,9 @@ vector_push_back( Vector self, void * data )
 VectorIndex
 vector_insert( Vector self, VectorIndex position, void * data )
 {
-	assert( ooc_isInstanceOf( self, Vector ) );
-	
 	ooc_manage( data, self->destroy );
+	
+	assert( ooc_isInstanceOf( self, Vector ) );
 	
 	if( self->type )
 		ooc_check_cast( data, self->type );
@@ -294,9 +294,9 @@ vector_get_item( Vector self, VectorIndex index )
 void
 vector_set_item( Vector self, VectorIndex index, void * data )
 {
-	assert( ooc_isInstanceOf( self, Vector ) );
-	
 	ooc_manage( data, self->destroy );
+	
+	assert( ooc_isInstanceOf( self, Vector ) );
 	
 	if( self->number_of_items <= index )
 		ooc_throw( exception_new( err_wrong_position ) );
