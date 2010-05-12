@@ -227,7 +227,7 @@ static
 void
 TestStr_destructor( TestStr self )
 {
-	ooc_free_and_null( (void**) & self->data );
+	ooc_free_and_null( (void*) & self->data );
 }
 
 /* Copy constuctor

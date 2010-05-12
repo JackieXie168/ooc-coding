@@ -108,9 +108,6 @@ struct ooc_Manageable
 	struct ooc_Manageable * previous;
 };
 
-#define MANAGEABLE_(l) manageable_##l
-#define MANAGEABLE(l) MANAGEABLE_(l)
-
 void		ooc_chain_manageable( struct ooc_Manageable * );
 
 /** @name Managed pointers, managed Objects
@@ -137,8 +134,13 @@ void		ooc_chain_manageable( struct ooc_Manageable * );
  * @hideinitializer
  */
 
-#define ooc_manage( target, destroyer ) \
-	struct ooc_Manageable MANAGEABLE(__LINE__) = { target, destroyer }; ooc_chain_manageable( & MANAGEABLE(__LINE__) );
+#define ooc_manage( p_target, p_destroyer ) \
+	struct ooc_Manageable _managed_; \
+		_managed_.target = p_target; \
+		_managed_.destroyer =  p_destroyer; \
+		ooc_chain_manageable( & _managed_ );
+/*	struct ooc_Manageable _managed_ = { target, destroyer }; ooc_chain_manageable( & _managed_ );
+ */
 	
 /** Manage an Object.
  * Provides protection to an Object, preventing memory leak in case of an exception.
@@ -151,8 +153,13 @@ void		ooc_chain_manageable( struct ooc_Manageable * );
  * @hideinitializer
  */
 
-#define ooc_manage_object( target ) \
-	struct ooc_Manageable MANAGEABLE(__LINE__) = { target, (ooc_destroyer) ooc_delete }; ooc_chain_manageable( & MANAGEABLE(__LINE__) );
+#define ooc_manage_object( p_target ) \
+ 	struct ooc_Manageable _managed_; \
+		_managed_.target = p_target; \
+		_managed_.destroyer =  (ooc_destroyer) ooc_delete; \
+		ooc_chain_manageable( & _managed_ );
+/*	struct ooc_Manageable _managed_ = { target, (ooc_destroyer) ooc_delete }; ooc_chain_manageable( & _managed_ );
+ */
 
 /** @def ooc_pass( target )
  * Removes the most recently pushed pointer from the managed pointers' stack.

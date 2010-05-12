@@ -23,7 +23,7 @@ vector_test_pushback( void )
 		
 	for( i = 0; i<100; i++ ) {
 		TestInt actual = (TestInt) vector_get_item( vector, i );
-		printf( "TestInt object at %p has data of: %d\n", actual, testint_get( actual) );
+		printf( "TestInt object at %p has data of: %d\n", (void*) actual, testint_get( actual) );
 		}
 	
 	ooc_delete( (Object) vector );

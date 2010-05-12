@@ -10,6 +10,9 @@
 <option id="gnu.c.compiler.option.include.paths.695418193" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libs}&quot;"/>
 </option>
+<option id="gnu.c.compiler.option.misc.ansi.724242992" superClass="gnu.c.compiler.option.misc.ansi" value="true" valueType="boolean"/>
+<option id="gnu.c.compiler.option.warnings.pedantic.85936721" superClass="gnu.c.compiler.option.warnings.pedantic" value="true" valueType="boolean"/>
+<option id="gnu.c.compiler.option.misc.other.1836441854" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0 -Wno-unused-function" valueType="string"/>
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.14344607" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug">
 <option id="gnu.c.link.option.libs.1156330745" superClass="gnu.c.link.option.libs" valueType="libs">
@@ -34,6 +37,9 @@
 <option id="gnu.c.compiler.option.include.paths.137037129" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libs}&quot;"/>
 </option>
+<option id="gnu.c.compiler.option.warnings.pedantic.15357544" superClass="gnu.c.compiler.option.warnings.pedantic" value="true" valueType="boolean"/>
+<option id="gnu.c.compiler.option.misc.other.1877101457" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0 -Wno-unused-function" valueType="string"/>
+<option id="gnu.c.compiler.option.misc.ansi.1038637109" superClass="gnu.c.compiler.option.misc.ansi" value="true" valueType="boolean"/>
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.c.linker.exe.release.318934311" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.release">
 <option id="gnu.c.link.option.libs.441265665" superClass="gnu.c.link.option.libs" valueType="libs">

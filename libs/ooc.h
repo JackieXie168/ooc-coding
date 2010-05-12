@@ -19,9 +19,10 @@
 #if defined( _MSC_VER )
 #define STIN static _inline
 #elif defined( __GNUC__ ) && !defined( __NO_INLINE__ )
-#define STIN static inline
+#define STIN static __inline__
 #else 
 #define STIN static
+#define NO_INLINE
 #warning "inline functions are unavailabe"
 #endif
 
@@ -372,7 +373,7 @@ extern const struct ClassTable BaseClass;
 				return ( pParent ## Vtable ) ( ((struct BaseObject *) this )->_vtab->_class->parent->vtable ); \
 				}
 
-#if defined( STIN )	/* Compilers that support function inlining */
+#if !defined( NO_INLINE )	/* Compilers that support function inlining */
 
 #define _declare_vtab_access( pClass, pParent )									\
 			STIN _vtab_access_fn( pClass )								\
@@ -410,7 +411,7 @@ extern const struct ClassTable BaseClass;
 
 #define	DeclareClass( pClass, pParent )  							\
 	typedef struct pClass ## Object * pClass;				\
-	extern const struct ClassTable pClass ## Class;
+	extern const struct ClassTable pClass ## Class
 
 
 /** Class virtual functions declaration macro.
@@ -495,7 +496,7 @@ extern const struct ClassTable BaseClass;
 	/* Allocating the Vtable */								\
 	struct pClass ## Vtable_stru pClass ## VtableInstance;	\
 															\
-	_define_vtab_access( pClass, pParent );					\
+	_define_vtab_access( pClass, pParent )					\
 															\
 	/* Allocating the class description table */			\
 	const struct ClassTable pClass ## Class = {				\
