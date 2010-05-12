@@ -1,3 +1,8 @@
+0.9.f
+Implementation of managed pointers was not ANSI-C compliant. :-(
+Reworked, now it is in line with ANSI-C, and can be compiled with VC++ as well.
+(And should be able to be compiled with many compilers ...)
+
 0.9.e
 Bugfix with nested managed pointers (unique name for each Manageables).
 To prevent possible name conflicts with other include files, templates are modified (adding ooc/ prefix).

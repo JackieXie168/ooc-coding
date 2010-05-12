@@ -25,12 +25,12 @@ static	void	Foo_constructor( Foo self, const void * params )
 	
 	chain_constructor( Foo, self, NULL );
 	
-	printf( "\tFoo object at %p has been constructed.\n", self );
+	printf( "\tFoo object at %p has been constructed.\n", (void*) self );
 }
 
 static	void	Foo_destructor( Foo self )
 {
-	printf( "\tFoo object at %p has been destroyed.\n", self );
+	printf( "\tFoo object at %p has been destroyed.\n", (void*) self );
 }
 
 static	int	Foo_copy( Foo self, const Foo from ) { return OOC_COPY_DEFAULT; }

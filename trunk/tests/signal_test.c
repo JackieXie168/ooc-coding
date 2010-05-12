@@ -192,7 +192,7 @@ listener_new( void )
 void
 listener_print( Listener self, SignalTest source, int * param )
 {
-	printf( "Signal from source %p reported count %d\n", source, *param );
+	printf( "Signal from source %p reported count %d\n", (void*) source, *param );
 }
 
 void

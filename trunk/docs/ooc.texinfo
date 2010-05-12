@@ -395,11 +395,12 @@ Using managed pointers is faster than using the @code{try ... finally ... end_tr
 Managing a pointer means that @strong{ooc} will take care of freeing the resouce in case of an exception. You can manage a pointer with the @code{ooc_manage()} macro. This macro pushes the pointer (and the corresponding destroyer function) to the top of the managed pointers stack.@*
 If there is an exception thrown, @strong{ooc} will continue the program execution at the next @code{catch} or @code{finally} statement, and takes care that all memory or Objects that are referenced by the managed pointers pushed onto the stack, are freed or deleted respectively till that point.@*
 If there was no exception thrown, you must remove the pointer from the stack with the @code{ooc_pass()} macro.@*
-Because the managed pointers' stack is a stack, you can remove the most recently pushed item only: you must use @code{ooc_pass()} always in the reverse order of using @code{ooc_manage()}!@*
+Because the managed pointers' stack is a @emph{stack}, you can remove the most recently pushed item only: you must use @code{ooc_pass()} always in the reverse order of using @code{ooc_manage()}!@*
 Use @code{ooc_manage()} / @code{ooc_manage_object()} and @code{ooc_pass()} always as a pair in the same 
 name scope! These macros use local variables, and the variable created by @code{ooc_manage()} must be 
 accessible by @code{ooc_pass()}! Never let @code{ooc_manage()} be executed more than once without executing
-the corresponding @code{ooc_pass()} before!
+the corresponding @code{ooc_pass()} before!@*
+To be ANSI-C compliant, the @code{ooc_manage()} and @code{ooc_manage_object()} macros always must preceed any statement in the given namespace! (This is because they define a local variable.) In practice this means that you must open a new name scope with @{ if you'd like to use the managed pointer in the middle of your code. Close this name scope only after passing the managed pointer. You can nest more namescopes when using multiple managed pointers. See the first example!
 
 
 @subsubsection Manage a pointer: @code{ooc_manage()}
@@ -428,12 +429,13 @@ void my_func( void )
     char * mem;
 
     mem = ooc_malloc( 1000 );
+    @{
+        ooc_manage( mem, ooc_free );
 
-    ooc_manage( mem, ooc_free );
+        do_a_risky_call();
 
-    do_a_risky_call();
-
-    ooc_free( ooc_pass( mem ) );                      
+        ooc_free( ooc_pass( mem ) );
+    @}                      
 @}
 @end example
 Simplier, faster.
