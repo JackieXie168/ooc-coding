@@ -8,7 +8,7 @@
 <tool id="cdt.managedbuild.tool.gnu.cpp.compiler.lib.debug.1799963570" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.lib.debug"/>
 <tool id="cdt.managedbuild.tool.gnu.c.compiler.lib.debug.938189461" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.lib.debug">
 <option id="gnu.c.compiler.option.misc.ansi.309796092" superClass="gnu.c.compiler.option.misc.ansi" value="true" valueType="boolean"/>
-<option id="gnu.c.compiler.option.misc.other.1447038746" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0 -Wno-unused-function" valueType="string"/>
+<option id="gnu.c.compiler.option.misc.other.1447038746" superClass="gnu.c.compiler.option.misc.other" value="-c -fopenmp -fmessage-length=0 -Wno-unused-function" valueType="string"/>
 <option id="gnu.c.compiler.option.warnings.pedantic.2008496132" superClass="gnu.c.compiler.option.warnings.pedantic" value="true" valueType="boolean"/>
 <option id="gnu.c.compiler.option.preprocessor.preprocess.148369106" superClass="gnu.c.compiler.option.preprocessor.preprocess" value="false" valueType="boolean"/>
 </tool>
@@ -23,7 +23,7 @@
 <tool id="cdt.managedbuild.tool.gnu.c.compiler.lib.release.858521757" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.lib.release">
 <option id="gnu.c.compiler.option.optimization.flags.1252964599" superClass="gnu.c.compiler.option.optimization.flags" value="-fno-strict-aliasing" valueType="string"/>
 <option id="gnu.c.compiler.option.warnings.pedantic.542949721" superClass="gnu.c.compiler.option.warnings.pedantic" value="true" valueType="boolean"/>
-<option id="gnu.c.compiler.option.misc.other.1287647337" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0 -Wno-unused-function" valueType="string"/>
+<option id="gnu.c.compiler.option.misc.other.1287647337" superClass="gnu.c.compiler.option.misc.other" value="-c -fopenmp -fmessage-length=0 -Wno-unused-function" valueType="string"/>
 <option id="gnu.c.compiler.option.misc.ansi.1481286271" superClass="gnu.c.compiler.option.misc.ansi" value="true" valueType="boolean"/>
 <option id="gnu.c.compiler.option.preprocessor.def.symbols.772336902" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
 <listOptionValue builtIn="false" value="NDEBUG"/>

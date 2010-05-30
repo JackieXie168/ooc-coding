@@ -14,28 +14,18 @@
 #define TRUE (! FALSE)
 #endif
 
+/* Include environment specific definitions
+ */
 
-/* implementing static inline */
 #if defined( _MSC_VER )
-#define STIN static _inline
-#elif defined( __GNUC__ ) && !defined( __NO_INLINE__ )
-#define STIN static __inline__
-#else 
-#define STIN static
-#define NO_INLINE
-#warning "inline functions are unavailabe"
-#endif
-
-/* implementing Thread Local Storage */
-#if defined( _MSC_VER )
-#define TLS static _declspec( thread )
+	#include "port/msvc.h"
+	
 #elif defined( __GNUC__ )
-#define TLS static __thread
+	#include "port/gnuc.h"
+	
 #else
-#define TLS
-#warning "ooc implementation is not thread-safe!"
+	#include "port/anyc.h"
 #endif
-
 
 /* Base objects and types
  */
@@ -531,7 +521,7 @@ extern const struct ClassTable BaseClass;
  * @param	pParam	Pointer to the construction parameters for the parent class's constructor.
  * 					This pointer is passed to the constructor without any check.
  * @note In some rare cases you may neglect calling the parent constructor, e.g. when there is no parent class,
- * or if you definitly know, that the paren class does not need construction, like in case of @c ListNode.
+ * or if you definitly know, that the parent class does not need construction, like in case of @c ListNode.
  * @hideinitializer
  */
 

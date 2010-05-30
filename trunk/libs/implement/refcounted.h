@@ -5,7 +5,8 @@
 
 ClassMembers( RefCounted, Base )
 
-	int		counter;
+	int			counter;
+	ooc_Mutex	access;
 
 EndOfClassMembers;
 

@@ -1,7 +1,7 @@
 
 SOURCE_FILES = ooc.c exception.c refcounted.c list.c vector.c signal.c
 
-AM_CFLAGS=
+AM_CFLAGS= -fopenmp
 
 pkglib_LIBRARIES = libooc.a libooc_d.a
 

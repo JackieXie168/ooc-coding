@@ -33,11 +33,15 @@ static
 void
 RefCounted_delete( RefCounted self )
 {
-	#ifndef _MSC_VER
-		#warning "Implementation of RefCounted_delete() is not thread safe"
-	#endif
-
-	if( --( self->counter ) == 0 )
+	int to_be_deleted = FALSE;
+	
+	ooc_lock( self->access );
+	if( self->counter != 0 )
+		--self->counter;
+	to_be_deleted = ( self->counter == 0 );
+	ooc_unlock( self->access );
+	
+	if( to_be_deleted )
 	   original_delete( (Object) self );
 }
 
@@ -76,6 +80,7 @@ RefCounted_constructor( RefCounted self, const void * params )
 	chain_constructor( RefCounted, self, NULL );
 	
     self->counter = 1;
+    ooc_mutex_init( self->access );
 }
 
 /* Destructor
@@ -85,6 +90,7 @@ static
 void
 RefCounted_destructor( RefCounted self )
 {
+    ooc_mutex_release( self->access );
 }
 
 /* Copy constuctor
@@ -94,7 +100,9 @@ static
 int
 RefCounted_copy( RefCounted self, const RefCounted from )
 {
-    self->counter = 1;  /* The new object has a new counter as well */
+    self->counter = 1;  				/* The new object has a new counter as well */
+    ooc_mutex_init( self->access );
+    
     return OOC_COPY_DONE;
 }
 
@@ -108,11 +116,9 @@ refcnt_addref( RefCounted self )
 {
 	assert( ooc_isInstanceOf( self, RefCounted ) );
 	
-	#ifndef _MSC_VER
-		#warning "Implementation of refcnt_addref() is not thread safe"
-	#endif
-
+	ooc_lock( self->access );
 	self->counter ++;
+	ooc_unlock( self->access );
 	
 	return self;
 }
