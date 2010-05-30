@@ -1,3 +1,7 @@
+0.9.g
+Separate headers fo each compilers / ports. Makes porting ooc much easier.
+Multithreading support.
+
 0.9.f
 Implementation of managed pointers was not ANSI-C compliant. :-(
 Reworked, now it is in line with ANSI-C, and can be compiled with VC++ as well.

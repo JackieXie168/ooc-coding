@@ -5,6 +5,8 @@
 #include <setjmp.h>
 #include <assert.h>
 
+#define COMPILING_OOC_C
+
 #include "ooc.h"
 
 #include "exception.h"
@@ -84,7 +86,8 @@ inherit_vtable_from_parent( const Class self )
 		}
 }
 
-static Class class_register = NULL;		/* Points to the most recently initialized Class */
+static Class 		class_register = NULL;		/* Points to the most recently initialized Class */
+static ooc_Mutex	class_register_change;
 
 void
 _ooc_init_class( const Class self )
@@ -103,9 +106,14 @@ _ooc_init_class( const Class self )
 
 		self->init( self );
 
+		if( class_register == NULL )					/* Race condition, but however we declared _ooc_init_class() as non-thread-safe */
+			ooc_mutex_init( class_register_change );
+			
+		ooc_lock( class_register_change );
 		self->vtable->_class_register_prev = class_register;
 		self->vtable->_class_register_next = NULL;
 		class_register = self;
+		ooc_unlock( class_register_change );
 	}
 }
 
@@ -116,6 +124,8 @@ _ooc_finalize_class( const Class self )
 
 		self->vtable->_class = NULL;		/* Class is marked uninitalized */
 		
+		ooc_lock( class_register_change );
+
 		if( class_register == self )		/* Move class register pointer if necessary */
 			class_register = self->vtable->_class_register_prev;
 
@@ -124,6 +134,11 @@ _ooc_finalize_class( const Class self )
 			
 		if( self->vtable->_class_register_next )	/* Unchain the current class II. */
 			self->vtable->_class_register_next->vtable->_class_register_prev = self->vtable->_class_register_prev;
+
+		ooc_unlock( class_register_change );
+			
+		if( class_register == NULL )
+			ooc_mutex_release( class_register_change );
 			
 		self->finz( self );					/* Finalize the current class */
 	}	
@@ -467,36 +482,7 @@ ooc_free_and_null( void ** mem )
 void *
 ooc_ptr_read_and_null( void ** ptr_ptr )
 {
-	
-	#if defined( _MSC_VER ) && defined ( _M_IX86 )
-	
-		__asm {
-			mov		EBX, ptr_ptr
-			mov		EAX, 0
-			xchg	[EBX], EAX
-			}
-	
-	#elif defined( __GNUC__ ) && defined( __i386__ )
-	
-		void * ret_val;
-		__asm__ ( 
-			  "movl		%1, %%ebx;"
-			  "movl		$0, %0;"
-			  "xchgl	%0, (%%ebx)"
-					: "=a" (ret_val)
-					: "m" (ptr_ptr)
-					: "ebx" );
-		return ret_val;
-	
-	#else
-	
-		#warning "Implementation of ooc_ptr_read_and_null() is not thread safe."
-		void * tmp = * ptr_ptr;
-		* ptr_ptr = NULL;
-		return tmp;
-		
-	#endif	
-	
+	OOC_IMPLEMENT_PTR_READ_AND_NULL
 }
 
 

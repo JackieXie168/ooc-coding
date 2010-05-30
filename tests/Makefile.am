@@ -1,5 +1,5 @@
 AM_LDFLAGS =
-AM_CFLAGS =
+AM_CFLAGS = -fopenmp
 AM_CPPFLAGS = -DNDEBUG -I../libs
 
 noinst_PROGRAMS=test

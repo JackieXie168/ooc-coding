@@ -38,7 +38,7 @@
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libs}&quot;"/>
 </option>
 <option id="gnu.c.compiler.option.warnings.pedantic.15357544" superClass="gnu.c.compiler.option.warnings.pedantic" value="true" valueType="boolean"/>
-<option id="gnu.c.compiler.option.misc.other.1877101457" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0 -Wno-unused-function" valueType="string"/>
+<option id="gnu.c.compiler.option.misc.other.1877101457" superClass="gnu.c.compiler.option.misc.other" value="-c -fopenmp -fmessage-length=0 -Wno-unused-function" valueType="string"/>
 <option id="gnu.c.compiler.option.misc.ansi.1038637109" superClass="gnu.c.compiler.option.misc.ansi" value="true" valueType="boolean"/>
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.c.linker.exe.release.318934311" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.release">
