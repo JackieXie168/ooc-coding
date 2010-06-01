@@ -12,7 +12,7 @@
 
 #define TLS
 
-#define	ooc_Mutex				int
+#define	ooc_Mutex				struct {} /* allocates 0 bytes, but the name is defined */
 #define ooc_mutex_init( x )
 #define ooc_mutex_release( x )
 #define ooc_lock( x )	

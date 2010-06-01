@@ -14,6 +14,8 @@ ClassMembers( List, Base )
     int					list_of_nodes;
     Class				type;
     list_item_destroyer	destroy;
+    
+    ooc_Mutex			modify;
 
 EndOfClassMembers;
 

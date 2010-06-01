@@ -1,6 +1,7 @@
 0.9.g
-Separate headers fo each compilers / ports. Makes porting ooc much easier.
+Separate header files for each compilers / ports. Makes porting ooc much easier.
 Multithreading support.
+Threadsafe ooc core, Vector, List and Signal.
 
 0.9.f
 Implementation of managed pointers was not ANSI-C compliant. :-(

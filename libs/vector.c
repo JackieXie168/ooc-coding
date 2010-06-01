@@ -23,7 +23,10 @@
  * When creating a Vector, a given amount of space, the chunk size (n*sizeof(void*)) is allocated.
  * If the Vector grows above this size, the Vector automatically reallocates the store, increasing
  * by the chunk size.
- * @warning	Vector implementation is not thread safe!
+ * @note	Vector implementation is thread safe, in the manner, that adding to or deleting items from the Vector
+ * 			will not mesh up the Vector. But the VectorIndices may become invalid if multiple threads modify the
+ * 			same Vector object. As a consecvence the @c _foreach_ and @c _find_ methods may behave unexpectedly
+ * 			if an other thread is modifying the Vector! Make your own locking if needed! 
  */
 
 #include <string.h>
@@ -49,6 +52,8 @@ ClassMembers( Vector, Base )
 	
 	Class					type;
 	vector_item_destroyer	destroy;
+	
+	ooc_Mutex		modify;
 
 EndOfClassMembers;
 
@@ -101,6 +106,8 @@ Vector_constructor( Vector self, const void * params )
 	
 	chain_constructor( Vector, self, params );
 	
+	ooc_mutex_init( self->modify );
+	
 	self->allocation_chunks	= p->size;
 	self->destroy = p->destroy;
 	self->type = p->type;
@@ -119,11 +126,16 @@ Vector_destructor( Vector self )
 {
 	VectorIndex i;
 	
+	ooc_lock( self->modify );
+	
 	if( self->destroy )
 		for( i = 0; i < self->number_of_items; i++ )
 			self->destroy( self->items[ i ] );
 		
 	ooc_free_and_null( (void **) & self->items );
+	
+	ooc_unlock( self->modify );
+	ooc_mutex_release( self->modify );
 }
 
 /* Copy constuctor
@@ -215,10 +227,14 @@ vector_push_back( Vector self, void * data )
 	if( self->type )
 		ooc_check_cast( data, self->type );
 	
+	ooc_lock( self->modify );
+	
 	vector_realloc_if_needed( self );
 	
 	self->items[ self->number_of_items ++ ] = ooc_pass( data );
-
+	
+	ooc_unlock( self->modify );
+	
 	return self->number_of_items - 1;
 }
 
@@ -235,6 +251,8 @@ vector_insert( Vector self, VectorIndex position, void * data )
 	if( self->number_of_items < position )
 		ooc_throw( exception_new( err_wrong_position ) );	
 	
+	ooc_lock( self->modify );
+	
 	vector_realloc_if_needed( self );
 	
 	if( position != self->number_of_items )
@@ -245,6 +263,8 @@ vector_insert( Vector self, VectorIndex position, void * data )
 	self->items[ position ] = ooc_pass( data );
 	
 	self->number_of_items ++;
+	
+	ooc_unlock( self->modify );
 	
 	return position;
 }
@@ -259,6 +279,8 @@ vector_delete_item( Vector self, VectorIndex position )
 	if( self->number_of_items <= position )
 		ooc_throw( exception_new( err_wrong_position ) );	
 	
+	ooc_lock( self->modify );
+	
 	tmp = self->items[ position ];
 	
 	if( position != self->number_of_items-1 )
@@ -267,6 +289,8 @@ vector_delete_item( Vector self, VectorIndex position )
 				( self->number_of_items - (position + 1) ) * sizeof( VectorItem ) );	/* len */
 	
 	self->number_of_items --;
+	
+	ooc_unlock( self->modify );
 	
 	if( self->destroy )
 		self->destroy( tmp );
@@ -314,9 +338,13 @@ vector_swap( Vector self, VectorIndex p1, VectorIndex p2 )
 	if( self->number_of_items <= p1 || self->number_of_items <= p2 )
 		ooc_throw( exception_new( err_wrong_position ) );
 		
+	ooc_lock( self->modify );
+	
 	tmp 				= self->items[ p1 ];
 	self->items[ p1 ] 	= self->items[ p2 ];
 	self->items[ p2 ]	= tmp;
+
+	ooc_unlock( self->modify );	
 }
 
 void
