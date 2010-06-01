@@ -18,11 +18,12 @@ vector_test_pushback( void )
 
 	vector = vector_new_type( 10, TestInt, TRUE );
 	
+	#pragma omp parallel for private(i) schedule( guided, 10 )
 	for( i = 0; i<100; i++ )
 		vector_push_back( vector, testint_new( i ) );
 		
 	for( i = 0; i<100; i++ ) {
-		TestInt actual = (TestInt) vector_get_item( vector, i );
+		TestInt actual = ooc_cast( vector_get_item( vector, i ), TestInt );
 		printf( "TestInt object at %p has data of: %d\n", (void*) actual, testint_get( actual) );
 		}
 	
@@ -45,7 +46,7 @@ vector_test_type_safety_I( void )
 		vector_push_back( vector, teststr_new( "bad") );
 		}
 	catch_any
-		printf( "\tType safety violation exception caught!\n" );
+		printf( "\tOK - Type safety violation exception caught!\n" );
 	end_try;
 	
 	ooc_delete( (Object) vector );
@@ -82,8 +83,7 @@ vector_test_type_safety_II( void )
 
 void
 vector_test( void )
-{
-
+{	
 	ooc_init_class( Exception );
 	ooc_init_class( Vector );
 	

@@ -119,6 +119,9 @@ ClassMembers( SignalQueued, ListNode )
 	void *			parameter;				/* managed by SignalQueued! */
 	void_fn_voidp	param_destroyer;
 	
+	int				invalid;				/* Signal in the queue became invalid, should not be emitted. */
+	ooc_Mutex		processing;
+	
 EndOfClassMembers;
 
 Virtuals( SignalQueued, ListNode )
@@ -129,16 +132,27 @@ AllocateClass( SignalQueued, ListNode );
 static	void	SignalQueued_initialize( Class this ) {}
 static	void	SignalQueued_finalize( Class this ) {}
 
-static	void	SignalQueued_constructor( SignalQueued self, const void * params ) {}
-static	void	SignalQueued_destructor( SignalQueued self )
+static
+void
+SignalQueued_constructor( SignalQueued self, const void * params )
+{
+	ooc_mutex_init( self->processing );
+}
+
+static
+void
+SignalQueued_destructor( SignalQueued self )
 {
 	if( self->param_destroyer && self->parameter )
 		self->param_destroyer( ooc_ptr_read_and_null( & self->parameter ) );
+		
+	ooc_mutex_release( self->processing );
 }
 
 static	int		SignalQueued_copy( SignalQueued self, const SignalQueued from ) { return OOC_NO_COPY; }
 
-static	List	signal_queue	= 	NULL; 	/* List of SignalQueued pointers */
+static	List		signal_queue	= 	NULL; 	/* List of SignalQueued pointers */
+static	ooc_Mutex	signal_queue_critical_section;
 
 /* Signal register
  */
@@ -169,6 +183,8 @@ Signal_initialize( Class this )
 	
 	signal_queue 	= list_new_of_nodes( SignalQueued, TRUE );
 	signal_register = list_new( ( list_item_destroyer ) ooc_delete_and_null );
+	
+	ooc_mutex_init( signal_queue_critical_section );
 }
 
 /* Class finalizing
@@ -180,6 +196,9 @@ Signal_finalize( Class this )
 {
 	ooc_delete_and_null( (Object *) & signal_queue );
 	ooc_delete_and_null( (Object *) & signal_register );
+	
+	ooc_mutex_release( signal_queue_critical_section );
+	
 }
 
 /* Constructor
@@ -259,7 +278,17 @@ static
 int
 signal_queue_process_item( SignalQueued sq )
 {
-	signal_emit_sync( sq->emitted_signal, sq->parameter, NULL );
+	try {
+		ooc_lock( sq->processing );
+			
+		if( ! sq->invalid )
+			signal_emit_sync( sq->emitted_signal, sq->parameter, NULL );
+		}
+	finally {
+		sq->invalid = TRUE; /* Signal has been already fired, no other threads can do it again. */
+		ooc_unlock( sq->processing );
+		}
+	end_try;
 	
 	return TRUE; /* delete this item from the queue */
 }
@@ -273,8 +302,17 @@ void
 signal_process_signals( void )
 {
 	assert( ooc_isInstanceOf( signal_queue, List ) );
+
+	try {
+		ooc_lock( signal_queue_critical_section );
 	
-	list_foreach_delete_if( signal_queue, (list_item_checker) signal_queue_process_item, NULL );
+		list_foreach_delete_if( signal_queue, (list_item_checker) signal_queue_process_item, NULL );
+		}
+	finally {
+		ooc_unlock( signal_queue_critical_section );
+		}
+	end_try;
+	
 }
 
 static
@@ -327,10 +365,15 @@ signal_is_hold_by( Signal * signal_p, Object holder )
 }
 
 static
-int
-signal_queued_is_hold_by( SignalQueued sq, Object holder )
+void
+signal_queued_invalidate_if_hold_by( SignalQueued sq, Object holder )
 {
-	return signal_is_hold_by( & sq->emitted_signal, holder );
+	ooc_lock( sq->processing );
+	
+	if( signal_is_hold_by( & sq->emitted_signal, holder ) )
+		sq->invalid = TRUE;
+		
+	ooc_unlock( sq->processing );
 }
 
 /** Object destroy notifier for the signaling system.
@@ -345,8 +388,8 @@ signal_destroy_notify( Object object )
 	assert( ooc_isInstanceOf( signal_register, List ) );
 	assert( ooc_isInstanceOf( signal_queue, List ) );
 	
-	/* remove all signals from queue that are held by this object */
-	list_foreach_delete_if( signal_queue, (list_item_checker) signal_queued_is_hold_by, object );
+	/* invalidate all signals in the queue that are held by this object */
+	list_foreach( signal_queue, (list_item_executor) signal_queued_invalidate_if_hold_by, object );
 	
 	/* disconnects all signals, that targets this object */
 	list_foreach( signal_register, (list_item_executor) signal_register_disconnect_target, object );

@@ -138,6 +138,8 @@ Object		ooc_new_classptr( const Class class_ptr, const void * par_ptr );
  * @param	object	The original Object.
  * @return	The newly created Object.
  * @note	May throw an Exception.
+ * @warning If in a multi-threaded application your @c Object needs to be in a consistent
+ * state while copying, you must lock it yourself. @c ooc_duplicate() does not do any locking.
  */
 
 Object		ooc_duplicate( const Object object );
@@ -292,13 +294,14 @@ void 		ooc_free_and_null( void ** mem );			/**< Memory free and nulling pointer.
 
 /** Pointer read and null.
  * Reads a pointer via a pointer, and nulls thread safely.
- * Atomic operation.
- * This is equuivalent to the following code:
+ * Atomic operation in case of GNUC and MSVC on x86 platforms.
+ * For other compilers this is equuivalent to the following code:
  * @code
  * void * tmp = * ptr_ptr;
  * *ptr_ptr = NULL;
  * return tmp;
  * @endcode
+ * wich is not thread safe but re-entrant safe.
  */ 
 
 void * 		ooc_ptr_read_and_null( void ** ptr_ptr );

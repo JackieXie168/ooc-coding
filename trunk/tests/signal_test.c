@@ -192,7 +192,11 @@ listener_new( void )
 void
 listener_print( Listener self, SignalTest source, int * param )
 {
+#ifndef _OPENMP
 	printf( "Signal from source %p reported count %d\n", (void*) source, *param );
+#else
+	printf( "Signal from source %p reported count %d in thread %d\n", (void*) source, *param, omp_get_thread_num() );
+#endif
 }
 
 void
@@ -215,6 +219,7 @@ signal_test( void )
 		signal_connect ( test1, & test1->counted, listener, (SignalHandler) listener_print );
 		signal_connect ( test2, & test2->counted, listener, (SignalHandler) listener_print );
 		
+		#pragma omp parallel for private(i) schedule( static, 10 )
 		for( i=0; i<1000; i++ ) {
 			signaltest_count( test1 );
 			signaltest_count( test2 );

@@ -17,7 +17,10 @@
  * List is a container class, that can hold pointers to any kind of data.
  * Every item stored in the list must work perfectly with the supplied list item destroyer!
  * In practice this means, that you can only store items in the list that has the same deletion method.
- * @warning	List implementation is not thread safe!
+ * @note	List implementation is thread safe, in the manner, that adding to or deleting items from the List
+ * 			will not mesh up the List. But the ListIterators may become invalid if multiple threads modify the
+ * 			same List object. As a consecvence the @c _foreach_ and @c _find_ methods may behave unexpectedly
+ * 			if an other thread is modifying the List! Make your own locking if needed! 
  */ 
 
 /* Allocating the class description table and the vtable
@@ -162,6 +165,8 @@ List_constructor( List self, const void * _params )
 	self->destroy 		= params->destroyer;
 	self->type			= params->type;
 	self->list_of_nodes	= params->list_of_nodes;
+	
+	ooc_mutex_init( self->modify );
 }
 
 /* Destructor
@@ -172,6 +177,8 @@ void
 List_destructor( List self )
 {
 	ListIterator p, next;
+	
+	ooc_lock( self->modify );
 	
 	next = self->first;
 	
@@ -185,7 +192,10 @@ List_destructor( List self )
 			self->destroy( get_item_ptr(p) );
 		
 		ooc_delete( (Object) p );
-		}	
+		}
+	
+	ooc_unlock( self->modify );
+	ooc_mutex_release( self->modify );
 }
 
 /* Copy constuctor
@@ -223,9 +233,13 @@ static
 ListIterator
 chain_first_node( List self, ListIterator new_node )
 {
+	ooc_lock( self->modify );
+
 	new_node->previous = new_node->next = NULL;
 	
 	self->first = self->last = new_node;
+
+	ooc_unlock( self->modify );
 
 	return new_node;
 }
@@ -234,6 +248,8 @@ static
 ListIterator
 chain_before( List self, ListIterator location, ListIterator new_node )
 {
+	ooc_lock( self->modify );
+
 	new_node->previous 	= location->previous;
 	new_node->next		= location;
 	
@@ -245,6 +261,8 @@ chain_before( List self, ListIterator location, ListIterator new_node )
 	if( location == self->first )
 		self->first = new_node;
 	
+	ooc_unlock( self->modify );
+
 	return new_node;	
 }
 
@@ -252,6 +270,8 @@ static
 ListIterator
 chain_after( List self, ListIterator location, ListIterator new_node )
 {
+	ooc_lock( self->modify );
+
 	new_node->previous 	= location;
 	new_node->next		= location->next;
 	
@@ -263,6 +283,8 @@ chain_after( List self, ListIterator location, ListIterator new_node )
 	if( location == self->last )
 		self->last = new_node;
 	
+	ooc_unlock( self->modify );
+
 	return new_node;
 }
 
@@ -270,6 +292,8 @@ static
 ListIterator
 unchain( List self, ListIterator location )
 {
+	ooc_lock( self->modify );
+
 	if( location->previous )
 		location->previous->next = location->next;
 		
@@ -282,6 +306,8 @@ unchain( List self, ListIterator location )
 	if( location == self->last )
 		self->last = location->previous;
 		
+	ooc_unlock( self->modify );
+
 	return location;
 }
 
@@ -497,19 +523,25 @@ list_previous( ListIterator node )
 }
 
 void
-list_swap( ListIterator node1, ListIterator node2 )
+list_swap( List self, ListIterator node1, ListIterator node2 )
 {
 	ListNode tmp_next, tmp_prev;
 	
+	assert( ooc_isInstanceOf( self, List ) );
+
 	if( ! ooc_isInstanceOf( node1, ListNode ) || ! ooc_isInstanceOf( node2, ListNode ) )
 		ooc_throw( exception_new( err_wrong_position ) );
 	
+	ooc_lock( self->modify );
+
 	tmp_next 		= node1->next;
 	tmp_prev 		= node1->previous;
 	node1->next 	= node2->next;
 	node1->previous = node2->previous;
 	node2->next 	= tmp_next;
 	node2->previous = tmp_prev;
+
+	ooc_unlock( self->modify );
 }
 
 void

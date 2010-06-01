@@ -3,7 +3,7 @@
 
 <ManagedProjectBuildInfo>
 <project id="ooc.cdt.managedbuild.target.gnu.lib.460854247" name="Static Library (Gnu)" projectType="cdt.managedbuild.target.gnu.lib">
-<configuration artifactExtension="a" artifactName="ooc" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.config.gnu.lib.debug.2104771532" name="Debug" parent="cdt.managedbuild.config.gnu.lib.debug">
+<configuration artifactExtension="a" artifactName="ooc" cleanCommand="rm -rf" description="Debug version with OPENMP threading" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.config.gnu.lib.debug.2104771532" name="Debug_gomp" parent="cdt.managedbuild.config.gnu.lib.debug">
 <toolChain id="cdt.managedbuild.toolchain.gnu.lib.debug.1012024285" name="GCC Tool Chain" superClass="cdt.managedbuild.toolchain.gnu.lib.debug">
 <tool id="cdt.managedbuild.tool.gnu.cpp.compiler.lib.debug.1799963570" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.lib.debug"/>
 <tool id="cdt.managedbuild.tool.gnu.c.compiler.lib.debug.938189461" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.lib.debug">
@@ -17,7 +17,7 @@
 <macros/>
 </toolChain>
 </configuration>
-<configuration artifactExtension="a" artifactName="ooc" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.config.gnu.lib.release.1290241984" name="Release" parent="cdt.managedbuild.config.gnu.lib.release">
+<configuration artifactExtension="a" artifactName="ooc" cleanCommand="rm -rf" description="Release version with OPENMP threading" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.config.gnu.lib.release.1290241984" name="Release_gomp" parent="cdt.managedbuild.config.gnu.lib.release">
 <toolChain id="cdt.managedbuild.toolchain.gnu.lib.release.960022714" name="GCC Tool Chain" superClass="cdt.managedbuild.toolchain.gnu.lib.release">
 <tool id="cdt.managedbuild.tool.gnu.cpp.compiler.lib.release.1667200908" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.lib.release"/>
 <tool id="cdt.managedbuild.tool.gnu.c.compiler.lib.release.858521757" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.lib.release">
@@ -31,6 +31,41 @@
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.archiver.lib.release.1290249510" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.lib.release"/>
 <tool id="cdt.managedbuild.tool.gnu.assembler.lib.release.932992231" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.lib.release"/>
+<macros/>
+</toolChain>
+</configuration>
+<configuration artifactExtension="a" artifactName="ooc" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.config.gnu.lib.debug.487284415" name="Debug_no_threads" parent="cdt.managedbuild.config.gnu.lib.debug">
+<toolChain id="cdt.managedbuild.toolchain.gnu.lib.debug.519292175" name="GCC Tool Chain" superClass="cdt.managedbuild.toolchain.gnu.lib.debug">
+<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.lib.debug.2124313656" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.lib.debug"/>
+<tool id="cdt.managedbuild.tool.gnu.c.compiler.lib.debug.722138765" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.lib.debug">
+<option id="gnu.c.compiler.option.misc.ansi.757061948" name="Support ANSI programs (-ansi)" superClass="gnu.c.compiler.option.misc.ansi" value="true" valueType="boolean"/>
+<option id="gnu.c.compiler.option.misc.other.386563478" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0 -Wno-unused-function" valueType="string"/>
+<option id="gnu.c.compiler.option.warnings.pedantic.1261827712" name="Pedantic (-pedantic)" superClass="gnu.c.compiler.option.warnings.pedantic" value="true" valueType="boolean"/>
+<option id="gnu.c.compiler.option.preprocessor.preprocess.860650352" name="Preprocess only (-E)" superClass="gnu.c.compiler.option.preprocessor.preprocess" value="false" valueType="boolean"/>
+<option id="gnu.c.compiler.option.preprocessor.def.symbols.1100320847" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+<listOptionValue builtIn="false" value="NO_THREADS"/>
+</option>
+</tool>
+<tool id="cdt.managedbuild.tool.gnu.archiver.lib.debug.1926284730" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.lib.debug"/>
+<tool id="cdt.managedbuild.tool.gnu.assembler.lib.debug.1439674331" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.lib.debug"/>
+<macros/>
+</toolChain>
+</configuration>
+<configuration artifactExtension="a" artifactName="ooc" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.config.gnu.lib.release.855940746" name="Release_no_threads" parent="cdt.managedbuild.config.gnu.lib.release">
+<toolChain id="cdt.managedbuild.toolchain.gnu.lib.release.531735552" name="GCC Tool Chain" superClass="cdt.managedbuild.toolchain.gnu.lib.release">
+<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.lib.release.503838248" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.lib.release"/>
+<tool id="cdt.managedbuild.tool.gnu.c.compiler.lib.release.2002443649" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.lib.release">
+<option id="gnu.c.compiler.option.optimization.flags.692387540" name="Other optimization flags" superClass="gnu.c.compiler.option.optimization.flags" value="-fno-strict-aliasing" valueType="string"/>
+<option id="gnu.c.compiler.option.warnings.pedantic.2139222764" name="Pedantic (-pedantic)" superClass="gnu.c.compiler.option.warnings.pedantic" value="true" valueType="boolean"/>
+<option id="gnu.c.compiler.option.misc.other.1777411366" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0 -Wno-unused-function" valueType="string"/>
+<option id="gnu.c.compiler.option.misc.ansi.998297544" name="Support ANSI programs (-ansi)" superClass="gnu.c.compiler.option.misc.ansi" value="true" valueType="boolean"/>
+<option id="gnu.c.compiler.option.preprocessor.def.symbols.55930772" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+<listOptionValue builtIn="false" value="NDEBUG"/>
+<listOptionValue builtIn="false" value="NO_THREADS"/>
+</option>
+</tool>
+<tool id="cdt.managedbuild.tool.gnu.archiver.lib.release.1205484454" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.lib.release"/>
+<tool id="cdt.managedbuild.tool.gnu.assembler.lib.release.185085932" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.lib.release"/>
 <macros/>
 </toolChain>
 </configuration>

@@ -221,13 +221,14 @@ ListIterator    list_next( ListIterator listiterator );
 ListIterator    list_previous( ListIterator listiterator );
 
 /** Changes two items' position in the list.
+ * @param	list			The list.
  * @param	listiterator1	The list iterator of the first item
  * @param	listiterator2	The list iterator of the second item
  * @note	Both parameters must be a valid list iterator,
  * 			passing @c NULL will throw @c err_wrong_position exception.
  */
  
-void			list_swap( ListIterator listiterator1, ListIterator listiterator2 );
+void			list_swap( List list, ListIterator listiterator1, ListIterator listiterator2 );
 
 /** Executes a method for each items in the list.
  * @param	list	The list.
