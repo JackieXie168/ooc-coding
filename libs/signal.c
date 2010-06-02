@@ -152,7 +152,10 @@ SignalQueued_destructor( SignalQueued self )
 static	int		SignalQueued_copy( SignalQueued self, const SignalQueued from ) { return OOC_NO_COPY; }
 
 static	List		signal_queue	= 	NULL; 	/* List of SignalQueued pointers */
+
+#ifndef NO_THREADS
 static	ooc_Mutex	signal_queue_critical_section;
+#endif
 
 /* Signal register
  */

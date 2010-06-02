@@ -68,7 +68,7 @@
 <option id="gnu.c.compiler.option.misc.ansi.602965028" name="Support ANSI programs (-ansi)" superClass="gnu.c.compiler.option.misc.ansi" value="true" valueType="boolean"/>
 <option id="gnu.c.compiler.option.warnings.pedantic.1597622225" name="Pedantic (-pedantic)" superClass="gnu.c.compiler.option.warnings.pedantic" value="true" valueType="boolean"/>
 <option id="gnu.c.compiler.option.misc.other.512755559" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fopenmp -fmessage-length=0 -Wno-unused-function" valueType="string"/>
-<option id="gnu.c.compiler.option.preprocessor.def.symbols.1583813307" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols"/>
+<option id="gnu.c.compiler.option.preprocessor.def.symbols.1583813307" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols"/>
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1586917060" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug">
 <option id="gnu.c.link.option.libs.312265085" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
@@ -109,6 +109,60 @@
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.1107783173" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.release"/>
 <tool id="cdt.managedbuild.tool.gnu.assembler.exe.release.1708054943" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.release"/>
+<macros/>
+</toolChain>
+</configuration>
+<configuration artifactName="tests" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.config.gnu.exe.debug.728825208" name="Debug_pthread" parent="cdt.managedbuild.config.gnu.exe.debug">
+<toolChain id="cdt.managedbuild.toolchain.gnu.exe.debug.300259218" name="GCC Tool Chain" superClass="cdt.managedbuild.toolchain.gnu.exe.debug">
+<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1465353713" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug"/>
+<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.239128045" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug">
+<option id="gnu.c.compiler.option.include.paths.1206553517" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libs}&quot;"/>
+</option>
+<option id="gnu.c.compiler.option.misc.ansi.2068998304" name="Support ANSI programs (-ansi)" superClass="gnu.c.compiler.option.misc.ansi" value="true" valueType="boolean"/>
+<option id="gnu.c.compiler.option.warnings.pedantic.1130882850" name="Pedantic (-pedantic)" superClass="gnu.c.compiler.option.warnings.pedantic" value="true" valueType="boolean"/>
+<option id="gnu.c.compiler.option.misc.other.1473985014" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fopenmp -fmessage-length=0 -Wno-unused-function" valueType="string"/>
+<option id="gnu.c.compiler.option.preprocessor.def.symbols.1976601077" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols"/>
+</tool>
+<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.521268403" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug">
+<option id="gnu.c.link.option.libs.1081955490" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
+<listOptionValue builtIn="false" value="ooc"/>
+</option>
+<option id="gnu.c.link.option.paths.2007745736" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="stringList">
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libs/Debug_pthread}&quot;"/>
+</option>
+<option id="gnu.c.link.option.ldflags.298219344" name="Linker flags" superClass="gnu.c.link.option.ldflags" value="-fopenmp" valueType="string"/>
+</tool>
+<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1138901821" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug"/>
+<tool id="cdt.managedbuild.tool.gnu.assembler.exe.debug.372561036" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.debug"/>
+<macros/>
+</toolChain>
+</configuration>
+<configuration artifactName="tests" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.config.gnu.exe.release.308760158" name="Release_pthread" parent="cdt.managedbuild.config.gnu.exe.release">
+<toolChain id="cdt.managedbuild.toolchain.gnu.exe.release.132901825" name="GCC Tool Chain" superClass="cdt.managedbuild.toolchain.gnu.exe.release">
+<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.1226787889" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release"/>
+<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.release.1451133348" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.release">
+<option id="gnu.c.compiler.option.preprocessor.def.symbols.10588832" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+<listOptionValue builtIn="false" value="NDEBUG"/>
+</option>
+<option id="gnu.c.compiler.option.include.paths.513313242" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libs}&quot;"/>
+</option>
+<option id="gnu.c.compiler.option.warnings.pedantic.931618197" name="Pedantic (-pedantic)" superClass="gnu.c.compiler.option.warnings.pedantic" value="true" valueType="boolean"/>
+<option id="gnu.c.compiler.option.misc.other.1558655006" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fopenmp -fmessage-length=0 -Wno-unused-function" valueType="string"/>
+<option id="gnu.c.compiler.option.misc.ansi.60174762" name="Support ANSI programs (-ansi)" superClass="gnu.c.compiler.option.misc.ansi" value="true" valueType="boolean"/>
+</tool>
+<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.release.1993464235" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.release">
+<option id="gnu.c.link.option.libs.884931486" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
+<listOptionValue builtIn="false" value="ooc"/>
+</option>
+<option id="gnu.c.link.option.paths.1052125089" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="stringList">
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libs/Release_pthread}&quot;"/>
+</option>
+<option id="gnu.c.link.option.ldflags.302645374" name="Linker flags" superClass="gnu.c.link.option.ldflags" value="-fopenmp" valueType="string"/>
+</tool>
+<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.1593154610" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.release"/>
+<tool id="cdt.managedbuild.tool.gnu.assembler.exe.release.2108855340" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.release"/>
 <macros/>
 </toolChain>
 </configuration>
