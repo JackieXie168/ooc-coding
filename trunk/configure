@@ -4188,6 +4188,7 @@ fi
 
 done
 
+$ac_includes_default
 
 # Checks for typedefs, structures, and compiler characteristics.
 { echo "$as_me:$LINENO: checking for an ANSI C-conforming const" >&5

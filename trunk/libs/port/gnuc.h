@@ -7,7 +7,6 @@
 #else 
 #define STIN static
 #define NO_INLINE
-#warning "inline functions are unavailabe"
 #endif
 
 #ifndef NO_THREADS
@@ -27,8 +26,16 @@
 #define ooc_try_lock( x )		omp_test_lock( & x ) 
 
 #else
-/* pthread should be used */
-#warning "no threading library available"
+
+#include <pthread.h>
+
+#define	ooc_Mutex				pthread_mutex_t
+#define ooc_mutex_init( x )		pthread_mutex_init( & x, NULL )
+#define ooc_mutex_release( x )	pthread_mutex_destroy( & x )
+#define ooc_lock( x ) 			pthread_mutex_lock( & x )	
+#define ooc_unlock( x ) 		pthread_mutex_unlock( & x )
+#define ooc_try_lock( x )		pthread_mutex_trylock( & x ) 
+
 #endif
 
 #else /* threadless implementation */
