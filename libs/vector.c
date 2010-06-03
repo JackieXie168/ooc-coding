@@ -53,7 +53,9 @@ ClassMembers( Vector, Base )
 	Class					type;
 	vector_item_destroyer	destroy;
 	
+#ifndef NO_THREADS
 	ooc_Mutex		modify;
+#endif
 
 EndOfClassMembers;
 

@@ -42,9 +42,7 @@
 
 #define TLS static
 
-typedef struct {} ooc_Nothing;
-
-#define	ooc_Mutex				ooc_Nothing /* allocates 0 bytes, but the name is defined */
+#define	ooc_Mutex				void
 #define ooc_mutex_init( x )
 #define ooc_mutex_release( x )
 #define ooc_lock( x )	

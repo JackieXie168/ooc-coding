@@ -120,7 +120,10 @@ ClassMembers( SignalQueued, ListNode )
 	void_fn_voidp	param_destroyer;
 	
 	int				invalid;				/* Signal in the queue became invalid, should not be emitted. */
+
+#ifndef NO_THREADS
 	ooc_Mutex		processing;
+#endif
 	
 EndOfClassMembers;
 

@@ -6,7 +6,10 @@
 ClassMembers( RefCounted, Base )
 
 	int			counter;
+
+#ifndef NO_THREADS
 	ooc_Mutex	access;
+#endif
 
 EndOfClassMembers;
 

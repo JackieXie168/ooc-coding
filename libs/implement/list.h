@@ -15,7 +15,9 @@ ClassMembers( List, Base )
     Class				type;
     list_item_destroyer	destroy;
     
-    ooc_Mutex			modify;
+#ifndef NO_THREADS
+	ooc_Mutex			modify;
+#endif
 
 EndOfClassMembers;
 
