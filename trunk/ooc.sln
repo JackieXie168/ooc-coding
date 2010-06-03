@@ -12,20 +12,34 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tools", "tools\tools.vcproj
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug_st|Win32 = Debug_st|Win32
 		Debug|Win32 = Debug|Win32
+		Release_st|Win32 = Release_st|Win32
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CD012B9A-10B9-431B-9574-49F29978BEDF}.Debug_st|Win32.ActiveCfg = Debug_st|Win32
+		{CD012B9A-10B9-431B-9574-49F29978BEDF}.Debug_st|Win32.Build.0 = Debug_st|Win32
 		{CD012B9A-10B9-431B-9574-49F29978BEDF}.Debug|Win32.ActiveCfg = Debug|Win32
 		{CD012B9A-10B9-431B-9574-49F29978BEDF}.Debug|Win32.Build.0 = Debug|Win32
+		{CD012B9A-10B9-431B-9574-49F29978BEDF}.Release_st|Win32.ActiveCfg = Release_st|Win32
+		{CD012B9A-10B9-431B-9574-49F29978BEDF}.Release_st|Win32.Build.0 = Release_st|Win32
 		{CD012B9A-10B9-431B-9574-49F29978BEDF}.Release|Win32.ActiveCfg = Release|Win32
 		{CD012B9A-10B9-431B-9574-49F29978BEDF}.Release|Win32.Build.0 = Release|Win32
+		{84AC1611-DAB8-43B8-936F-BE286E8098CB}.Debug_st|Win32.ActiveCfg = Debug_st|Win32
+		{84AC1611-DAB8-43B8-936F-BE286E8098CB}.Debug_st|Win32.Build.0 = Debug_st|Win32
 		{84AC1611-DAB8-43B8-936F-BE286E8098CB}.Debug|Win32.ActiveCfg = Debug|Win32
 		{84AC1611-DAB8-43B8-936F-BE286E8098CB}.Debug|Win32.Build.0 = Debug|Win32
+		{84AC1611-DAB8-43B8-936F-BE286E8098CB}.Release_st|Win32.ActiveCfg = Release_st|Win32
+		{84AC1611-DAB8-43B8-936F-BE286E8098CB}.Release_st|Win32.Build.0 = Release_st|Win32
 		{84AC1611-DAB8-43B8-936F-BE286E8098CB}.Release|Win32.ActiveCfg = Release|Win32
 		{84AC1611-DAB8-43B8-936F-BE286E8098CB}.Release|Win32.Build.0 = Release|Win32
+		{D7E5A9FD-C7D7-446C-BFF9-35C2E5DE15E6}.Debug_st|Win32.ActiveCfg = Debug_st|Win32
+		{D7E5A9FD-C7D7-446C-BFF9-35C2E5DE15E6}.Debug_st|Win32.Build.0 = Debug_st|Win32
 		{D7E5A9FD-C7D7-446C-BFF9-35C2E5DE15E6}.Debug|Win32.ActiveCfg = Debug|Win32
 		{D7E5A9FD-C7D7-446C-BFF9-35C2E5DE15E6}.Debug|Win32.Build.0 = Debug|Win32
+		{D7E5A9FD-C7D7-446C-BFF9-35C2E5DE15E6}.Release_st|Win32.ActiveCfg = Release_st|Win32
+		{D7E5A9FD-C7D7-446C-BFF9-35C2E5DE15E6}.Release_st|Win32.Build.0 = Release_st|Win32
 		{D7E5A9FD-C7D7-446C-BFF9-35C2E5DE15E6}.Release|Win32.ActiveCfg = Release|Win32
 		{D7E5A9FD-C7D7-446C-BFF9-35C2E5DE15E6}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
