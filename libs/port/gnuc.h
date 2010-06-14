@@ -1,6 +1,15 @@
 #ifndef GNUC_H_
 #define GNUC_H_
 
+/* Longjump functions */
+ 
+#include <setjmp.h>
+
+#define JMP_BUF		jmp_buf
+#define SETJMP		setjmp
+#define LONGJMP		longjmp
+
+
 /* implementing static inline */
 #if !defined( __NO_INLINE__ )
 #define STIN static __inline__
@@ -50,6 +59,7 @@
 #define ooc_try_lock( x )		TRUE 
 
 #endif
+
 
 #ifdef COMPILING_OOC_C
 

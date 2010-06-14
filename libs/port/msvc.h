@@ -1,6 +1,15 @@
 #ifndef MSVC_H_
 #define MSVC_H_
 
+/* Longjump functions */
+ 
+#include <setjmp.h>
+
+#define JMP_BUF		jmp_buf
+#define SETJMP		setjmp
+#define LONGJMP		longjmp
+
+
 /* implementing static inline */
 #define STIN static _inline
 

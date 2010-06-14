@@ -2,7 +2,6 @@
 #define OOC_H
 
 #include <stdlib.h>
-#include <setjmp.h>
 #include <assert.h>
 
 #ifndef NULL

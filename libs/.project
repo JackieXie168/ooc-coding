@@ -15,4 +15,11 @@
 		<nature>org.eclipse.cdt.core.cnature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>multi_thread.dox</name>
+			<type>1</type>
+			<location>/home/jars/workspace_ooc/libs/multi_thread.dox</location>
+		</link>
+	</linkedResources>
 </projectDescription>

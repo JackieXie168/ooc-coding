@@ -81,14 +81,14 @@ struct ooc_try_block {
 	Exception				exc_obj;
 	int						status;
 	struct ooc_try_block *	previous;
-	jmp_buf					buffer;
+	JMP_BUF					buffer;
 	struct ooc_Manageable * managed;
 	};
 
 #define		try			{ struct ooc_try_block TryContext;		\
 						Exception exception;					\
 						ooc_link_try_block( &TryContext );		\
-						if( ! setjmp(TryContext.buffer) )
+						if( ! SETJMP(TryContext.buffer) )
 #define		catch(ec)	else if( (exception = ooc_exception_caught( & ec ## Class ))) 
 #define		catch_any	else if( (exception = ooc_exception_caught( NULL )))
 #define		finally		exception = NULL;	/* Only for supressing "unused variable warning" with a pure try .. finallly ..end_try block */
@@ -127,8 +127,8 @@ void		ooc_chain_manageable( struct ooc_Manageable * );
 /** Manage a pointer.
  * Provides protection to a pointer, preventing memory leak in case of an exception.
  * Pushes a pointer onto the top of the managed pointers' stack.
- * @param	target		Pointer to the resource to be managed.
- * @param	destroyer	Appropriate destroyer function for the target (typically @c ooc_delete or @c ooc_free).
+ * @param	p_target	Pointer to the resource to be managed.
+ * @param	p_destroyer	Appropriate destroyer function for the target (typically @c ooc_delete or @c ooc_free).
  * @return	Does not return anything.
  * @see ooc_pass()
  * @hideinitializer
@@ -139,8 +139,6 @@ void		ooc_chain_manageable( struct ooc_Manageable * );
 		_managed_.target = p_target; \
 		_managed_.destroyer =  p_destroyer; \
 		ooc_chain_manageable( & _managed_ );
-/*	struct ooc_Manageable _managed_ = { target, destroyer }; ooc_chain_manageable( & _managed_ );
- */
 	
 /** Manage an Object.
  * Provides protection to an Object, preventing memory leak in case of an exception.
@@ -148,7 +146,7 @@ void		ooc_chain_manageable( struct ooc_Manageable * );
  * @code
  * ooc_manage( my_object, (ooc_destroyer) ooc_delete );
  * @endcode
- * @param	target		Pointer to the @c Objcet to be managed.
+ * @param	p_target	Pointer to the @c Objcet to be managed.
  * @see ooc_pass()
  * @hideinitializer
  */
@@ -158,8 +156,6 @@ void		ooc_chain_manageable( struct ooc_Manageable * );
 		_managed_.target = p_target; \
 		_managed_.destroyer =  (ooc_destroyer) ooc_delete; \
 		ooc_chain_manageable( & _managed_ );
-/*	struct ooc_Manageable _managed_ = { target, (ooc_destroyer) ooc_delete }; ooc_chain_manageable( & _managed_ );
- */
 
 /** @def ooc_pass( target )
  * Removes the most recently pushed pointer from the managed pointers' stack.
