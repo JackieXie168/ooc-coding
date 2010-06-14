@@ -204,7 +204,7 @@ ooc_throw( Exception exc_obj_ptr )
 			}
 		else {
 			try_pt->exc_obj = exc_obj_ptr;
-			longjmp( try_pt->buffer, !0 );
+			LONGJMP( try_pt->buffer, !0 );
 			}
 		}
 	else {

@@ -301,7 +301,10 @@ signal_queue_process_item( SignalQueued sq )
 
 /**	Processes the asynchronously emitted signals.
  * Must be called from the eventloop. Processes all buffered async signals.
- * @warning	The async signals emitted by the called handlers will be executed as well before return. 
+ * @warning	The async signals emitted by the called handlers will be executed as well before return.
+ * @warning This is a blocking operation! Only on thread is used for emitting the signals. If an other thread 
+ * 			attempts to call signal_process_signals() parallely then that thraed will be bocked.
+ * @todo	Implement a multithreaded signal emission routine. 
  */
   
 void
@@ -553,6 +556,9 @@ int main( int argc, char argv[] )
 
 @todo		Desrcibing the use of the signaling system
 
-@warning	Signal handling is not thread safe!
+@note	Signal implementation is thread safe. Any thread can emit a signal at any time.
+		However the initialization of the Signal class must be done before any fork in the program.
+
+@see	signal_process_signals() for blocking behavior!
 
  */ 

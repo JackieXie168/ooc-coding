@@ -136,7 +136,6 @@ Vector_destructor( Vector self )
 		
 	ooc_free_and_null( (void **) & self->items );
 	
-	ooc_unlock( self->modify );
 	ooc_mutex_release( self->modify );
 }
 
