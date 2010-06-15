@@ -52,22 +52,22 @@ To link against the right ooc libraries you must use the following linker option
 <TR>
 	<TD>libooc</TD>
 	<TD>-pthread or\n -fopenmp</TD>
-	<TD>/MT</TD>	
+	<TD>/MT or /MD</TD>	
 </TR>
 <TR>
 	<TD>libooc_st</TD>
 	<TD>-</TD>
-	<TD>/???</TD>	
+	<TD>/MT or /MD\n(/ML is depreciated)</TD>	
 </TR>
 <TR>
 	<TD>libooc_d</TD>
 	<TD>-g3 \n-pthread or -fopenmp</TD>
-	<TD>/MTd</TD>	
+	<TD>/MTd or /MDd</TD>	
 </TR>
 <TR>
 	<TD>libooc_st_d</TD>
 	<TD>-</TD>
-	<TD>/???</TD>	
+	<TD>/MTd or /MDd\n(/MLd is depreciated)</TD>	
 </TR>
 </TABLE>
 
