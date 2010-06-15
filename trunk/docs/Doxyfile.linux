@@ -5,7 +5,7 @@
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = ooc
-PROJECT_NUMBER         = 0.9.f
+PROJECT_NUMBER         = 0.9.g
 OUTPUT_DIRECTORY       = api
 CREATE_SUBDIRS         = NO
 OUTPUT_LANGUAGE        = English
@@ -146,7 +146,7 @@ EXCLUDE                =
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = 
 EXCLUDE_SYMBOLS        = 
-EXAMPLE_PATH           = 
+EXAMPLE_PATH           = ../libs/port
 EXAMPLE_PATTERNS       = *
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             = 

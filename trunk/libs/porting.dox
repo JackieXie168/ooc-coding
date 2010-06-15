@@ -1,0 +1,132 @@
+/**
+
+@page porting Porting ooc.
+
+The ooc was designed to be easily portable. Creating ooc the main goal was to establish an
+OOP environment that is easily portable onto special systems as well, like small microcumputers,
+microcontrollers and DSPs that has at least an ANSI compatible C compiler. \n
+
+@section headers Porting headers.
+All portability issues are collected into separated header files, that I call porting headers.
+Each port has its own porting header in the directory named @e libs/port in the source tree, and 
+@e include/ooc/port in the installed system.
+@note	Modifying any of the porting headers you must rebuild and reinstall ooc! Modifying 
+		porting headers on an installed system may not behave as required!
+		
+In the main header file (@c ooc.h) there is an include tree, that decides which porting header
+should be included.\n
+Currently the following porting headers are available:
+<TABLE>
+<TR>
+	<TD>Porting header</TD>
+	<TD>Description</TD>
+</TR>
+<TR>
+	<TD>anyc.h</TD>
+	<TD>Uses ANSI-C only, should be able to be compiled by any C compiler. \n
+	There is no multithreading support in this port!</TD>
+</TR>
+<TR>
+	<TD>gnuc.h</TD>
+	<TD>Linux 32 bit x86 port with GNU GCC compilation. \n
+	Pthread or OpenMP multithreading is supported as well as single threading.</TD>
+</TR>
+<TR>
+	<TD>msvc.h</TD>
+	<TD>Microsoft Windows 32 bit x86 port with MS Visual C++ compilation. \n
+	Windows threads and OpenMP multithreading is supported as well as single threading.</TD>
+</TR>
+</TABLE>
+
+@section new_port How to create a new port?
+To create a new port you must do the followings:
+	-#	Create a porting header file in the @e libs/port directory in the source tree.\n
+		The content of the porting header file is described in the next section.
+	-#	Modify the include tree at the beginning of the main header file (ooc.h) to
+		include your porting header properly.
+	-#	Build and install ooc.
+	
+@section port_header_parts What must contain a porting header?
+When you create a new porting header it is advisable to start out from the closest 
+existing header, worst case from @c anyc.h. Copy it into the @e libs/port directory 
+with a new name. \n
+The porting header must contain the followings parts:
+
+@dontinclude ./port/anyc.h
+
+@subsection port_stdlib Include the standard libraries.
+Include the necessary standard libraries in your system. See @ref port_stdc "standard includes" for details.
+
+@skip	standard
+@until	endif
+
+@note If your system does not support these standard headers or functions, you must implement them,
+and modify this section accordingly.
+
+@subsection port_setjmp Longjump primitives.
+Longjump primitives are used for exception handling. You must define how your system handles
+longjumps, or you must implement a longjump mechanism on your own. \n
+
+@skip Longjump
+@until LONGJMP
+
+@note on some systems the signaling must be considered as well! (sigsetjmp, siglongjmp)
+
+@subsection port_inline Inline control.
+If your compiler allows, you can set some functions inline for better performance. To achive this
+define the @c STIN macro as the prefix for static inline functions, and undefine NO_INLINE macro. \n
+If your compiler does not support function inlining, leave this section as follows.
+
+@skip inline
+@until NO_INLINE
+
+@subsection port_locks Threading primitives.
+You must define the threading primitives for the given port. \n
+Define the appropriate prefix for thread local storage variables, or leave the @c TLS macro as follows:
+
+@skip Threadless
+@until TLS
+
+Define the mutex and locking primitives for the current system. For a threadless implementation
+this looks like:
+
+@skip	ooc_Mutex
+@until	ooc_try_lock
+
+@see multi_thread.dox
+
+@subsection port_xchg Atomic pointer exchange.
+Define an atomic pointer exchange (read while nulling) operation as a macro called @c OOC_IMPLEMENT_PTR_READ_AND_NULL. 
+This is very important for threadsafe pointer manipulation.
+It is used for nulling a pointer while reading its content into a temporary variable. \n
+If your implementation is threadless, this operatin must be reentrance safe. The reentrance safe default implementation is
+the following:
+
+@skip COMPILING_OOC_C
+@until endif
+
+@note The @c COMPILING_OOC_C macro ensures, that this definition is available in the ooc core implementation only.
+
+@section port_stdc Requirements against the standard C library.
+The standard C library on the host must support the following minimal set compatible with 
+ANSI-C:\n
+The following headers must be available:
+	- stddef.h (for size_t )
+	- string.h (for memcpy() )
+	- stdlib.h (for the functions below )
+	- assert.h (for the assert macro )
+
+The following memory handling functions must be available:
+	- void * malloc( size_t size )
+	- void * calloc( size_t num, size_t size )
+	- void * realloc( void *ptr, size_t size )
+	- void   free( const void * mem )
+	- void   memcpy( void * dest, const void * src, size_t size )
+	- void   memmove( void * dest, const void * src, size_t size )
+	- void   abort( void )
+	
+(This is not an extra requirement :-) If your host does not support these functions
+then you must implement them.)
+
+
+*/

@@ -1,6 +1,4 @@
 
-#include <stddef.h>
-#include <string.h>
 
 #define COMPILING_OOC_C
 

@@ -1,9 +1,6 @@
 #ifndef OOC_H
 #define OOC_H
 
-#include <stdlib.h>
-#include <assert.h>
-
 #ifndef NULL
 #define NULL    ((void *)0)
 #endif

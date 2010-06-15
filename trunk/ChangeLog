@@ -2,6 +2,7 @@
 Separate header files for each compilers / ports. Makes porting ooc much easier.
 Multithreading support.
 Threadsafe ooc core, Vector, List and Signal.
+Syntax has been changed for list_swap() method (required by proper multithread support)
 
 0.9.f
 Implementation of managed pointers was not ANSI-C compliant. :-(
