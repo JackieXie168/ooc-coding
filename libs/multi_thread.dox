@@ -5,11 +5,12 @@ Multithreading primitives.
 Multithreading primitives that can be used writing ooc core and ooc extensions (e.g. new containers, etc.)
 Don't use these in your own code!
 Use the platform native threading or some generalized one (e.g. OpenMP) instead.
+
 @page page_MT Multithreading support.
 
 The ooc library has multithreaded and a single threaded versions. \n
 The single threaded versions does not include any trheading support,
-so it is faster if you do not use threads. \n
+so it is faster if you do not need using threads. \n
 The multithreaded libraries are built on the native threading mechanism
 of the platform.
 @section Libs Libraries.
@@ -50,7 +51,7 @@ To link against the right ooc libraries you must use the following linker option
 </TR>
 <TR>
 	<TD>libooc</TD>
-	<TD>-</TD>
+	<TD>-pthread or\n -fopenmp</TD>
 	<TD>/MT</TD>	
 </TR>
 <TR>
@@ -60,7 +61,7 @@ To link against the right ooc libraries you must use the following linker option
 </TR>
 <TR>
 	<TD>libooc_d</TD>
-	<TD>-</TD>
+	<TD>-g3 \n-pthread or -fopenmp</TD>
 	<TD>/MTd</TD>	
 </TR>
 <TR>
@@ -85,7 +86,7 @@ with the ooc sorce code together)
 </TR>
 <TR>
 	<TD>Multithreaded version</TD>
-	<TD></TD>
+	<TD>-pthread</TD>
 	<TD></TD>	
 </TR>
 <TR>

@@ -1,6 +1,16 @@
 #ifndef GNUC_H_
 #define GNUC_H_
 
+/* Inlcude standard headers */
+
+#include <stdlib.h>
+#include <assert.h>
+
+#ifdef COMPILING_OOC_C
+#include <stddef.h>
+#include <string.h>
+#endif /* COMPILING_OOC_C */
+
 /* Longjump functions */
  
 #include <setjmp.h>
