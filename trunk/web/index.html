@@ -1,0 +1,224 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>Object Oriented C - ooc</title>
+  
+
+  
+  
+  <link rel="stylesheet" href="ooc.css" type="text/css">
+
+  
+  <meta name="description" content="ooc is an object oriented C programming method with macro based, pure ANSI-C toolset.">
+
+  
+  <meta name="keywords" content="ooc ooc-coding Object Oriented C ANSI-C programming portable"></head><body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="6" cellspacing="0">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; background-color: rgb(0, 51, 0); text-align: center;" margin-bottom="0" padding-bottom="0" colspan="3">
+      <h1 style="padding-top: 0pt; padding-bottom: 0pt;" class="colored">Object
+Oriented C - ooc</h1>
+      </td>
+      
+    </tr>
+    <tr>
+      <td style="vertical-align: top; width: 270px; background-color: rgb(102, 204, 204); padding-top: 0pt;">
+      <h3>Download</h3>
+      <p>Download latest source code and documentation from <a href="http://sourceforge.net/projects/ooc-coding/files/">sourceforge.net</a>.</p>
+      <h3>Tutorial</h3>
+      <p>Tutorial in downloadable <a href="docs/ooc.pdf">PDF</a>.</p>
+      <p><a target="_blank" href="docs/ooc.html/index.html">Online</a>
+tutorial.</p>
+      <h3>Documentation</h3>
+      <p><a target="_blank" href="docs/api/html/index.html">Online</a>
+documentation.</p>
+      <h3>Licensing</h3>
+      <p><strong>ooc</strong> is licensed under <a href="http://www.gnu.org/licenses/gpl.html">GPL 3.0</a>.<br>
+      </p>
+      <h3>Sourceforge.net</h3>
+      <p><strong>ooc</strong> <a href="http://sourceforge.net/projects/ooc-coding/">project page</a>.<br>
+      </p>
+      <p>Get <a href="http://sourceforge.net/projects/ooc-coding/forums/forum/1098079">help</a>.<br>
+      </p>
+      <h3>Contact</h3>
+      <p>If you've been lost, just contact me at <em>old-fashioned </em>(at)<em>
+users.sourceforge.net</em>.<br>
+      </p>
+      </td>
+      <td style="vertical-align: top;">
+      <p>Object Oriented C (<strong>ooc</strong>)
+kit is for those who want to program in an object orieneted manner, but
+sticks on the good old C as well. ooc implements classes, single
+inheritance and exception handling. Ideal for students getting to know
+OO programming.<br>
+      </p>
+      <p>It can be mainly useful for education and for small systems
+that lack C++ compiler. Althoug I have written quite complex programs
+using <strong>ooc</strong>!<br>
+      </p>
+      <p>By the help of <strong>ooc</strong>
+you can write object oriented code in C with little efforts, though you
+must understand the underlying object model.<br>
+      </p>
+      <p>Creating <strong>ooc</strong> my main
+goal was to develop a lightweight object model, that provides many
+features of C++ but is pure ANSI-C. Thus this is highly portable even
+for small embedded systems as well. On other hand it was kind a "proof
+of concept" and a hobby.<br>
+      </p>
+      <p> </p>
+      <h2>Features</h2>
+      <ul>
+        <li>Uses only C macros and functions, no language extensions
+required! (ANSI-C)</li>
+        <li>Easy to read source code for your application. Care was
+taken to make things as simple as possible.</li>
+        <li>Single inheritance of classes.</li>
+        <li>Implementing exceptions (in pure C!)</li>
+        <li>Virtual functions for classes</li>
+        <li>External tool for easy class implementation</li>
+      </ul>
+      <h2>Comparison</h2>
+      <p>There are some other object models in C as weel. They may be
+worth a try. The mostly known is <a href="http://en.wikipedia.org/wiki/GObject" target="_blank">GObject</a>,
+that is a very sophisticated system, but requires lot of typing, and
+subclassing is labor-intensive.</p>
+      <p>A short comparison table may help understand the key
+differences:</p>
+      <table style="text-align: left; width: 100%;" border="1" cellpadding="2" cellspacing="2">
+        <tbody>
+          <tr>
+            <th style="width: 40%;">Feature<br>
+            </th>
+            <th style="width: 20%; text-align: center; vertical-align: middle;">ooc<br>
+            </th>
+            <th style="width: 20px; vertical-align: middle; text-align: center;">GObject<br>
+            </th>
+            <th style="width: 20%; text-align: center; vertical-align: middle;">C++<br>
+            </th>
+          </tr>
+          <tr>
+            <td style="vertical-align: top;">Class inheritance<br>
+            </td>
+            <td style="text-align: center;">+<br>
+            </td>
+            <td style="text-align: center;">+<br>
+            </td>
+            <td style="text-align: center;">+<br>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top;">Run-time type safety<br>
+            </td>
+            <td style="text-align: center;">+<br>
+            </td>
+            <td style="text-align: center;">+<br>
+            </td>
+            <td style="text-align: center;">(optional)<br>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top;">Exception handling<br>
+            </td>
+            <td style="text-align: center;">+<br>
+try ... catch .. finally<br>
+            </td>
+            <td style="text-align: center;"><br>
+            </td>
+            <td style="text-align: center;">+<br>
+try ... catch<br>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top;">Managed pointers<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">+<br>
+ooc_manage, ooc_pass<br>
+            </td>
+            <td style="vertical-align: top;"><br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">+<br>
+std::auto_ptr&lt;&gt;()<br>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top;">Operator overloading<br>
+            </td>
+            <td style="vertical-align: top;"><br>
+            </td>
+            <td style="vertical-align: top;"><br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">+<br>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top;">Function / method
+overloading<br>
+            </td>
+            <td style="vertical-align: top;"><br>
+            </td>
+            <td style="vertical-align: top;"><br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">+<br>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top;">Properties <br>
+            </td>
+            <td style="vertical-align: top;"><br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">+<br>
+            </td>
+            <td style="vertical-align: top;"><br>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top;">Compile time private /
+protected / public check<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">so-so<br>
+            </td>
+            <td style="vertical-align: top;"><br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">+<br>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top;"><em>TBC</em>...<br>
+            </td>
+            <td style="text-align: center;"><br>
+            </td>
+            <td style="text-align: center;"><br>
+            </td>
+            <td style="text-align: center;"><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      <p><em>Happy ooc-coding!<br>
+      </em></p>
+      <div style="text-align: right;"><em><a title="Document made with KompoZer" href="http://kompozer.net/"><img alt="Document made with KompoZer" src="http://kompozer.sourceforge.net/images/kompozer_80x15.png" border="0"></a></em><br>
+      <em></em></div>
+      </td>
+      <td style="vertical-align: top; width: 15%; background-color: rgb(102, 204, 204);">
+      <h3>Latest</h3>2010. 05. 12<br>
+Version 0.9.f is available.<br>
+      <br>
+Version 0.9.e is available.<br>
+      <br>
+      <br>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+</body></html>
