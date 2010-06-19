@@ -1,7 +1,7 @@
 
 SOURCE_FILES = ooc.c exception.c refcounted.c list.c vector.c signal.c
 
-AM_CFLAGS=
+AM_CFLAGS= -I..
 AUTOMAKE_OPTIONS = nostdinc
 
 pkglib_LIBRARIES = libooc.a libooc_d.a libocc_st.a libocc_st_d.a 

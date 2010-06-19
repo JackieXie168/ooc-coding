@@ -14,7 +14,8 @@ install-html-local:
 uninstall-local:
 	rm -rf $(DESTDIR)${docdir}/api
 
-EXTRA_DIST = Doxyfile.linux ooc.html api ooc.pdf
+EXTRA_DIST = Doxyfile.linux ooc.html api ooc.pdf *.png
 
 dist-hook:
 	zip -r ../ooc-doc-$(VERSION).zip ooc.pdf ooc.html api
+
