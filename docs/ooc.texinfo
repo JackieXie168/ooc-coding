@@ -50,6 +50,7 @@ supports it in developing GNU and promoting software freedom.''
 * Using Classes::
 * Implementing Classes::
 * Memory handling::
+* Type less, produce more: Class manipulation tool
 * Copying This Manual: GNU Free Documentation License
 * Table of Figures::
 * Index: Indices
@@ -1062,6 +1063,83 @@ Always use this, if your class has a memory pointer as a class member, for examp
 The thread safety of @strong{ooc} does not mean that your code will be thread safe automatically! You must take care about the proper thread-safe implementation of your classes!
 @sp 1
 The @code{ooc_init_class()}, @code{ooc_finalize_class()} and @code{ooc_finalize_all()} functions are @emph{not} thread safe! It is advisable calling @code{ooc_init_class()} from the main thread before the fork and @code{ooc_finalize_all()} after the join.
+
+@node Class manipulation tool
+@chapter Class manipulation tool
+
+Creating @strong{ooc} classes by typing from scratch may be labor-intensive, error prone, but mostly boring. Fortunatley @strong{ooc} has a tool that helps you create classes from templates, or from other classes that are
+already implemented. This tool is suprisingly called @kbd{ooc} and is used as follows. Type at the prompt:
+@example
+~$ ooc --new MyClass
+@end example
+This instruction creates a class called MyClass from the default ooc template, and puts it into the current working directory. Using the default template the following files will be created in the current working directory:
+@table @kbd
+
+@item myclass.h
+This is the MyClass header containing the declaration of MyClass class plus its virtual functions. These are
+the publicly available declarations for MyClass, this class is to be included by the users of the class.
+Extend this file with your method declarations as needed.
+
+@item myclass.c
+This is the class implementation file. It contains the class allocation, constructor, descructor etc. skeletons.
+You must extend this file with your method definitions, and other code.
+
+@item implement/myclass.h
+This is the implementation header. This cointains the declaration of class data members, that are publicly not available. This file must be included by the subclasses of MyClass. (If you create your classes with the @kbd{ooc} tool with @kbd{--from} or @kbd{--source} switches then these includes are handled automatically.)
+
+@end table
+
+As you have created your class using the @kbd{ooc} tool, check the created skeletons, and modify them as needed.
+The created class can not be compiled without some modifications, and this is intentional: this forces you to set the construction parameters properly for example.
+
+The following switches can be used with @kbd{ooc}. The switches can be combined!
+
+@table @code
+@item --help
+Prints the version information and a short help message.
+
+@item --new ClassName
+Creates a new class named as ClassName.
+
+@item --parent ParentClassName
+The created class is created as a subclass for ParentClassName. If @code{--parent} switch is missing, then @code{Base} will be used as parent class.
+
+@item --from SampleClassName
+Uses SampleClassName as a template. If @code{--from} switch is missing, then the default @code{SampleClass} template is used. @*
+If @code{--source} switch is not defined then the template class is searched for in the files called @code{sampleclassname.c}, @code{sampleclassname.h} and @code{implement/sampleclassname.h} in the default template directory (usually @code{/usr/local/share/ooc/template}).
+
+@item --source filename
+Uses @code{filename.c}, @code{filename.h} and @code{implement/filename.h} files as the template file. @*
+If @code{filename} is a simple filename (not absolute path) then it is located in the standard template directory (usually @code{/usr/local/share/ooc/template}).
+If @code{--from} switch is not defined then the default @code{SampleClass} is looked for as a template in @code{sampleclassname}. @*
+
+@item --target filename
+Puts the results into @code{filename.c}, @code{filename.h} and @code{implement/filename.h} files in the current working directory. (Depending on the template used, some files may not be used.)@*
+Does not overwrite the files, appends the new content to the end of the files.
+
+@end table
+
+The next example creates a Foo class with header and implementation files, and adds FooException to the files as an additional class.
+@example
+~$ ooc --new Foo --parent Bar
+~$ ooc --new FooException --parent Exception --source private --target foo
+@end example
+
+You will have @code{foo.c}, @code{foo.h} and @code{implement/foo.h} files with class definitions and implementations for @code{Foo} and @code{FooException}.@*
+
+The following templates are available:
+@table @kbd
+@item sample
+The default template. This generates a class with 'protected' data members and implementation header. This class can be sublessed.
+(This is the default if you do not specify a @kbd{--source}.)
+
+@item private
+Class definition with private members only. This type of class can not be subclassed! (no implementation header)
+
+@item minimal
+A minimal class definition, only with a class implementation file (no headers). Use this for internal classes within a class.
+
+@end table
 
 @node GNU Free Documentation License
 @appendix GNU Free Documentation License

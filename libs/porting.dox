@@ -123,6 +123,7 @@ The following memory handling functions must be available:
 	- void   free( const void * mem )
 	- void   memcpy( void * dest, const void * src, size_t size )
 	- void   memmove( void * dest, const void * src, size_t size )
+	- void   memset( void * dest, int c, size_t size )
 	- void   abort( void )
 	
 (This is not an extra requirement :-) If your host does not support these functions
