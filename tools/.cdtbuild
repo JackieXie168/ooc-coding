@@ -32,6 +32,9 @@
 <resourceConfiguration exclude="true" id="cdt.managedbuild.config.gnu.exe.debug.2118225604./tools/template/minimal.c" name="minimal.c" rcbsApplicability="disable" resourcePath="/tools/template/minimal.c" toolsToInvoke="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1092761254./tools/template/minimal.c">
 <tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1092761254./tools/template/minimal.c" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1092761254"/>
 </resourceConfiguration>
+<resourceConfiguration exclude="true" id="cdt.managedbuild.config.gnu.exe.debug.2118225604./tools/template/test.c" name="test.c" rcbsApplicability="disable" resourcePath="/tools/template/test.c" toolsToInvoke="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1092761254./tools/template/test.c">
+<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1092761254./tools/template/test.c" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1092761254"/>
+</resourceConfiguration>
 </configuration>
 <macros/>
 </project>
