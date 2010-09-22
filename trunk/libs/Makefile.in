@@ -59,7 +59,8 @@ libocc_st_a_LIBADD =
 am__objects_1 = libocc_st_a-ooc.$(OBJEXT) \
 	libocc_st_a-exception.$(OBJEXT) \
 	libocc_st_a-refcounted.$(OBJEXT) libocc_st_a-list.$(OBJEXT) \
-	libocc_st_a-vector.$(OBJEXT) libocc_st_a-signal.$(OBJEXT)
+	libocc_st_a-vector.$(OBJEXT) libocc_st_a-signal.$(OBJEXT) \
+	libocc_st_a-testcase.$(OBJEXT)
 am_libocc_st_a_OBJECTS = $(am__objects_1)
 libocc_st_a_OBJECTS = $(am_libocc_st_a_OBJECTS)
 libocc_st_d_a_AR = $(AR) $(ARFLAGS)
@@ -68,14 +69,16 @@ am__objects_2 = libocc_st_d_a-ooc.$(OBJEXT) \
 	libocc_st_d_a-exception.$(OBJEXT) \
 	libocc_st_d_a-refcounted.$(OBJEXT) \
 	libocc_st_d_a-list.$(OBJEXT) libocc_st_d_a-vector.$(OBJEXT) \
-	libocc_st_d_a-signal.$(OBJEXT)
+	libocc_st_d_a-signal.$(OBJEXT) \
+	libocc_st_d_a-testcase.$(OBJEXT)
 am_libocc_st_d_a_OBJECTS = $(am__objects_2)
 libocc_st_d_a_OBJECTS = $(am_libocc_st_d_a_OBJECTS)
 libooc_a_AR = $(AR) $(ARFLAGS)
 libooc_a_LIBADD =
 am__objects_3 = libooc_a-ooc.$(OBJEXT) libooc_a-exception.$(OBJEXT) \
 	libooc_a-refcounted.$(OBJEXT) libooc_a-list.$(OBJEXT) \
-	libooc_a-vector.$(OBJEXT) libooc_a-signal.$(OBJEXT)
+	libooc_a-vector.$(OBJEXT) libooc_a-signal.$(OBJEXT) \
+	libooc_a-testcase.$(OBJEXT)
 am_libooc_a_OBJECTS = $(am__objects_3)
 libooc_a_OBJECTS = $(am_libooc_a_OBJECTS)
 libooc_d_a_AR = $(AR) $(ARFLAGS)
@@ -83,7 +86,7 @@ libooc_d_a_LIBADD =
 am__objects_4 = libooc_d_a-ooc.$(OBJEXT) \
 	libooc_d_a-exception.$(OBJEXT) libooc_d_a-refcounted.$(OBJEXT) \
 	libooc_d_a-list.$(OBJEXT) libooc_d_a-vector.$(OBJEXT) \
-	libooc_d_a-signal.$(OBJEXT)
+	libooc_d_a-signal.$(OBJEXT) libooc_d_a-testcase.$(OBJEXT)
 am_libooc_d_a_OBJECTS = $(am__objects_4)
 libooc_d_a_OBJECTS = $(am_libooc_d_a_OBJECTS)
 DEFAULT_INCLUDES = 
@@ -189,7 +192,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SOURCE_FILES = ooc.c exception.c refcounted.c list.c vector.c signal.c
+SOURCE_FILES = ooc.c exception.c refcounted.c list.c vector.c signal.c testcase.c
 AM_CFLAGS = -I..
 AUTOMAKE_OPTIONS = nostdinc
 pkglib_LIBRARIES = libooc.a libooc_d.a libocc_st.a libocc_st_d.a 
@@ -297,24 +300,28 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libocc_st_a-ooc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libocc_st_a-refcounted.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libocc_st_a-signal.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libocc_st_a-testcase.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libocc_st_a-vector.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libocc_st_d_a-exception.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libocc_st_d_a-list.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libocc_st_d_a-ooc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libocc_st_d_a-refcounted.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libocc_st_d_a-signal.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libocc_st_d_a-testcase.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libocc_st_d_a-vector.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libooc_a-exception.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libooc_a-list.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libooc_a-ooc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libooc_a-refcounted.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libooc_a-signal.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libooc_a-testcase.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libooc_a-vector.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libooc_d_a-exception.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libooc_d_a-list.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libooc_d_a-ooc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libooc_d_a-refcounted.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libooc_d_a-signal.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libooc_d_a-testcase.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libooc_d_a-vector.Po@am__quote@
 
 .c.o:
@@ -415,6 +422,20 @@ libocc_st_a-signal.obj: signal.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libocc_st_a_CFLAGS) $(CFLAGS) -c -o libocc_st_a-signal.obj `if test -f 'signal.c'; then $(CYGPATH_W) 'signal.c'; else $(CYGPATH_W) '$(srcdir)/signal.c'; fi`
 
+libocc_st_a-testcase.o: testcase.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libocc_st_a_CFLAGS) $(CFLAGS) -MT libocc_st_a-testcase.o -MD -MP -MF $(DEPDIR)/libocc_st_a-testcase.Tpo -c -o libocc_st_a-testcase.o `test -f 'testcase.c' || echo '$(srcdir)/'`testcase.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libocc_st_a-testcase.Tpo $(DEPDIR)/libocc_st_a-testcase.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='testcase.c' object='libocc_st_a-testcase.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libocc_st_a_CFLAGS) $(CFLAGS) -c -o libocc_st_a-testcase.o `test -f 'testcase.c' || echo '$(srcdir)/'`testcase.c
+
+libocc_st_a-testcase.obj: testcase.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libocc_st_a_CFLAGS) $(CFLAGS) -MT libocc_st_a-testcase.obj -MD -MP -MF $(DEPDIR)/libocc_st_a-testcase.Tpo -c -o libocc_st_a-testcase.obj `if test -f 'testcase.c'; then $(CYGPATH_W) 'testcase.c'; else $(CYGPATH_W) '$(srcdir)/testcase.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libocc_st_a-testcase.Tpo $(DEPDIR)/libocc_st_a-testcase.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='testcase.c' object='libocc_st_a-testcase.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libocc_st_a_CFLAGS) $(CFLAGS) -c -o libocc_st_a-testcase.obj `if test -f 'testcase.c'; then $(CYGPATH_W) 'testcase.c'; else $(CYGPATH_W) '$(srcdir)/testcase.c'; fi`
+
 libocc_st_d_a-ooc.o: ooc.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libocc_st_d_a_CFLAGS) $(CFLAGS) -MT libocc_st_d_a-ooc.o -MD -MP -MF $(DEPDIR)/libocc_st_d_a-ooc.Tpo -c -o libocc_st_d_a-ooc.o `test -f 'ooc.c' || echo '$(srcdir)/'`ooc.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libocc_st_d_a-ooc.Tpo $(DEPDIR)/libocc_st_d_a-ooc.Po
@@ -498,6 +519,20 @@ libocc_st_d_a-signal.obj: signal.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='signal.c' object='libocc_st_d_a-signal.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libocc_st_d_a_CFLAGS) $(CFLAGS) -c -o libocc_st_d_a-signal.obj `if test -f 'signal.c'; then $(CYGPATH_W) 'signal.c'; else $(CYGPATH_W) '$(srcdir)/signal.c'; fi`
+
+libocc_st_d_a-testcase.o: testcase.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libocc_st_d_a_CFLAGS) $(CFLAGS) -MT libocc_st_d_a-testcase.o -MD -MP -MF $(DEPDIR)/libocc_st_d_a-testcase.Tpo -c -o libocc_st_d_a-testcase.o `test -f 'testcase.c' || echo '$(srcdir)/'`testcase.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libocc_st_d_a-testcase.Tpo $(DEPDIR)/libocc_st_d_a-testcase.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='testcase.c' object='libocc_st_d_a-testcase.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libocc_st_d_a_CFLAGS) $(CFLAGS) -c -o libocc_st_d_a-testcase.o `test -f 'testcase.c' || echo '$(srcdir)/'`testcase.c
+
+libocc_st_d_a-testcase.obj: testcase.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libocc_st_d_a_CFLAGS) $(CFLAGS) -MT libocc_st_d_a-testcase.obj -MD -MP -MF $(DEPDIR)/libocc_st_d_a-testcase.Tpo -c -o libocc_st_d_a-testcase.obj `if test -f 'testcase.c'; then $(CYGPATH_W) 'testcase.c'; else $(CYGPATH_W) '$(srcdir)/testcase.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libocc_st_d_a-testcase.Tpo $(DEPDIR)/libocc_st_d_a-testcase.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='testcase.c' object='libocc_st_d_a-testcase.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libocc_st_d_a_CFLAGS) $(CFLAGS) -c -o libocc_st_d_a-testcase.obj `if test -f 'testcase.c'; then $(CYGPATH_W) 'testcase.c'; else $(CYGPATH_W) '$(srcdir)/testcase.c'; fi`
 
 libooc_a-ooc.o: ooc.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libooc_a_CFLAGS) $(CFLAGS) -MT libooc_a-ooc.o -MD -MP -MF $(DEPDIR)/libooc_a-ooc.Tpo -c -o libooc_a-ooc.o `test -f 'ooc.c' || echo '$(srcdir)/'`ooc.c
@@ -583,6 +618,20 @@ libooc_a-signal.obj: signal.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libooc_a_CFLAGS) $(CFLAGS) -c -o libooc_a-signal.obj `if test -f 'signal.c'; then $(CYGPATH_W) 'signal.c'; else $(CYGPATH_W) '$(srcdir)/signal.c'; fi`
 
+libooc_a-testcase.o: testcase.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libooc_a_CFLAGS) $(CFLAGS) -MT libooc_a-testcase.o -MD -MP -MF $(DEPDIR)/libooc_a-testcase.Tpo -c -o libooc_a-testcase.o `test -f 'testcase.c' || echo '$(srcdir)/'`testcase.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libooc_a-testcase.Tpo $(DEPDIR)/libooc_a-testcase.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='testcase.c' object='libooc_a-testcase.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libooc_a_CFLAGS) $(CFLAGS) -c -o libooc_a-testcase.o `test -f 'testcase.c' || echo '$(srcdir)/'`testcase.c
+
+libooc_a-testcase.obj: testcase.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libooc_a_CFLAGS) $(CFLAGS) -MT libooc_a-testcase.obj -MD -MP -MF $(DEPDIR)/libooc_a-testcase.Tpo -c -o libooc_a-testcase.obj `if test -f 'testcase.c'; then $(CYGPATH_W) 'testcase.c'; else $(CYGPATH_W) '$(srcdir)/testcase.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libooc_a-testcase.Tpo $(DEPDIR)/libooc_a-testcase.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='testcase.c' object='libooc_a-testcase.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libooc_a_CFLAGS) $(CFLAGS) -c -o libooc_a-testcase.obj `if test -f 'testcase.c'; then $(CYGPATH_W) 'testcase.c'; else $(CYGPATH_W) '$(srcdir)/testcase.c'; fi`
+
 libooc_d_a-ooc.o: ooc.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libooc_d_a_CFLAGS) $(CFLAGS) -MT libooc_d_a-ooc.o -MD -MP -MF $(DEPDIR)/libooc_d_a-ooc.Tpo -c -o libooc_d_a-ooc.o `test -f 'ooc.c' || echo '$(srcdir)/'`ooc.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libooc_d_a-ooc.Tpo $(DEPDIR)/libooc_d_a-ooc.Po
@@ -666,6 +715,20 @@ libooc_d_a-signal.obj: signal.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='signal.c' object='libooc_d_a-signal.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libooc_d_a_CFLAGS) $(CFLAGS) -c -o libooc_d_a-signal.obj `if test -f 'signal.c'; then $(CYGPATH_W) 'signal.c'; else $(CYGPATH_W) '$(srcdir)/signal.c'; fi`
+
+libooc_d_a-testcase.o: testcase.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libooc_d_a_CFLAGS) $(CFLAGS) -MT libooc_d_a-testcase.o -MD -MP -MF $(DEPDIR)/libooc_d_a-testcase.Tpo -c -o libooc_d_a-testcase.o `test -f 'testcase.c' || echo '$(srcdir)/'`testcase.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libooc_d_a-testcase.Tpo $(DEPDIR)/libooc_d_a-testcase.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='testcase.c' object='libooc_d_a-testcase.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libooc_d_a_CFLAGS) $(CFLAGS) -c -o libooc_d_a-testcase.o `test -f 'testcase.c' || echo '$(srcdir)/'`testcase.c
+
+libooc_d_a-testcase.obj: testcase.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libooc_d_a_CFLAGS) $(CFLAGS) -MT libooc_d_a-testcase.obj -MD -MP -MF $(DEPDIR)/libooc_d_a-testcase.Tpo -c -o libooc_d_a-testcase.obj `if test -f 'testcase.c'; then $(CYGPATH_W) 'testcase.c'; else $(CYGPATH_W) '$(srcdir)/testcase.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libooc_d_a-testcase.Tpo $(DEPDIR)/libooc_d_a-testcase.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='testcase.c' object='libooc_d_a-testcase.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libooc_d_a_CFLAGS) $(CFLAGS) -c -o libooc_d_a-testcase.obj `if test -f 'testcase.c'; then $(CYGPATH_W) 'testcase.c'; else $(CYGPATH_W) '$(srcdir)/testcase.c'; fi`
 install-pkgconfigDATA: $(pkgconfig_DATA)
 	@$(NORMAL_INSTALL)
 	test -z "$(pkgconfigdir)" || $(MKDIR_P) "$(DESTDIR)$(pkgconfigdir)"

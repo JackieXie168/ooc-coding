@@ -1,5 +1,5 @@
 
-SOURCE_FILES = ooc.c exception.c refcounted.c list.c vector.c signal.c
+SOURCE_FILES = ooc.c exception.c refcounted.c list.c vector.c signal.c testcase.c
 
 AM_CFLAGS= -I..
 AUTOMAKE_OPTIONS = nostdinc
