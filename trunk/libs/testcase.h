@@ -19,7 +19,7 @@ struct TestCaseMethod
 #define TEST(name) {#name, (test_method_type)name}
 
 ClassMembers( TestCase, Base )
-	const struct TestCaseMethod **	methods;
+	const struct TestCaseMethod	*	methods;
 	int								failed;
 	int								run;
 EndOfClassMembers;

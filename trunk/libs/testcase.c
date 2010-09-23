@@ -77,7 +77,7 @@ TestCase_constructor( TestCase self, const void * params )
 	
 	chain_constructor( TestCase, self, NULL );
 
-	self->methods = (const struct TestCaseMethod **) params;
+	self->methods = (const struct TestCaseMethod *) params;
 }
 
 /* Destructor
@@ -107,8 +107,6 @@ TestCase_copy( TestCase self, const TestCase from )
  
 static int current_test_failed;
 static int current_method_fail_count;
-static const char * current_method_name;
-static const char * current_test_name;
 
 /** Marks the current test method as failed.
  */
@@ -119,51 +117,51 @@ testcase_fail( const char * filename, int line, const char * message )
 	current_test_failed = TRUE;
 	
 	if( current_method_fail_count++ == 0 )
-		printf( "\n\tFailed: " );
+		printf( "\n" );
 		
-	fprintf(stderr, "%s [%s : %d : %s.%s()]", message ? message : "", filename, line, current_test_name, current_method_name );
+	printf("\tFailed: %s [%s : %u]\n", message ? message : "", filename, line );
 }
 
 static
 void
 testcase_run_methods(TestCase self)
 {
-	const struct TestCaseMethod ** methods = self->methods;
+	const struct TestCaseMethod * method = self->methods;
 	
-	while((*methods)->method)
+	while(method->method)
 	{
 		current_test_failed = FALSE;
 		++self->run;
 		
-		printf( "\r[%d] %s.before()", self->run , ooc_get_type((Object)self)->name);
+		printf( "[%d] %s.before()\r", self->run , ooc_get_type((Object)self)->name);
 		TestCaseVirtual(self)->before(self);
 		
 		try
 		{
 			current_method_fail_count = 0;
-			current_test_name = ooc_get_type((Object)self)->name;
-			current_method_name = (*methods)->name;
 			
-			printf( "\r[%d] %s.%s()", self->run, ooc_get_type((Object)self)->name, (*methods)->name );
+			printf( "[%d] %s.%s()\r", self->run, ooc_get_type((Object)self)->name, method->name );
 			
-			((*methods)->method)(self);
+			method->method(self);
 		}
 		catch_any {
-			printf( "\n\tFailed: " );
-			fprintf(stderr, "Unexpected exception %s:%s(), code: %d, user code: %d\n",
+			if( ! current_test_failed )
+				printf("\n");
+			printf("\tUnexpected exception: %s, code: %d, user code: %d\n",
 							ooc_get_type((Object)exception)->name,
-							(*methods)->name,
 							exception_get_error_code(exception),
 							exception_get_user_code(exception));
 			current_test_failed = TRUE;
 		}
 		end_try;
 		
-		printf( "\r[%d] %s.after()", self->run, ooc_get_type((Object)self)->name );
+		printf( "[%d] %s.after()\r", self->run, ooc_get_type((Object)self)->name );
 		TestCaseVirtual(self)->after(self);
 		
 		if( current_test_failed )
 			self->failed++;
+		
+		method++;
 	}	
 }
 
@@ -178,17 +176,18 @@ testcase_run( TestCase self)
 		if( ! ooc_isInstanceOf(self, TestCase) )
 			ooc_throw( exception_new(err_bad_cast) );
 			
-		printf( "\r%s.before_class()", ooc_get_type((Object)self)->name );
+		setbuf(stdout, NULL); /* Unbufferered sdout displays better the current operation */
+			
+		printf( "%s.before_class()\r", ooc_get_type((Object)self)->name );
 		TestCaseVirtual(self)->before_class(self);
 
 		testcase_run_methods(self);
 				
-		printf( "\r%s.after_class()", ooc_get_type((Object)self)->name );
+		printf( "%s.after_class()\r", ooc_get_type((Object)self)->name );
 		TestCaseVirtual(self)->after_class(self);
 	}
 	catch_any {
-		printf( "\n\tFailed: " );
-		fprintf(stderr, "Unexpected exception %s in %s, code: %d, user code: %d\n",
+		printf("\n\tUnexpected exception %s in %s, code: %d, user code: %d\n",
 						ooc_get_type((Object)exception)->name,
 						ooc_get_type((Object)self)->name,
 						exception_get_error_code(exception),
@@ -198,7 +197,7 @@ testcase_run( TestCase self)
 	end_try;
 	
 	if( self->failed != 0 )
-		fprintf(stderr, "Test case %s failed: %d/%d (methods run/failed)\n", ooc_get_type((Object)self)->name, self->run, self->failed );
+		printf("Test case %s failed: %d/%d (methods run/failed)\n", ooc_get_type((Object)self)->name, self->run, self->failed );
 	
 	return 	(self->failed == 0 ) ? 0 : 1;
 }

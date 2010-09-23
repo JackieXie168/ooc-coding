@@ -57,6 +57,8 @@ Sample_initialize( Class this )
 	((TestCaseVtable)vtab)->after			= 	(test_method_type) sample_after;
 	((TestCaseVtable)vtab)->after_class		= 	(test_method_type) sample_after_class;
 
+	ooc_init_class( Exception );
+	
 	ooc_init_class( !!! Classes that are USED by Sample !!! ); Remove if you initialize it other place!
 	
 	/* Allocate global resources here */
@@ -83,6 +85,8 @@ Sample_constructor( Sample self, const void * params )
 	assert( ooc_isInitialized( Sample ) );
 	
 	chain_constructor( Sample, self, NULL );
+	
+	self->TestCase.methods = (const struct TestCaseMethod *) params;
 }
 
 /* Destructor
@@ -146,10 +150,13 @@ void
 static
 sample_method1( Sample self )
 {
-	
+	fail("Intentionally failed");
 }
 
-/* Test methods order table
+/** Test methods order table.
+ * Put your test methods in this table in the order they should be executed
+ * using the TEST(method) macro. 
+ * 
  */
  
 struct TestCaseMethod methods[] =
@@ -168,6 +175,6 @@ int main(int argc, char * argv[])
 	Sample sample;
 	
 	ooc_init_class( Sample );
-	sample = (Sample) ooc_new( Sample, methods );
+	sample = (Sample) ooc_new( Sample, &methods );
 	return testcase_run((TestCase)sample);
 }
