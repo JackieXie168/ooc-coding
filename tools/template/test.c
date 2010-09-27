@@ -150,7 +150,7 @@ void
 static
 sample_method1( Sample self )
 {
-	fail("Intentionally failed");
+	failMsg("Intentionally failed");
 }
 
 /** Test methods order table.

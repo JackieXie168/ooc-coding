@@ -3,7 +3,9 @@
  */
 
 #include "testcase.h"
-#include "exception.h"
+#include "implement/exception.h"
+
+#include <signal.h>
 
 /** @class TestCase
  *  @brief TestCase class - base class for unit testing.
@@ -165,6 +167,11 @@ testcase_run_methods(TestCase self)
 	}	
 }
 
+/* Signal handler prototype
+ */
+ 
+static void signal_handler(int signum);
+
 /** Run the TestCase.
  * 
  */
@@ -172,6 +179,12 @@ testcase_run_methods(TestCase self)
 int
 testcase_run( TestCase self)
 {
+	ooc_init_class( SegmentationFault );
+	ooc_init_class( ArithmeticFault );
+	
+	signal(SIGSEGV, signal_handler);
+	signal(SIGFPE, signal_handler);
+	
 	try {
 		if( ! ooc_isInstanceOf(self, TestCase) )
 			ooc_throw( exception_new(err_bad_cast) );
@@ -200,4 +213,66 @@ testcase_run( TestCase self)
 		printf("Test case %s failed: %d/%d (methods run/failed)\n", ooc_get_type((Object)self)->name, self->run, self->failed );
 	
 	return 	(self->failed == 0 ) ? 0 : 1;
+}
+
+/** Segmentation fault exception.
+*/
+
+ClassMembers( SegmentationFault, Exception )
+EndOfClassMembers;
+
+Virtuals( SegmentationFault, Exception )
+EndOfVirtuals;
+
+AllocateClass( SegmentationFault, Exception );
+
+static	void	SegmentationFault_initialize( Class this ) {}
+static	void	SegmentationFault_finalize( Class this ) {}
+
+static	void	SegmentationFault_constructor( SegmentationFault self, const void * params )
+{
+	assert( ooc_isInitialized( SegmentationFault ) );
+	
+	chain_constructor( SegmentationFault, self, NULL );
+}
+
+static	void	SegmentationFault_destructor( SegmentationFault self ) {}
+static	int		SegmentationFault_copy( SegmentationFault self, const SegmentationFault from ) { return OOC_COPY_DEFAULT; }
+
+/** Arithmetic fault exception.
+*/
+
+ClassMembers( ArithmeticFault, Exception )
+EndOfClassMembers;
+
+Virtuals( ArithmeticFault, Exception )
+EndOfVirtuals;
+
+AllocateClass( ArithmeticFault, Exception );
+
+static	void	ArithmeticFault_initialize( Class this ) {}
+static	void	ArithmeticFault_finalize( Class this ) {}
+
+static	void	ArithmeticFault_constructor( ArithmeticFault self, const void * params )
+{
+	assert( ooc_isInitialized( ArithmeticFault ) );
+	
+	chain_constructor( ArithmeticFault, self, NULL );
+}
+
+static	void	ArithmeticFault_destructor( ArithmeticFault self ) {}
+static	int		ArithmeticFault_copy( ArithmeticFault self, const ArithmeticFault from ) { return OOC_COPY_DEFAULT; }
+
+/* Signal handler
+ */
+ 
+static
+void
+signal_handler( int signum )
+{
+	switch( signum ) {
+		case SIGSEGV :	ooc_throw( (Exception) ooc_new( SegmentationFault, NULL ) );
+		case SIGFPE	 :	ooc_throw( (Exception) ooc_new( ArithmeticFault, NULL ) );
+		default 	 :	ooc_throw( exception_new( err_bad_throw ) );
+	}
 }
