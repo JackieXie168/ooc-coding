@@ -46,8 +46,26 @@ int testcase_run( TestCase );
 /* Assertions
  */
  
-#define fail(msg)					testcase_fail(__FILE__, __LINE__, msg)
-#define assertTrue(expr, msg)		if(!expr) testcase_fail(__FILE__, __LINE__, msg)
-#define assertFalse(expr, msg)		if(expr) testcase_fail(__FILE__, __LINE__, msg)
+#define fail()							testcase_fail(__FILE__, __LINE__, NULL)
+#define assertTrue(expr)				if(!(expr)) testcase_fail(__FILE__, __LINE__, NULL)
+#define assertFalse(expr)				if(expr) testcase_fail(__FILE__, __LINE__, NULL)
+#define assertNull(expr)				if((expr)!=NULL) testcase_fail(__FILE__, __LINE__, NULL)
+#define assertNotNull(expr)				if((expr)==NULL) testcase_fail(__FILE__, __LINE__, NULL)
+#define assertZero(expr)				if((expr)!=0) testcase_fail(__FILE__, __LINE__, NULL)
+#define assertNotZero(expr)				if((expr)==0) testcase_fail(__FILE__, __LINE__, NULL)
+
+#define failMsg(msg)					testcase_fail(__FILE__, __LINE__, msg)
+#define assertTrueMsg(expr, msg)		if(!(expr)) testcase_fail(__FILE__, __LINE__, msg)
+#define assertFalseMsg(expr, msg)		if(expr) testcase_fail(__FILE__, __LINE__, msg)
+#define assertNullMsg(expr, msg)		if((expr)!=NULL) testcase_fail(__FILE__, __LINE__, msg)
+#define assertNotNullMsg(expr, msg)		if((expr)==NULL) testcase_fail(__FILE__, __LINE__, msg)
+#define assertZeroMsg(expr, msg)		if((expr)!=0) testcase_fail(__FILE__, __LINE__, msg)
+#define assertNotZeroMsg(expr, msg)		if((expr)==0) testcase_fail(__FILE__, __LINE__, msg)
+
+/* Exceptions
+ */
+ 
+DeclareClass( SegmentationFault, Exception );
+DeclareClass( ArithmeticFault, Exception );
 
 #endif  /* TESTCASE_H */
