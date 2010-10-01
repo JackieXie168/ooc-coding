@@ -12,27 +12,27 @@
 #include "../libs/exception.h"
 #include "../libs/testcase.h"
 
-/** @class ProbaTest
- *  @brief ProbaTest class - brief description.
+/** @class SignalTest
+ *  @brief SignalTest class - brief description.
  * 	@see probatest.h
  */
 
 /** @file probatest.h 
- *  @brief ProbaTest class - brief description.
- * ProbaTest is a .....
+ *  @brief SignalTest class - brief description.
+ * SignalTest is a .....
  * @note	This class is a final class, can not be inherited.
  */ 
 
-DeclareClass( ProbaTest, TestCase );
+DeclareClass( SignalTest, TestCase );
 
-Virtuals( ProbaTest, TestCase )
+Virtuals( SignalTest, TestCase )
 EndOfVirtuals;
 
 /* Declaring the members of the class. 
  * They are all private.
  */
 
-ClassMembers( ProbaTest, TestCase )
+ClassMembers( SignalTest, TestCase )
 
 	int		data;
 
@@ -41,27 +41,27 @@ EndOfClassMembers;
 /* Allocating the class description table and the vtable
  */
 
-AllocateClass( ProbaTest, TestCase );
+AllocateClass( SignalTest, TestCase );
 
 
 /* Class initializing
  */
 
-static void probatest_before_class( ProbaTest self );
-static void probatest_before( ProbaTest self );
-static void probatest_after( ProbaTest self );
-static void probatest_after_class( ProbaTest self );
+static void signaltest_before_class( SignalTest self );
+static void signaltest_before( SignalTest self );
+static void signaltest_after( SignalTest self );
+static void signaltest_after_class( SignalTest self );
 
 static
 void
-ProbaTest_initialize( Class this )
+SignalTest_initialize( Class this )
 {
-	ProbaTestVtable vtab = (ProbaTestVtable) this->vtable;
+	SignalTestVtable vtab = (SignalTestVtable) this->vtable;
 	
-	((TestCaseVtable)vtab)->before_class	= 	(test_method_type) probatest_before_class;
-	((TestCaseVtable)vtab)->before			= 	(test_method_type) probatest_before;
-	((TestCaseVtable)vtab)->after			= 	(test_method_type) probatest_after;
-	((TestCaseVtable)vtab)->after_class		= 	(test_method_type) probatest_after_class;
+	((TestCaseVtable)vtab)->before_class	= 	(test_method_type) signaltest_before_class;
+	((TestCaseVtable)vtab)->before			= 	(test_method_type) signaltest_before;
+	((TestCaseVtable)vtab)->after			= 	(test_method_type) signaltest_after;
+	((TestCaseVtable)vtab)->after_class		= 	(test_method_type) signaltest_after_class;
 
 	ooc_init_class( Exception );
 	
@@ -73,7 +73,7 @@ ProbaTest_initialize( Class this )
 
 static
 void
-ProbaTest_finalize( Class this )
+SignalTest_finalize( Class this )
 {
 	/* Release global resources! */
 }
@@ -84,11 +84,11 @@ ProbaTest_finalize( Class this )
 
 static
 void
-ProbaTest_constructor( ProbaTest self, const void * params )
+SignalTest_constructor( SignalTest self, const void * params )
 {
-	assert( ooc_isInitialized( ProbaTest ) );
+	assert( ooc_isInitialized( SignalTest ) );
 	
-	chain_constructor( ProbaTest, self, NULL );
+	chain_constructor( SignalTest, self, NULL );
 	
 	self->TestCase.methods = (const struct TestCaseMethod *) params;
 }
@@ -98,7 +98,7 @@ ProbaTest_constructor( ProbaTest self, const void * params )
 
 static
 void
-ProbaTest_destructor( ProbaTest self )
+SignalTest_destructor( SignalTest self )
 {
 }
 
@@ -107,7 +107,7 @@ ProbaTest_destructor( ProbaTest self )
 
 static
 int
-ProbaTest_copy( ProbaTest self, const ProbaTest from )
+SignalTest_copy( SignalTest self, const SignalTest from )
 {
 	/* Prevent object duplication */
 	return OOC_NO_COPY;
@@ -119,28 +119,28 @@ ProbaTest_copy( ProbaTest self, const ProbaTest from )
  
 static
 void
-probatest_before_class( ProbaTest self )
+signaltest_before_class( SignalTest self )
 {
 	return;
 }
 
 static
 void
-probatest_before( ProbaTest self )
+signaltest_before( SignalTest self )
 {
 	return;
 }
 
 static
 void
-probatest_after( ProbaTest self )
+signaltest_after( SignalTest self )
 {
 	return;
 }
 
 static
 void
-probatest_after_class( ProbaTest self )
+signaltest_after_class( SignalTest self )
 {
 	return;
 }
@@ -152,7 +152,7 @@ probatest_after_class( ProbaTest self )
 
 void
 static
-probatest_segfault( ProbaTest self )
+signaltest_segfault( SignalTest self )
 {
 	int * bad_ptr = NULL;
 	
@@ -167,7 +167,7 @@ probatest_segfault( ProbaTest self )
 
 void
 static
-probatest_fpfault( ProbaTest self )
+signaltest_fpfault( SignalTest self )
 {
 	int zero = 0;
 	
@@ -189,8 +189,8 @@ probatest_fpfault( ProbaTest self )
 struct TestCaseMethod methods[] =
 {
 	
-	TEST(probatest_segfault),
-	TEST(probatest_fpfault),
+	TEST(signaltest_segfault),
+	TEST(signaltest_fpfault),
 	
 	{NULL, NULL} /* Do NOT delete this line! */
 };
@@ -200,9 +200,13 @@ struct TestCaseMethod methods[] =
  
 int main(int argc, char * argv[])
 {
-	ProbaTest probatest;
+	SignalTest signaltest;
+	int result;
 	
-	ooc_init_class( ProbaTest );
-	probatest = (ProbaTest) ooc_new( ProbaTest, &methods );
-	return testcase_run((TestCase)probatest);
+	ooc_init_class( SignalTest );
+	signaltest = (SignalTest) ooc_new( SignalTest, &methods );
+	result = testcase_run((TestCase)signaltest);
+	ooc_delete( (Object) signaltest );
+	ooc_finalize_all();
+	return result;
 }

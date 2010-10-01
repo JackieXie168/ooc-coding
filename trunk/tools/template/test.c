@@ -15,6 +15,7 @@
  *  @brief Sample class - brief description.
  * Sample is a .....
  * @note	This class is a final class, can not be inherited.
+ * @note	Run as: valgrind --leak-check=yes --quiet ./sample
  */ 
 
 DeclareClass( Sample, TestCase );
@@ -173,8 +174,12 @@ struct TestCaseMethod methods[] =
 int main(int argc, char * argv[])
 {
 	Sample sample;
+	int result;
 	
 	ooc_init_class( Sample );
 	sample = (Sample) ooc_new( Sample, &methods );
-	return testcase_run((TestCase)sample);
+	result = testcase_run((TestCase)sample);
+	ooc_delete( (Object) sample );
+	ooc_finalize_all();
+	return result;
 }
