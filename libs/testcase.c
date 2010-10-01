@@ -170,7 +170,7 @@ testcase_run_methods(TestCase self)
 /* Signal handler prototype
  */
  
-static void signal_handler(int signum);
+static void signal_handler( int signum );
 
 /** Run the TestCase.
  * 
@@ -182,8 +182,8 @@ testcase_run( TestCase self)
 	ooc_init_class( SegmentationFault );
 	ooc_init_class( ArithmeticFault );
 	
-	signal(SIGSEGV, signal_handler);
-	signal(SIGFPE, signal_handler);
+	signal( SIGSEGV, signal_handler );
+	signal( SIGFPE, signal_handler );
 	
 	try {
 		if( ! ooc_isInstanceOf(self, TestCase) )
@@ -271,8 +271,10 @@ void
 signal_handler( int signum )
 {
 	switch( signum ) {
-		case SIGSEGV :	ooc_throw( (Exception) ooc_new( SegmentationFault, NULL ) );
-		case SIGFPE	 :	ooc_throw( (Exception) ooc_new( ArithmeticFault, NULL ) );
-		default 	 :	ooc_throw( exception_new( err_bad_throw ) );
+		case SIGSEGV :	signal( SIGSEGV, signal_handler );
+						ooc_throw( (Exception) ooc_new( SegmentationFault, NULL ) );
+		case SIGFPE	 :	signal( SIGFPE, signal_handler );
+						ooc_throw( (Exception) ooc_new( ArithmeticFault, NULL ) );
+		default 	 :	break;
 	}
 }
