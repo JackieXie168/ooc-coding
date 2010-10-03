@@ -82,11 +82,11 @@ Vector			_vector_new_type( VectorIndex chunk_size, Class type, int manage );
  * All items in the Vector are treated static, they are not freed when destroying Vector.
  * @param	table		The source table.
  * @param	record_size	The record size in the table.
- * @param	chunk_size	The chunk size for the Vector.
+ * @param	table_size	The number of records in the table.
  * @return	The newly created Vector.
  */ 
 
-Vector			vector_new_from_table( void * table, size_t record_size, VectorIndex chunk_size );
+Vector			vector_new_from_table( void * table, size_t record_size, VectorIndex table_size );
 
 /** Put an item at the end of the Vector.
  * @param	vector	The vector.

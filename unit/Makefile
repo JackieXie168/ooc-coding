@@ -7,12 +7,12 @@ FAKEOBJECTS = $(patsubst %.c, %.o, $(FAKES))
 TARGETS = $(patsubst %.c, %, $(TESTS))
 
 CPPFLAGS =
-CFLAGS = -O0 -g3 -pthread
+CFLAGS = -O0 -g3 -fopenmp
 CC = gcc
 LL = gcc
 CONFIGPATH = Debug_pthread
-LDFLAGS = -L../libs/$(CONFIGPATH) -pthread
-LDOBJECTS = $(FAKEOBJECTS)
+LDFLAGS = -L../libs/$(CONFIGPATH)
+LDOBJECTS = $(FAKEOBJECTS) -fopenmp
 LDLIBS = -looc
 
 debug : $(TARGETS)

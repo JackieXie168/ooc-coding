@@ -2,8 +2,6 @@
 /* This is a ExceptionTest class implementation file
  */
 
-#include "../libs/ooc.h"
-#include "../libs/exception.h"
 #include "../libs/testcase.h"
 
 #include "foo.h"

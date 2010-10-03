@@ -2,8 +2,6 @@
 /* This is a Sample class implementation file
  */
 
-#include <ooc/ooc.h>
-#include <ooc/exception.h>
 #include <ooc/testcase.h>
 
 /** @class Sample

@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 #include "ooc.h"
+#include "exception.h"
 
 DeclareClass( TestCase, Base );
 

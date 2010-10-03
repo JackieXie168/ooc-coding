@@ -7,6 +7,7 @@
 DeclareClass( Foo, Base );
 
 Foo foo_new( void );
+Foo foo_new_with_data( int );
 Foo foo_new_with_text( char * text );
 Foo foo_new_with_const_text( const char * text );
 
