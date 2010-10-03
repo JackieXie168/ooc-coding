@@ -15,16 +15,16 @@
  * @note	This class is a final class, can not be inherited.
  */ 
 
-DeclareClass( SignalTest, TestCase );
+DeclareClass( TestCaseTest, TestCase );
 
-Virtuals( SignalTest, TestCase )
+Virtuals( TestCaseTest, TestCase )
 EndOfVirtuals;
 
 /* Declaring the members of the class. 
  * They are all private.
  */
 
-ClassMembers( SignalTest, TestCase )
+ClassMembers( TestCaseTest, TestCase )
 
 	int		data;
 
@@ -33,27 +33,27 @@ EndOfClassMembers;
 /* Allocating the class description table and the vtable
  */
 
-AllocateClass( SignalTest, TestCase );
+AllocateClass( TestCaseTest, TestCase );
 
 
 /* Class initializing
  */
 
-static void signaltest_before_class( SignalTest self );
-static void signaltest_before( SignalTest self );
-static void signaltest_after( SignalTest self );
-static void signaltest_after_class( SignalTest self );
+static void testcasetest_before_class( TestCaseTest self );
+static void testcasetest_before( TestCaseTest self );
+static void testcasetest_after( TestCaseTest self );
+static void testcasetest_after_class( TestCaseTest self );
 
 static
 void
-SignalTest_initialize( Class this )
+TestCaseTest_initialize( Class this )
 {
-	SignalTestVtable vtab = (SignalTestVtable) this->vtable;
+	TestCaseTestVtable vtab = (TestCaseTestVtable) this->vtable;
 	
-	((TestCaseVtable)vtab)->before_class	= 	(test_method_type) signaltest_before_class;
-	((TestCaseVtable)vtab)->before			= 	(test_method_type) signaltest_before;
-	((TestCaseVtable)vtab)->after			= 	(test_method_type) signaltest_after;
-	((TestCaseVtable)vtab)->after_class		= 	(test_method_type) signaltest_after_class;
+	((TestCaseVtable)vtab)->before_class	= 	(test_method_type) testcasetest_before_class;
+	((TestCaseVtable)vtab)->before			= 	(test_method_type) testcasetest_before;
+	((TestCaseVtable)vtab)->after			= 	(test_method_type) testcasetest_after;
+	((TestCaseVtable)vtab)->after_class		= 	(test_method_type) testcasetest_after_class;
 
 	ooc_init_class( Exception );
 	
@@ -65,7 +65,7 @@ SignalTest_initialize( Class this )
 
 static
 void
-SignalTest_finalize( Class this )
+TestCaseTest_finalize( Class this )
 {
 	/* Release global resources! */
 }
@@ -76,11 +76,11 @@ SignalTest_finalize( Class this )
 
 static
 void
-SignalTest_constructor( SignalTest self, const void * params )
+TestCaseTest_constructor( TestCaseTest self, const void * params )
 {
-	assert( ooc_isInitialized( SignalTest ) );
+	assert( ooc_isInitialized( TestCaseTest ) );
 	
-	chain_constructor( SignalTest, self, NULL );
+	chain_constructor( TestCaseTest, self, NULL );
 	
 	self->TestCase.methods = (const struct TestCaseMethod *) params;
 }
@@ -90,7 +90,7 @@ SignalTest_constructor( SignalTest self, const void * params )
 
 static
 void
-SignalTest_destructor( SignalTest self )
+TestCaseTest_destructor( TestCaseTest self )
 {
 }
 
@@ -99,7 +99,7 @@ SignalTest_destructor( SignalTest self )
 
 static
 int
-SignalTest_copy( SignalTest self, const SignalTest from )
+TestCaseTest_copy( TestCaseTest self, const TestCaseTest from )
 {
 	/* Prevent object duplication */
 	return OOC_NO_COPY;
@@ -111,28 +111,28 @@ SignalTest_copy( SignalTest self, const SignalTest from )
  
 static
 void
-signaltest_before_class( SignalTest self )
+testcasetest_before_class( TestCaseTest self )
 {
 	return;
 }
 
 static
 void
-signaltest_before( SignalTest self )
+testcasetest_before( TestCaseTest self )
 {
 	return;
 }
 
 static
 void
-signaltest_after( SignalTest self )
+testcasetest_after( TestCaseTest self )
 {
 	return;
 }
 
 static
 void
-signaltest_after_class( SignalTest self )
+testcasetest_after_class( TestCaseTest self )
 {
 	return;
 }
@@ -144,7 +144,7 @@ signaltest_after_class( SignalTest self )
 
 void
 static
-signaltest_segfault( SignalTest self )
+segfault( TestCaseTest self )
 {
 	int * bad_ptr = NULL;
 	
@@ -159,7 +159,7 @@ signaltest_segfault( SignalTest self )
 
 void
 static
-signaltest_fpfault( SignalTest self )
+fpfault( TestCaseTest self )
 {
 	int zero = 0;
 	
@@ -181,8 +181,8 @@ signaltest_fpfault( SignalTest self )
 struct TestCaseMethod methods[] =
 {
 	
-	TEST(signaltest_segfault),
-	TEST(signaltest_fpfault),
+	TEST(segfault),
+	TEST(fpfault),
 	
 	{NULL, NULL} /* Do NOT delete this line! */
 };
@@ -192,13 +192,13 @@ struct TestCaseMethod methods[] =
  
 int main(int argc, char * argv[])
 {
-	SignalTest signaltest;
+	TestCaseTest testcasetest;
 	int result;
 	
-	ooc_init_class( SignalTest );
-	signaltest = (SignalTest) ooc_new( SignalTest, &methods );
-	result = testcase_run((TestCase)signaltest);
-	ooc_delete( (Object) signaltest );
+	ooc_init_class( TestCaseTest );
+	testcasetest = (TestCaseTest) ooc_new( TestCaseTest, &methods );
+	result = testcase_run((TestCase)testcasetest);
+	ooc_delete( (Object) testcasetest );
 	ooc_finalize_all();
 	return result;
 }
