@@ -2,14 +2,6 @@
 /* This is a ProbaTest class implementation file
  */
 
-/*
-#include <ooc/ooc.h>
-#include <ooc/exception.h>
-#include <ooc/testcase.h>
-*/
-
-#include "../libs/ooc.h"
-#include "../libs/exception.h"
 #include "../libs/testcase.h"
 
 /** @class SignalTest

@@ -135,14 +135,14 @@ testcase_run_methods(TestCase self)
 		current_test_failed = FALSE;
 		++self->run;
 		
-		printf( "[%d] %s.before()\r", self->run , ooc_get_type((Object)self)->name);
+		printf( "[%d] %s.before()                                \r", self->run , ooc_get_type((Object)self)->name);
 		TestCaseVirtual(self)->before(self);
 		
 		try
 		{
 			current_method_fail_count = 0;
 			
-			printf( "[%d] %s.%s()\r", self->run, ooc_get_type((Object)self)->name, method->name );
+			printf( "[%d] %s.%s()                                \r", self->run, ooc_get_type((Object)self)->name, method->name );
 			
 			method->method(self);
 		}
@@ -157,7 +157,7 @@ testcase_run_methods(TestCase self)
 		}
 		end_try;
 		
-		printf( "[%d] %s.after()\r", self->run, ooc_get_type((Object)self)->name );
+		printf( "[%d] %s.after()                                \r", self->run, ooc_get_type((Object)self)->name );
 		TestCaseVirtual(self)->after(self);
 		
 		if( current_test_failed )

@@ -79,6 +79,7 @@ static
 void
 Foo_destructor( Foo self )
 {
+	ooc_free_and_null( (void**) & self->text );
 }
 
 /* Copy constuctor
@@ -106,15 +107,24 @@ foo_new( void )
 }
 
 Foo
+foo_new_with_data( int data )
+{
+	Foo foo = foo_new();
+	
+	foo_set_data( foo, data );
+	
+	return foo;
+}
+
+Foo
 foo_new_with_text( char * text )
 {
 	Foo foo;
 	
 	ooc_manage( text, (ooc_destroyer) ooc_free );
 	
-	ooc_init_class( Foo );
-		
 	foo = foo_new();
+	
 	foo_add_text( foo, ooc_pass( text ) );
 	
 	return foo;
@@ -123,15 +133,12 @@ foo_new_with_text( char * text )
 Foo
 foo_new_with_const_text( const char * text )
 {
-	Foo foo;
+	Foo foo = foo_new();
 	
-	ooc_init_class( Foo );
-		
-	foo = foo_new();
 	{
-		ooc_manage_object( foo );
-		foo_add_text( foo, ooc_strdup( text ) );
-		return ooc_pass( foo );
+	ooc_manage_object( foo );
+	foo_add_text( foo, ooc_strdup( text ) );
+	return ooc_pass( foo );
 	}
 }
 

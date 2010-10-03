@@ -5,3 +5,5 @@
 ./signaltest
 
 valgrind --leak-check=yes --quiet ./exceptiontest
+
+valgrind --leak-check=yes --quiet ./vectortest
