@@ -319,6 +319,8 @@ vector_get_item( Vector self, VectorIndex index )
 void
 vector_set_item( Vector self, VectorIndex index, void * data )
 {
+	void * tmp;
+	
 	ooc_manage( data, self->destroy );
 	
 	assert( ooc_isInstanceOf( self, Vector ) );
@@ -326,7 +328,16 @@ vector_set_item( Vector self, VectorIndex index, void * data )
 	if( self->number_of_items <= index )
 		ooc_throw( exception_new( err_wrong_position ) );
 		
+	ooc_lock( self->modify );
+	
+	tmp = self->items [ index ];
+	
 	self->items [ index ]	=	ooc_pass( data );
+	
+	ooc_unlock( self->modify );
+	
+	if( self->destroy )
+		self->destroy( tmp );
 }
 
 void
