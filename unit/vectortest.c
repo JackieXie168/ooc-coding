@@ -269,6 +269,29 @@ test_from_table( void )
 
 static
 void
+test_set_item( void )
+{
+	Vector vector = vector_new_type( 10, Foo, TRUE );
+	int i;
+
+	#pragma omp parallel for private(i) schedule( guided, 10 )
+	for( i = 0; i<100; i++ )
+		vector_push_back( vector, foo_new_with_const_text( "Test string." ) );
+		
+	assertTrue( vector_items( vector ) == 100 );
+	
+	#pragma omp parallel for private(i) schedule( guided, 10 )
+	for( i = 0; i<100; i++ )
+		vector_set_item( vector, i, foo_new_with_data( 100 - i ) );
+		
+	for( i = 0; i<100; i++ )
+		assertTrue( foo_get_data( ooc_cast( vector_get_item( vector, i ), Foo ) ) ==  100 - i );
+		
+	ooc_delete( (Object) vector );
+}
+
+static
+void
 test_insert( void )
 {
 	Vector vector = vector_new_type( 10, Foo, TRUE );
@@ -470,6 +493,34 @@ test_find_item( void )
 
 static
 void
+test_find_item_reverse( void )
+{
+	Vector vector = vector_new_type( 10, Foo, TRUE );
+	int i;
+	VectorIndex found;
+	
+	for(i=0; i<100; i++ )
+		vector_push_back( vector, foo_new_with_data( 100 - i ) );
+	assertTrue( vector_items( vector ) == 100 );
+
+	found = vector_find_item_reverse( vector, 99, (vector_item_checker) test_checker_always_false, &foreach_param );
+	assertTrue( found == vector_items( vector ) );
+	
+	foreach_counter = 0;
+	found = vector_items( vector );
+	do {
+		--found;
+		found = vector_find_item_reverse( vector, found, (vector_item_checker) test_checker_dividable, &foreach_param );
+		if( found != vector_items( vector ) )
+			assertTrue( can_divide( foo_get_data( ooc_cast( vector_get_item( vector, found ), Foo ) ) ) );
+		} while( found != vector_items( vector ) );
+	assertTrue( foreach_counter == 100 );
+	
+	ooc_delete( (Object) vector );	
+}
+
+static
+void
 test_wrong_position( void )
 {
 	Vector vector = vector_new_type( 10, Foo, TRUE );
@@ -522,12 +573,14 @@ struct TestCaseMethod methods[] =
 	TEST(test_type_safety_I),
 	TEST(test_type_safety_II),
 	TEST(test_from_table),
+	TEST(test_set_item),
 	TEST(test_insert),
 	TEST(test_delete),
 	TEST(test_swap),
 	TEST(test_foreach),
 	TEST(test_foreach_until),
 	TEST(test_find_item),
+	TEST(test_find_item_reverse),
 	TEST(test_wrong_position),
 
 	{NULL, NULL} /* Do NOT delete this line! */
