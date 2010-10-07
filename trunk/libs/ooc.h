@@ -332,7 +332,7 @@ struct BaseVtable_stru
 {
 	Class			_class;
 	Class			_class_register_prev;
-	Class			_class_register_next;
+	Class			_class_register_next; 
 	void   			(* _delete )( Object );
 };
 

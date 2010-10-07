@@ -108,6 +108,8 @@ _ooc_init_class( const Class self )
 			ooc_mutex_init( class_register_change );
 			
 		ooc_lock( class_register_change );
+		if( class_register ) 
+			class_register->vtable->_class_register_next = self;
 		self->vtable->_class_register_prev = class_register;
 		self->vtable->_class_register_next = NULL;
 		class_register = self;
@@ -133,10 +135,13 @@ _ooc_finalize_class( const Class self )
 		if( self->vtable->_class_register_next )	/* Unchain the current class II. */
 			self->vtable->_class_register_next->vtable->_class_register_prev = self->vtable->_class_register_prev;
 
-		ooc_unlock( class_register_change );
-			
+		self->vtable->_class_register_prev = NULL;
+		self->vtable->_class_register_next = NULL;
+				
 		if( class_register == NULL )
 			ooc_mutex_release( class_register_change );
+		else
+			ooc_unlock( class_register_change );
 			
 		self->finz( self );					/* Finalize the current class */
 	}	

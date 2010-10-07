@@ -325,6 +325,9 @@ vector_set_item( Vector self, VectorIndex index, void * data )
 	
 	assert( ooc_isInstanceOf( self, Vector ) );
 	
+	if( self->type )
+		ooc_check_cast( data, self->type );
+	
 	if( self->number_of_items <= index )
 		ooc_throw( exception_new( err_wrong_position ) );
 		

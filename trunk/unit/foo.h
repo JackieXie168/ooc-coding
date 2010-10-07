@@ -2,7 +2,7 @@
 #ifndef FOO_H
 #define FOO_H
 
-#include <ooc/ooc.h>
+#include "../libs/ooc.h"
 
 DeclareClass( Foo, Base );
 
