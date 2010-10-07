@@ -237,6 +237,54 @@ test_type_safety_II( void )
 
 static
 void
+test_type_safety_set_item( void )
+{
+	Vector vector;
+	
+	vector = vector_new_type( 10, Bar, TRUE );
+	vector_push_back( vector, bar_new( ) );
+	try {
+		vector_set_item( vector, 0, foo_new() );
+		fail();
+	}
+	catch_any
+		assertTrue( exception_get_error_code( exception ) == err_bad_cast );
+	end_try;
+	ooc_delete( (Object) vector );
+	
+	vector = vector_new( 10, (vector_item_destroyer) ooc_delete );
+	vector_push_back( vector, bar_new( ) );
+	vector_set_item( vector, 0, foo_new( ) );
+	vector_set_item( vector, 0, bar_new( ) );
+	ooc_delete( (Object) vector );
+}
+
+static
+void
+test_type_safety_insert( void )
+{
+	Vector vector;
+	
+	vector = vector_new_type( 10, Bar, TRUE );
+	vector_push_back( vector, bar_new( ) );
+	try {
+		vector_insert( vector, 0, foo_new() );
+		fail();
+	}
+	catch_any
+		assertTrue( exception_get_error_code( exception ) == err_bad_cast );
+	end_try;
+	ooc_delete( (Object) vector );
+	
+	vector = vector_new( 10, (vector_item_destroyer) ooc_delete );
+	vector_push_back( vector, bar_new( ) );
+	vector_insert( vector, 0, foo_new( ) );
+	vector_insert( vector, 0, bar_new( ) );
+	ooc_delete( (Object) vector );
+}
+
+static
+void
 test_from_table( void )
 {
 	static
@@ -521,7 +569,7 @@ test_find_item_reverse( void )
 
 static
 void
-test_wrong_position( void )
+test_wrong_position_get_item( void )
 {
 	Vector vector = vector_new_type( 10, Foo, TRUE );
 	int i;
@@ -557,6 +605,195 @@ test_wrong_position( void )
 	ooc_delete( (Object) vector );	
 }
 
+static
+void
+test_wrong_position_set_item( void )
+{
+	Vector vector = vector_new_type( 10, Foo, TRUE );
+	int i;
+	
+	try {
+		vector_set_item( vector, 0, foo_new_with_data( 2 ) );
+		fail();
+	}
+	catch_any
+		assertTrue( exception_get_error_code( exception ) == err_wrong_position );
+	end_try;
+	
+	for(i=0; i<100; i++ )
+		vector_push_back( vector, foo_new_with_data( 100 - i ) );
+	assertTrue( vector_items( vector ) == 100 );
+	
+	try {
+		vector_set_item( vector, -1,  foo_new_with_data( 2 ) );
+		fail();
+	}
+	catch_any
+		assertTrue( exception_get_error_code( exception ) == err_wrong_position );
+	end_try;
+
+	try {
+		vector_set_item( vector, vector_items( vector ), foo_new_with_data( 2 ) );
+		fail();
+	}
+	catch_any
+		assertTrue( exception_get_error_code( exception ) == err_wrong_position );
+	end_try;
+
+	ooc_delete( (Object) vector );	
+}
+
+static
+void
+test_wrong_position_insert( void )
+{
+	Vector vector = vector_new_type( 10, Foo, TRUE );
+	int i;
+	
+	try {
+		vector_insert( vector, 1, foo_new_with_data( 2 ) );
+		fail();
+	}
+	catch_any
+		assertTrue( exception_get_error_code( exception ) == err_wrong_position );
+	end_try;
+	
+	for(i=0; i<100; i++ )
+		vector_push_back( vector, foo_new_with_data( 100 - i ) );
+	assertTrue( vector_items( vector ) == 100 );
+	
+	try {
+		vector_insert( vector, -1,  foo_new_with_data( 2 ) );
+		fail();
+	}
+	catch_any
+		assertTrue( exception_get_error_code( exception ) == err_wrong_position );
+	end_try;
+
+	try {
+		vector_insert( vector, vector_items( vector )+1, foo_new_with_data( 2 ) );
+		fail();
+	}
+	catch_any
+		assertTrue( exception_get_error_code( exception ) == err_wrong_position );
+	end_try;
+
+	ooc_delete( (Object) vector );	
+}
+
+static
+void
+test_wrong_position_delete_item( void )
+{
+	Vector vector = vector_new_type( 10, Foo, TRUE );
+	int i;
+	
+	try {
+		vector_delete_item( vector, 0 );
+		fail();
+	}
+	catch_any
+		assertTrue( exception_get_error_code( exception ) == err_wrong_position );
+	end_try;
+	
+	for(i=0; i<100; i++ )
+		vector_push_back( vector, foo_new_with_data( 100 - i ) );
+	assertTrue( vector_items( vector ) == 100 );
+	
+	try {
+		vector_delete_item( vector, -1 );
+		fail();
+	}
+	catch_any
+		assertTrue( exception_get_error_code( exception ) == err_wrong_position );
+	end_try;
+
+	try {
+		vector_delete_item( vector, vector_items( vector ) );
+		fail();
+	}
+	catch_any
+		assertTrue( exception_get_error_code( exception ) == err_wrong_position );
+	end_try;
+
+	ooc_delete( (Object) vector );	
+}
+
+static
+void
+test_wrong_position_find_item( void )
+{
+	Vector vector = vector_new_type( 10, Foo, TRUE );
+	int i;
+	
+	try {
+		vector_find_item( vector, 0, (vector_item_checker) test_checker_always_false, &foreach_param );
+		fail();
+	}
+	catch_any
+		assertTrue( exception_get_error_code( exception ) == err_wrong_position );
+	end_try;
+	
+	for(i=0; i<100; i++ )
+		vector_push_back( vector, foo_new_with_data( 100 - i ) );
+	assertTrue( vector_items( vector ) == 100 );
+	
+	try {
+		vector_find_item( vector, -1, (vector_item_checker) test_checker_always_false, &foreach_param );
+		fail();
+	}
+	catch_any
+		assertTrue( exception_get_error_code( exception ) == err_wrong_position );
+	end_try;
+
+	try {
+		vector_find_item( vector, vector_items( vector ), (vector_item_checker) test_checker_always_false, &foreach_param );
+		fail();
+	}
+	catch_any
+		assertTrue( exception_get_error_code( exception ) == err_wrong_position );
+	end_try;
+
+	ooc_delete( (Object) vector );	
+}
+
+static
+void
+test_wrong_position_find_item_reverse( void )
+{
+	Vector vector = vector_new_type( 10, Foo, TRUE );
+	int i;
+	
+	try {
+		vector_find_item_reverse( vector, 0, (vector_item_checker) test_checker_always_false, &foreach_param );
+		fail();
+	}
+	catch_any
+		assertTrue( exception_get_error_code( exception ) == err_wrong_position );
+	end_try;
+	
+	for(i=0; i<100; i++ )
+		vector_push_back( vector, foo_new_with_data( 100 - i ) );
+	assertTrue( vector_items( vector ) == 100 );
+	
+	try {
+		vector_find_item_reverse( vector, -1, (vector_item_checker) test_checker_always_false, &foreach_param );
+		fail();
+	}
+	catch_any
+		assertTrue( exception_get_error_code( exception ) == err_wrong_position );
+	end_try;
+
+	try {
+		vector_find_item_reverse( vector, vector_items( vector ), (vector_item_checker) test_checker_always_false, &foreach_param );
+		fail();
+	}
+	catch_any
+		assertTrue( exception_get_error_code( exception ) == err_wrong_position );
+	end_try;
+
+	ooc_delete( (Object) vector );	
+}
 
 /** Test methods order table.
  * Put your test methods in this table in the order they should be executed
@@ -572,6 +809,8 @@ struct TestCaseMethod methods[] =
 	TEST(test_untyped),
 	TEST(test_type_safety_I),
 	TEST(test_type_safety_II),
+	TEST(test_type_safety_set_item),
+	TEST(test_type_safety_insert),
 	TEST(test_from_table),
 	TEST(test_set_item),
 	TEST(test_insert),
@@ -581,7 +820,12 @@ struct TestCaseMethod methods[] =
 	TEST(test_foreach_until),
 	TEST(test_find_item),
 	TEST(test_find_item_reverse),
-	TEST(test_wrong_position),
+	TEST(test_wrong_position_get_item),
+	TEST(test_wrong_position_set_item),
+	TEST(test_wrong_position_insert),
+	TEST(test_wrong_position_delete_item),
+	TEST(test_wrong_position_find_item),
+	TEST(test_wrong_position_find_item_reverse),
 
 	{NULL, NULL} /* Do NOT delete this line! */
 };

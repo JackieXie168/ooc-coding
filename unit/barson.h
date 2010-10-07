@@ -2,7 +2,7 @@
 #ifndef BARSON_H
 #define BARSON_H
 
-#include <ooc/ooc.h>
+#include "../libs/ooc.h"
 
 #include "bar.h"
 

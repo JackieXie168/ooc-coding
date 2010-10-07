@@ -2,7 +2,7 @@
 #ifndef BAR_H
 #define BAR_H
 
-#include <ooc/ooc.h>
+#include "../libs/ooc.h"
 
 DeclareClass( Bar, Base );
 
