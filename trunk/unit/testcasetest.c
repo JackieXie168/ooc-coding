@@ -150,6 +150,23 @@ segfault( TestCaseTest self )
 	
 	try {
 		int i = *bad_ptr;
+		fail();
+	}
+	catch_any {
+		assertTrue( ooc_isInstanceOf( exception, SegmentationFault ) );
+	}
+	end_try;
+}
+
+void
+static
+callnull( TestCaseTest self )
+{
+	void (* bad_ptr)(void) = NULL;
+	
+	try {
+		bad_ptr();
+		fail();
 	}
 	catch_any {
 		assertTrue( ooc_isInstanceOf( exception, SegmentationFault ) );
@@ -165,6 +182,7 @@ fpfault( TestCaseTest self )
 	
 	try {
 		int i = 10/zero;
+		fail();
 	}
 	catch_any {
 		assertTrue( ooc_isInstanceOf( exception, ArithmeticFault ) );
@@ -182,6 +200,7 @@ struct TestCaseMethod methods[] =
 {
 	
 	TEST(segfault),
+	TEST(callnull),
 	TEST(fpfault),
 	
 	{NULL, NULL} /* Do NOT delete this line! */

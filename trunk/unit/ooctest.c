@@ -2,6 +2,8 @@
 /* This is a OocTest class implementation file
  */
 
+#include <string.h>
+
 #include "../libs/testcase.h"
 
 #include "implement/foo.h"
@@ -302,19 +304,22 @@ test_virtual_initialization( void )
 	ooc_init_class( BarBadGrandSon );
 	
 	bbgs = (BarBadGrandSon) ooc_new( BarBadGrandSon, NULL );
+	{
+		ooc_manage_object( bbgs );
 	
-	BarBadGrandSonVirtual( bbgs )->BarSon.barson_virtual( (BarSon) bbgs );
-	BarBadGrandSonVirtual( bbgs )->BarSon.Bar.bar_virtual( (Bar) bbgs );
-	
-	try {
-		BarBadGrandSonVirtual( bbgs )->uninitialized_virtual();
-		fail();
+		BarBadGrandSonVirtual( bbgs )->BarSon.barson_virtual( (BarSon) bbgs );
+		BarBadGrandSonVirtual( bbgs )->BarSon.Bar.bar_virtual( (Bar) bbgs );
+		
+		try {
+			BarBadGrandSonVirtual( bbgs )->uninitialized_virtual();
+			fail();
+		}
+		catch_any
+			assertTrue( exception_get_error_code( exception ) == err_undefined_virtual );
+		end_try;
+		
+		ooc_delete( ooc_pass( (Object) bbgs ) );
 	}
-	catch_any
-		assertTrue( exception_get_error_code( exception ) == err_undefined_virtual );
-	end_try;
-	
-	ooc_delete( (Object) bbgs );
 	
 	ooc_finalize_class( BarBadGrandSon );
 }
@@ -379,6 +384,234 @@ test_lifecycle( void )
 	ooc_finalize_class( FooLife );
 }
 
+static
+void
+test_new( void )
+{
+	Foo foo;
+	
+	foo = foo_new();
+	assertNull( foo->text );
+	assertZero( foo->data );
+	ooc_delete( (Object) foo );
+	
+	foo = foo_new_with_data( 100 );
+	assertNull( foo->text );
+	assertTrue( foo->data == 100 );
+	ooc_delete( (Object) foo );
+
+	foo = foo_new_with_const_text( "copyable test text" );
+	assertZero( strcmp( foo->text, "copyable test text" ) );
+	assertZero( foo->data );
+	ooc_delete( (Object) foo );
+}
+
+/* Test constructors and inheritance
+ */
+ 
+static const char * ctorcheck_params = "CtorCheck parameters";
+
+DeclareClass( CtorCheck, Base );
+
+ClassMembers( CtorCheck, Base )
+	int ctor_called;
+	int	dtor_called;
+	int copy_called;
+	int child_ctor_called;
+	int	child_dtor_called;
+	int child_copy_called;
+	int copy_operation;
+	int	data;
+EndOfClassMembers;
+
+Virtuals( CtorCheck, Base )
+EndOfVirtuals;
+
+AllocateClass( CtorCheck, Base );
+
+static	void	CtorCheck_initialize( Class this ) {}
+static	void	CtorCheck_finalize( Class this ) {}
+
+static	void	CtorCheck_constructor( CtorCheck self, const void * params )
+{
+	assertTrue( ooc_isInitialized( CtorCheck ) );
+	assertTrue( params == ctorcheck_params );
+	assertFalse( self->ctor_called );
+	self->ctor_called = TRUE;
+}
+static	void	CtorCheck_destructor( CtorCheck self )
+{
+	assertTrue( self->child_dtor_called );
+	assertFalse( self->dtor_called );
+	self->dtor_called = TRUE;
+}
+static	int		CtorCheck_copy( CtorCheck self, const CtorCheck from )
+{
+	assertFalse( self->copy_called );
+	self->copy_called = TRUE;
+	return OOC_COPY_DONE;
+}
+
+DeclareClass( CtorCheckSon, CtorCheck );
+
+#define CCS_ARRAY_LEN 100
+
+ClassMembers( CtorCheckSon, CtorCheck )
+	int		array[ CCS_ARRAY_LEN ];
+EndOfClassMembers;
+
+Virtuals( CtorCheckSon, CtorCheck )
+EndOfVirtuals;
+
+AllocateClass( CtorCheckSon, CtorCheck );
+
+static	void	CtorCheckSon_initialize( Class this ) {}
+static	void	CtorCheckSon_finalize( Class this ) {}
+
+static	void	CtorCheckSon_constructor( CtorCheckSon self, const void * params )
+{
+	assertTrue( ooc_isInitialized( CtorCheckSon ) );
+	assertTrue( params == ctorcheck_params );
+	assertFalse( self->CtorCheck.child_ctor_called );	
+	assertFalse( self->CtorCheck.ctor_called );
+	chain_constructor( CtorCheckSon, self, params );
+	assertTrue( self->CtorCheck.ctor_called );
+	self->CtorCheck.child_ctor_called = TRUE;
+}
+
+static	void	CtorCheckSon_destructor( CtorCheckSon self )
+{
+	assertFalse( self->CtorCheck.child_dtor_called );
+	assertFalse( self->CtorCheck.dtor_called );
+	self->CtorCheck.child_dtor_called = TRUE;
+}
+
+static	int		CtorCheckSon_copy( CtorCheckSon self, const CtorCheckSon from )
+{
+	assertTrue( self->CtorCheck.copy_called );
+	self->CtorCheck.child_copy_called = TRUE;
+	return from->CtorCheck.copy_operation;
+}
+
+static
+void
+test_ctor_new( void )
+{
+	CtorCheck ccs;
+	
+	ooc_init_class(	CtorCheckSon );
+	
+	ccs = (CtorCheck) ooc_new( CtorCheckSon, ctorcheck_params );
+	assertTrue( ooc_isInstanceOf( ccs, CtorCheckSon ) );
+	assertTrue( ccs->ctor_called );
+	assertTrue( ccs->child_ctor_called );
+	assertFalse( ccs->dtor_called );
+	assertFalse( ccs->child_dtor_called );
+	assertZero( ccs->data );
+	
+	ooc_release( (Object) ccs );
+	assertTrue( ccs->dtor_called );
+	assertTrue( ccs->child_dtor_called );
+
+	ooc_free( ccs );
+	ooc_finalize_class( CtorCheckSon );
+}
+
+static
+void
+test_ctor_use( void )
+{
+	CtorCheck ccs;
+	int value, i;
+	
+	ooc_init_class(	CtorCheckSon );
+	
+	ccs = (CtorCheck) ooc_malloc( sizeof(struct CtorCheckSonObject)/sizeof(char) );
+	memset( ccs, 0xAA, sizeof(struct CtorCheckSonObject)/sizeof(char) );
+	
+	ooc_use( ccs, CtorCheckSon, ctorcheck_params );
+	
+	assertTrue( ooc_isInstanceOf( ccs, CtorCheckSon ) );
+	assertTrue( ccs->ctor_called );
+	assertTrue( ccs->child_ctor_called );
+	assertFalse( ccs->dtor_called );
+	assertFalse( ccs->child_dtor_called );
+	assertZero( ccs->data );
+	
+	ooc_release( (Object) ccs );
+	assertTrue( ccs->dtor_called );
+	assertTrue( ccs->child_dtor_called );
+
+	ooc_free( ccs );
+	ooc_finalize_class( CtorCheckSon );
+}
+
+static
+void
+test_copy( void )
+{
+	CtorCheckSon ccs, duplicate;
+	
+	ooc_init_class(	CtorCheckSon );
+	
+	ccs = (CtorCheckSon) ooc_new( CtorCheckSon, ctorcheck_params );
+	memset( & ccs->array, 0xAA, CCS_ARRAY_LEN );
+
+	ccs->CtorCheck.copy_operation = OOC_COPY_DEFAULT;
+	duplicate = (CtorCheckSon) ooc_duplicate( (Object) ccs );
+	assertNotNull( duplicate );
+	assertTrue( ccs != duplicate );
+	assertTrue( ooc_isInstanceOf( duplicate, CtorCheckSon ) );
+	assertZero( memcmp( &ccs->array, &duplicate->array, CCS_ARRAY_LEN ) );
+	ooc_delete_and_null( (Object*) &duplicate );
+
+	ccs->CtorCheck.copy_operation = OOC_COPY_DONE;
+	duplicate = (CtorCheckSon) ooc_duplicate( (Object) ccs );
+	assertTrue( duplicate->CtorCheck.copy_called );
+	assertTrue( duplicate->CtorCheck.child_copy_called );
+	ooc_delete_and_null( (Object*) &duplicate );
+
+	ccs->CtorCheck.copy_operation = OOC_NO_COPY;
+	try {
+		duplicate = (CtorCheckSon) ooc_duplicate( (Object) ccs );
+		fail();
+	}
+	catch_any {
+		assertNull( duplicate );
+		assertTrue( exception_get_error_code( exception ) == err_can_not_be_duplicated );
+	}
+	end_try;
+	
+	ooc_delete( (Object) ccs );
+	ooc_finalize_class( CtorCheckSon );
+}
+
+static
+void
+test_delete_and_null( void )
+{
+	void	*mem, *old, *tmp;
+	Foo 	foo;
+
+	mem = ooc_malloc( 100 );
+	assertNotNull( mem );
+	old = mem;
+	tmp = ooc_ptr_read_and_null( & mem );
+	assertTrue( old == tmp );
+	assertNull( mem );
+	ooc_free( tmp );
+			
+	mem = ooc_malloc( 100 );
+	assertNotNull( mem );
+	ooc_free_and_null( & mem );
+	assertNull( mem );
+			
+	foo = foo_new();
+	assertTrue( ooc_isInstanceOf( foo, Foo ) );
+	ooc_delete_and_null( (Object*) &foo );
+	assertNull( foo );
+}
+
 /** Test methods order table.
  * Put your test methods in this table in the order they should be executed
  * using the TEST(method) macro. 
@@ -393,6 +626,11 @@ struct TestCaseMethod methods[] =
 	TEST(test_finalize),
 	TEST(test_lifecycle),
 	TEST(test_virtual_initialization),
+	TEST(test_new),
+	TEST(test_ctor_new),
+	TEST(test_ctor_use),
+	TEST(test_copy),
+	TEST(test_delete_and_null),
 	
 	{NULL, NULL} /* Do NOT delete this line! */
 };
@@ -412,5 +650,4 @@ int main(int argc, char * argv[])
 	ooc_finalize_all();
 	return result;
 }
-
 
