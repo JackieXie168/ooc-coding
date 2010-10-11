@@ -21,7 +21,7 @@ RefCounted refcnt_addref( RefCounted object );
 
 /** Increments the reference counter.
  * This is a macro version, which is more convenient since there is no need
- * for maual type casting.
+ * for manual type casting.
  * @param	object	The Object to be counted.
  * @return	The object.
  * @see refcnt_addref()
