@@ -124,7 +124,7 @@ Vector_constructor( Vector self, const void * params )
 
 static
 void
-Vector_destructor( Vector self )
+Vector_destructor( Vector self, VectorVtable vtab )
 {
 	VectorIndex i;
 	

@@ -77,7 +77,7 @@ Foo_constructor( Foo self, const void * params )
 
 static
 void
-Foo_destructor( Foo self )
+Foo_destructor( Foo self, FooVtable vtab )
 {
 	ooc_free_and_null( (void**) & self->text );
 }

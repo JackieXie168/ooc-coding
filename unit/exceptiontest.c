@@ -90,7 +90,7 @@ ExceptionTest_constructor( ExceptionTest self, const void * params )
 
 static
 void
-ExceptionTest_destructor( ExceptionTest self )
+ExceptionTest_destructor( ExceptionTest self, ExceptionTestVtable vtab )
 {
 }
 

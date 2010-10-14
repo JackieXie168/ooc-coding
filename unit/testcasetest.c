@@ -90,7 +90,7 @@ TestCaseTest_constructor( TestCaseTest self, const void * params )
 
 static
 void
-TestCaseTest_destructor( TestCaseTest self )
+TestCaseTest_destructor( TestCaseTest self, TestCaseTestVtable vtab )
 {
 }
 

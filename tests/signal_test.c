@@ -66,7 +66,7 @@ SignalTest_constructor( SignalTest self, const void * params )
 
 static
 void
-SignalTest_destructor( SignalTest self )
+SignalTest_destructor( SignalTest self, SignalTestVtable vtab )
 {
 	signal_destroy_notify( (Object) self );
 }
@@ -159,7 +159,7 @@ Listener_constructor( Listener self, const void * params )
 
 static
 void
-Listener_destructor( Listener self )
+Listener_destructor( Listener self, ListenerVtable vtab )
 {
 	signal_destroy_notify( (Object) self );	
 }

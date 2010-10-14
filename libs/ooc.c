@@ -266,19 +266,26 @@ void
 ooc_destroy_object( Object self )
 {
 	Class type;
+	Vtable vtab;
 
 	assert( self != NULL );
 	
-	type = self->_vtab->_class;
-
-	/* destruct first */
-	type->dtor( self );
-
-	/* destruct the parents */
-	while( has_parent( type ) ) {
-		type = type->parent;
-		type->dtor( self );
-		}	
+	/* Makes the Object invalid */
+	vtab = ooc_ptr_read_and_null( (void**) &self->_vtab );
+	
+	if( vtab )
+	{
+		type = vtab->_class;
+		
+		/* destruct child first */
+		type->dtor( self, vtab );
+	
+		/* destruct the parents */
+		while( has_parent( type ) ) {
+			type = type->parent;
+			type->dtor( self, vtab );
+			}
+	}
 }
 
 void
@@ -290,7 +297,7 @@ ooc_release( Object self )
 void
 ooc_delete( Object self )
 {
-	if( self )
+	if( self && self->_vtab )
 	   self->_vtab->_delete( self );
 }
 
