@@ -28,7 +28,7 @@ static	void	Foo_constructor( Foo self, const void * params )
 	printf( "\tFoo object at %p has been constructed.\n", (void*) self );
 }
 
-static	void	Foo_destructor( Foo self )
+static	void	Foo_destructor( Foo self, FooVtable vtab )
 {
 	printf( "\tFoo object at %p has been destroyed.\n", (void*) self );
 }
@@ -68,7 +68,7 @@ static	void	FooException_constructor( FooException self, const void * params )
 	self->Exception.user_code = * ((int*) params );
 }
 
-static	void	FooException_destructor( FooException self ) {}
+static	void	FooException_destructor( FooException self, FooExceptionVtable vtab ) {}
 static	int	FooException_copy( FooException self, const FooException from ) { return OOC_COPY_DEFAULT; }
 
 Exception

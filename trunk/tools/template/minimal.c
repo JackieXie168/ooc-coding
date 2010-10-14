@@ -40,6 +40,6 @@ static	void	Sample_constructor( Sample self, const void * params )
 	chain_constructor( Sample, self, NULL ); !!! TODO !!! change the third parameter as required! 
 }
 
-static	void	Sample_destructor( Sample self ) {}
+static	void	Sample_destructor( Sample self, SampleVtable vtab ) {}
 static	int	Sample_copy( Sample self, const Sample from ) { return OOC_COPY_DEFAULT; }
 

@@ -77,7 +77,7 @@ BarSon_constructor( BarSon self, const void * params )
 
 static
 void
-BarSon_destructor( BarSon self )
+BarSon_destructor( BarSon self, BarSonVtable vtab )
 {
 }
 

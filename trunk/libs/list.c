@@ -63,7 +63,7 @@ ListNode_constructor( ListNode self, const void * params )
 
 static
 void
-ListNode_destructor( ListNode self )
+ListNode_destructor( ListNode self, ListNodeVtable vtab )
 {
 }
 
@@ -114,7 +114,7 @@ _ListNodeVoidp_constructor( _ListNodeVoidp self, const void * params )
 
 static
 void
-_ListNodeVoidp_destructor( _ListNodeVoidp self )
+_ListNodeVoidp_destructor( _ListNodeVoidp self, _ListNodeVoidpVtable vtab )
 {
 	/* We do not destroy the item, because we do not know
 	 * the destroyer for the item here!
@@ -174,7 +174,7 @@ List_constructor( List self, const void * _params )
 
 static
 void
-List_destructor( List self )
+List_destructor( List self, ListVtable vtab )
 {
 	ListIterator p, next;
 	

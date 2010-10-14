@@ -60,7 +60,7 @@ TestBase_constructor( TestBase self, const void * params )
 
 static
 void
-TestBase_destructor( TestBase self )
+TestBase_destructor( TestBase self, TestBaseVtable vtab )
 {
 }
 
@@ -130,7 +130,7 @@ TestInt_constructor( TestInt self, const void * params )
 
 static
 void
-TestInt_destructor( TestInt self )
+TestInt_destructor( TestInt self, TestIntVtable vtab )
 {
 }
 
@@ -225,7 +225,7 @@ TestStr_constructor( TestStr self, const void * params )
 
 static
 void
-TestStr_destructor( TestStr self )
+TestStr_destructor( TestStr self, TestStrVtable vtab )
 {
 	ooc_free_and_null( (void*) & self->data );
 }

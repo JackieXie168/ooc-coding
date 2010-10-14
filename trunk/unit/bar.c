@@ -77,7 +77,7 @@ Bar_constructor( Bar self, const void * params )
 
 static
 void
-Bar_destructor( Bar self )
+Bar_destructor( Bar self, BarVtable vtab )
 {
 	ooc_free_and_null( (void**) & self->text );
 }

@@ -88,7 +88,7 @@ RefCounted_constructor( RefCounted self, const void * params )
 
 static
 void
-RefCounted_destructor( RefCounted self )
+RefCounted_destructor( RefCounted self, RefCountedVtable vtab )
 {
     ooc_mutex_release( self->access );
 }

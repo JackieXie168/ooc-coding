@@ -77,7 +77,7 @@ BarDaughter_constructor( BarDaughter self, const void * params )
 
 static
 void
-BarDaughter_destructor( BarDaughter self )
+BarDaughter_destructor( BarDaughter self, BarDaughterVtable vtab )
 {
 }
 

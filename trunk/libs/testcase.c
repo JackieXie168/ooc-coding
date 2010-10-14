@@ -87,7 +87,7 @@ TestCase_constructor( TestCase self, const void * params )
 
 static
 void
-TestCase_destructor( TestCase self )
+TestCase_destructor( TestCase self, TestCaseVtable vtab )
 {
 }
 
@@ -236,7 +236,7 @@ static	void	SegmentationFault_constructor( SegmentationFault self, const void * 
 	chain_constructor( SegmentationFault, self, NULL );
 }
 
-static	void	SegmentationFault_destructor( SegmentationFault self ) {}
+static	void	SegmentationFault_destructor( SegmentationFault self, SegmentationFaultVtable vtab ) {}
 static	int		SegmentationFault_copy( SegmentationFault self, const SegmentationFault from ) { return OOC_COPY_DEFAULT; }
 
 /** Arithmetic fault exception.
@@ -260,7 +260,7 @@ static	void	ArithmeticFault_constructor( ArithmeticFault self, const void * para
 	chain_constructor( ArithmeticFault, self, NULL );
 }
 
-static	void	ArithmeticFault_destructor( ArithmeticFault self ) {}
+static	void	ArithmeticFault_destructor( ArithmeticFault self, ArithmeticFaultVtable vtab ) {}
 static	int		ArithmeticFault_copy( ArithmeticFault self, const ArithmeticFault from ) { return OOC_COPY_DEFAULT; }
 
 /* Signal handler

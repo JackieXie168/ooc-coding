@@ -100,7 +100,7 @@ VectorTest_constructor( VectorTest self, const void * params )
 
 static
 void
-VectorTest_destructor( VectorTest self )
+VectorTest_destructor( VectorTest self, VectorTestVtable vtab )
 {
 }
 

@@ -117,7 +117,7 @@ Exception_constructor( Exception self, const void * params )
 
 static
 void
-Exception_destructor( Exception self )
+Exception_destructor( Exception self, ExceptionVtable vtab )
 {
 }
 

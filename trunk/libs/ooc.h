@@ -324,7 +324,7 @@ struct ClassTable
 	void				(* init) ( Class this );        				/* class initializer */
 	void				(* finz) ( Class this );						/* class finalizer */
 	void				(* ctor) (Object self, const void * params );	/* constructor */
-	void				(* dtor) (Object self);							/* destructor */
+	void				(* dtor) (Object self, Vtable vtab);			/* destructor */
 	int				  	(* copy) (Object self, const Object from); 		/* copy constructor */
 };
 
@@ -479,7 +479,7 @@ extern const struct ClassTable BaseClass;
 	static void   pClass ## _initialize ( Class );	        \
 	static void   pClass ## _finalize ( Class );	        \
 	static void   pClass ## _constructor( pClass, const void * ); \
-	static void   pClass ## _destructor ( pClass );	        \
+	static void   pClass ## _destructor ( pClass, pClass ## Vtable ); \
 	static int	  pClass ## _copy ( pClass, const pClass );	\
 															\
 	/* Allocating the Vtable */								\
@@ -497,7 +497,7 @@ extern const struct ClassTable BaseClass;
 											pClass ## _initialize,	\
 											pClass ## _finalize,	\
 		(void (*)( Object, const void *)) 	pClass ## _constructor,	\
-		(void (*)( Object))               	pClass ## _destructor,	\
+		(void (*)( Object, Vtable ))        pClass ## _destructor,	\
 		(int  (*)( Object, const Object)) 	pClass ## _copy	        \
 		}
 		

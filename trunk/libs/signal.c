@@ -85,7 +85,7 @@ SignalItem_constructor( SignalItem self, const void * params )
 
 static
 void
-SignalItem_destructor( SignalItem self )
+SignalItem_destructor( SignalItem self, SignalItemVtable vtab )
 {
 }
 
@@ -144,7 +144,7 @@ SignalQueued_constructor( SignalQueued self, const void * params )
 
 static
 void
-SignalQueued_destructor( SignalQueued self )
+SignalQueued_destructor( SignalQueued self, SignalQueuedVtable vtab )
 {
 	if( self->param_destroyer && self->parameter )
 		self->param_destroyer( ooc_ptr_read_and_null( & self->parameter ) );
@@ -232,7 +232,7 @@ Signal_constructor( Signal self, const void * params )
 
 static
 void
-Signal_destructor( Signal self )
+Signal_destructor( Signal self, SignalVtable vtab )
 {
 }
 

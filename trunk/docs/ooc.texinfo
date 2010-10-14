@@ -518,17 +518,15 @@ For your convenience there is the object deletion function via its pointer, @cod
 
 @example
 
-void String_destructor( Object _self )
+void String_destructor( String self, StringVtable vtab )
 @{
-    String self = (String) _self;
-
     /* Deletes the member object and nulls the pointer */
     ooc_delete_and_null( & self->other );
 @}
 
 @end example
 
-Always use this way a object destruction when you would like to destroy objects that you did allocate globally or as members of other classes! Especially it is important in class destructor codes!
+Always use this way a object destruction when you would like to destroy objects that you did allocate globally or as members of other classes! Especially it is important in class destructor codes! (Since ooc 1.0, it is guaranteed that the destructor runs only once. However it is still recommended nulling pointers in your code when deleting, just for clarity.)
 
 @section Accessing class members
 The class members can be accessed via the object pointer if they are made public, although it is not an advisable method. It is recommended accessing the class members only via the class methods.
@@ -907,24 +905,23 @@ Foo_copy( Foo self, const Foo from )
 The destructor destroys the object of your class before releasing the allocated memory. The @code{ooc_delete} uses this constructor when deleting an object.
 @sp 1
 The destructor has a fix name: the class name concatenated with @code{_destructor}. @*
-The destructor has a single parameter: a pointer to the object to be detroyed.
+The destructor has two parameters: a pointer to the object to be detroyed, and a pointer to its virtual table.
 @sp 1
 Within the destructor you can @emph{not} throw any exception!@*
-You should use only @code{ooc_delete_and_null()} @code{and ooc_free_and_null()} in destructors! This prevents crashes because of double freeing or deleting in case of circular references.
+In the destructor you must consider, that your object is not valid: the virtual table pointer was nulled before entering in to the destructor. This is for marking the object that deletion is pending, and preventing multiple entry into the desctructor. (This way we could save some bytes in each objects.) This means that you can not use @code{Virtual} macro, or other macros that use the virtual table, e.g. @code{ooc_isInstanceOf()}.@*
+However you can still access the virtual functions via the @code{vtab} parameter, so you can use them if you need.
+Since ooc 1.0 it is guaranteed that the destructor runs only once. However you should use only @code{ooc_delete_and_null()} @code{and ooc_free_and_null()} in destructors! This prevents crashes because of double freeing or deleting in case of circular references.
 
 @example
 
 static
 void
-Foo_destructor( Foo self )
+Foo_destructor( Foo self, FooVtable vtab )
 @{
     ooc_free_and_null( & self->data_ptr );
 @}
 
 @end example
-
-Be carefull, that your code in the destructor must be reentrant! This is important because in case of circular references, the destructor may be invoked multiple times for the same object. And the destructor must work with partially complete object as well!
-
 
 @subsection Implementing class methods
 
@@ -977,7 +974,7 @@ Foo_constructor( Foo self, const void * params )
 
 static
 void
-Foo_destructor( Foo self )
+Foo_destructor( Foo self, FooVtable vtab )
 @{
     ooc_delete_and_null( (Object*) & self->bar );
 @}
@@ -1004,7 +1001,7 @@ Foo_constructor( Foo self, const void * params )
 
 static
 void
-Foo_destructor( Foo self )
+Foo_destructor( Foo self, FooVtable vtab )
 @{
     ooc_release( (Object) & self->bar );
 @}

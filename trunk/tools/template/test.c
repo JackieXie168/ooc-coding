@@ -93,7 +93,7 @@ Sample_constructor( Sample self, const void * params )
 
 static
 void
-Sample_destructor( Sample self )
+Sample_destructor( Sample self, SampleVtable vtab )
 {
 }
 
