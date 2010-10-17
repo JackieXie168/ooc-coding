@@ -528,7 +528,6 @@ void
 test_ctor_use( void )
 {
 	CtorCheck ccs;
-	int value, i;
 	
 	ooc_init_class(	CtorCheckSon );
 	
