@@ -285,7 +285,7 @@ void *		ooc_calloc( size_t num, size_t size );		/**< Memory allocation and clear
 void *		ooc_realloc( void *ptr, size_t size );		/**< Memory reallocation. Reallocates memory like realloc(), but throws an Exception on error */
 void *		ooc_memdup( const void *ptr, size_t size );	/**< Memory duplication. Duplicates a memory block with a new alloc, throws an Exception on error */
 char *		ooc_strdup( const char * s );				/**< C string duplication. Duplicates a C string with a new alloc, throws an Exception on error */
-void 		ooc_free( const void * mem );				/**< Memory free. Frees memory allocated by ooc_malloc(), ooc_calloc() or ooc_realloc() */
+void 		ooc_free( void * mem );						/**< Memory free. Frees memory allocated by ooc_malloc(), ooc_calloc() or ooc_realloc() */
 void 		ooc_free_and_null( void ** mem );			/**< Memory free and nulling pointer. Frees memory via a pointer, and NULL the pointer thread safely */
 
 /** Pointer read and null.

@@ -9,4 +9,6 @@ valgrind --leak-check=yes --quiet ./exceptiontest
 # This test should not be run in Valgrind because it uses unix signals
 ./testcasetest
 
+valgrind --leak-check=yes --quiet ./refcountedtest
+
 valgrind --leak-check=yes --quiet ./vectortest
