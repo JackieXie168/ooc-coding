@@ -2,6 +2,9 @@
 /* This is a RefCountedTest class implementation file
  */
 
+#include <omp.h>
+#include <Windows.h>
+
 #include "../libs/testcase.h"
 
 #include "../libs/implement/refcounted.h"

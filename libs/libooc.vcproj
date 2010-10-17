@@ -4,6 +4,7 @@
 	Version="9,00"
 	Name="libooc"
 	ProjectGUID="{CD012B9A-10B9-431B-9574-49F29978BEDF}"
+	RootNamespace="libooc"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="0"
 	>
@@ -52,6 +53,7 @@
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 				CompileAs="1"
+				DisableSpecificWarnings="4996"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -289,11 +291,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\implement\exception.h"
+				RelativePath=".\exception.h"
 				>
 			</File>
 			<File
-				RelativePath=".\exception.h"
+				RelativePath=".\implement\exception.h"
 				>
 			</File>
 			<File
@@ -301,11 +303,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\list.h"
+				RelativePath=".\implement\list.h"
 				>
 			</File>
 			<File
-				RelativePath=".\implement\list.h"
+				RelativePath=".\list.h"
 				>
 			</File>
 			<File
@@ -317,15 +319,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\refcounted.h"
-				>
-			</File>
-			<File
 				RelativePath=".\implement\refcounted.h"
 				>
 			</File>
 			<File
+				RelativePath=".\refcounted.h"
+				>
+			</File>
+			<File
 				RelativePath=".\signal.h"
+				>
+			</File>
+			<File
+				RelativePath=".\testcase.h"
 				>
 			</File>
 			<File
@@ -362,6 +368,10 @@
 			</File>
 			<File
 				RelativePath=".\signal.c"
+				>
+			</File>
+			<File
+				RelativePath=".\testcase.c"
 				>
 			</File>
 			<File

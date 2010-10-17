@@ -90,7 +90,7 @@ static
 void
 RefCounted_destructor( RefCounted self, RefCountedVtable vtab )
 {
-    ooc_mutex_release( self->access );
+   ooc_mutex_release( self->access );
 }
 
 /* Copy constuctor
@@ -122,5 +122,3 @@ refcnt_addref( RefCounted self )
 	
 	return self;
 }
-
-

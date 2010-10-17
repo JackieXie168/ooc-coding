@@ -366,7 +366,7 @@ void
 test_delete( void )
 {
 	Vector vector = vector_new_type( 10, Foo, TRUE );
-	int i, j;
+	VectorIndex i, j;
 	
 	for(i=0; i<100; i++ )
 		vector_push_back( vector, foo_new_with_data( i ) );
@@ -417,7 +417,7 @@ test_swap( void )
 	ooc_delete( (Object) vector );	
 }
 
-static const char foreach_param[] = "parameter";
+static char foreach_param[] = "parameter";
 static int foreach_counter;
 
 static
