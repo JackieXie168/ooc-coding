@@ -1,5 +1,5 @@
 
-TESTABLE_TARGETS = ../libs/Debug_pthread/libooc.a
+TESTABLE_TARGETS = ../libs/Debug_gomp/libooc.a
 
 SOURCES = $(wildcard *.c)
 
@@ -12,10 +12,10 @@ CPPFLAGS =
 CFLAGS = -O0 -g3 -fopenmp
 CC = gcc
 LL = gcc
-CONFIGPATH = Debug_pthread
+CONFIGPATH = Debug_gomp
 LDFLAGS = -L../libs/$(CONFIGPATH) -fopenmp
 LDOBJECTS = $(FAKEOBJECTS)
-LDLIBS = -looc
+LDLIBS =
 
 debug : $(TARGETS)
 

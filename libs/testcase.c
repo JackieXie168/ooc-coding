@@ -6,6 +6,7 @@
 #include "implement/exception.h"
 
 #include <signal.h>
+#include <string.h>
 
 /** @class TestCase
  *  @brief TestCase class - base class for unit testing.
@@ -29,6 +30,8 @@
  */
 
 AllocateClass( TestCase, Base );
+
+static ooc_Mutex	printing;
 
 /* Class virtual function prototypes
  */
@@ -54,6 +57,8 @@ TestCase_initialize( Class this )
 	vtab->before		= 	_testcase_default_virtual;
 	vtab->after			= 	_testcase_default_virtual;
 	vtab->after_class	= 	_testcase_default_virtual;
+	
+	ooc_mutex_init( printing );
 }
 
 /* Class finalizing
@@ -63,6 +68,7 @@ static
 void
 TestCase_finalize( Class this )
 {
+	ooc_mutex_release( printing );
 }
 
 
@@ -118,10 +124,58 @@ testcase_fail( const char * filename, int line, const char * message )
 {
 	current_test_failed = TRUE;
 	
+	ooc_lock( printing );
+
 	if( current_method_fail_count++ == 0 )
 		printf( "\n" );
 		
 	printf("\tFailed: %s [%s : %u]\n", message ? message : "", filename, line );
+
+	ooc_unlock( printing );
+}
+
+static const char * before_class = "before_class";
+static const char * after_class = "after_class";
+
+static
+void
+print_func_name( TestCase self, const char * func )
+{
+	int			buffer_length;
+	int			display_length;
+	static int	previous_display_length = 0;
+	char *	volatile display_text = NULL;
+	
+	try {
+		ooc_lock( printing );
+		
+		buffer_length = 32 + strlen( func ) + 1 + strlen( ooc_get_type((Object)self)->name ) + 3;
+		
+		if( buffer_length < previous_display_length )
+			buffer_length = previous_display_length + 1;
+		
+		display_text = ooc_malloc( buffer_length );
+		
+		if( func == before_class || func == after_class )
+			sprintf( display_text,  "%s.%s()", ooc_get_type((Object)self)->name, func );
+		else
+			sprintf( display_text,  "[%d] %s.%s()", self->run , ooc_get_type((Object)self)->name, func );
+		
+		display_length = strlen( display_text );
+		if( display_length < previous_display_length ) {
+			memset( &display_text[ display_length ], ' ', previous_display_length - display_length );
+			display_text[ previous_display_length ] = '\0';
+			}
+	
+		previous_display_length = strlen( display_text );
+			
+		printf( "%s\r", display_text );
+	}
+	finally {
+		ooc_unlock( printing );
+		ooc_free( display_text );
+	}
+	end_try;
 }
 
 static
@@ -135,18 +189,20 @@ testcase_run_methods(TestCase self)
 		current_test_failed = FALSE;
 		++self->run;
 		
-		printf( "[%d] %s.before()                                \r", self->run , ooc_get_type((Object)self)->name);
+		print_func_name( self, "before" );
 		TestCaseVirtual(self)->before(self);
 		
 		try
 		{
 			current_method_fail_count = 0;
 			
-			printf( "[%d] %s.%s()                                \r", self->run, ooc_get_type((Object)self)->name, method->name );
+			print_func_name( self, method->name );
 			
 			method->method(self);
 		}
 		catch_any {
+			ooc_lock( printing );
+			
 			if( ! current_test_failed )
 				printf("\n");
 			printf("\tUnexpected exception: %s, code: %d, user code: %d\n",
@@ -154,10 +210,11 @@ testcase_run_methods(TestCase self)
 							exception_get_error_code(exception),
 							exception_get_user_code(exception));
 			current_test_failed = TRUE;
+			ooc_unlock( printing );
 		}
 		end_try;
 		
-		printf( "[%d] %s.after()                                \r", self->run, ooc_get_type((Object)self)->name );
+		print_func_name( self, "after" );
 		TestCaseVirtual(self)->after(self);
 		
 		if( current_test_failed )
@@ -191,26 +248,31 @@ testcase_run( TestCase self)
 			
 		setbuf(stdout, NULL); /* Unbufferered sdout displays better the current operation */
 			
-		printf( "%s.before_class()\r", ooc_get_type((Object)self)->name );
+		print_func_name( self, before_class );
 		TestCaseVirtual(self)->before_class(self);
 
 		testcase_run_methods(self);
 				
-		printf( "%s.after_class()\r", ooc_get_type((Object)self)->name );
+		print_func_name( self, after_class );
 		TestCaseVirtual(self)->after_class(self);
 	}
 	catch_any {
+		ooc_lock( printing );
 		printf("\n\tUnexpected exception %s in %s, code: %d, user code: %d\n",
 						ooc_get_type((Object)exception)->name,
 						ooc_get_type((Object)self)->name,
 						exception_get_error_code(exception),
 						exception_get_user_code(exception));
 		self->failed++;
+		ooc_unlock( printing );
 	}
 	end_try;
 	
-	if( self->failed != 0 )
+	if( self->failed != 0 ) {
+		ooc_lock( printing );
 		printf("Test case %s failed: %d/%d (methods run/failed)\n", ooc_get_type((Object)self)->name, self->run, self->failed );
+		ooc_unlock( printing );
+	}
 	
 	return 	(self->failed == 0 ) ? 0 : 1;
 }

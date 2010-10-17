@@ -466,10 +466,10 @@ ooc_strdup( const char * s )
 
 
 void
-ooc_free( const void * mem )
+ooc_free( void * mem )
 {
 	if( mem )
-		free( (void*) mem );
+		free( mem );
 }
 
 void
