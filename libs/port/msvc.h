@@ -44,12 +44,17 @@
 
 #include <Windows.h>
 
-#define	ooc_Mutex				CRITICAL_SECTION
-#define ooc_mutex_init( x )		InitializeCriticalSection ( & x )
-#define ooc_mutex_release( x )	DeleteCriticalSection( & x )
-#define ooc_lock( x ) 			EnterCriticalSection( & x )	
-#define ooc_unlock( x ) 		LeaveCriticalSection( & x )
-#define ooc_try_lock( x )		TryEnterCriticalSection( & x ) 
+/* Because omp_lock_t is implemented as void *, we must implement ooc_Mutex as a pointer too
+in native Windows threading mode, to keep the binary compatibility between openmp and native 
+Windows threading. This let us mix the ooc libraries compiled with native Windows settings 
+and user programs either with native or with /openmp settings. */
+
+typedef	CRITICAL_SECTION *		ooc_Mutex;
+#define ooc_mutex_init( x )		InitializeCriticalSection ( x = ooc_malloc( sizeof(CRITICAL_SECTION) ) )
+#define ooc_mutex_release( x )	do { DeleteCriticalSection( x ); ooc_free( x ); } while(0)
+#define ooc_lock( x ) 			EnterCriticalSection( x )	
+#define ooc_unlock( x ) 		LeaveCriticalSection( x )
+#define ooc_try_lock( x )		TryEnterCriticalSection( x ) 
 
 #endif
 

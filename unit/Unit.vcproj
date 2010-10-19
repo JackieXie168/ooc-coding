@@ -112,19 +112,19 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\implement\bar.h"
-				>
-			</File>
-			<File
 				RelativePath=".\bar.h"
 				>
 			</File>
 			<File
-				RelativePath=".\bardaughter.h"
+				RelativePath=".\implement\bar.h"
 				>
 			</File>
 			<File
 				RelativePath=".\implement\bardaughter.h"
+				>
+			</File>
+			<File
+				RelativePath=".\bardaughter.h"
 				>
 			</File>
 			<File
@@ -136,11 +136,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\foo.h"
+				RelativePath=".\implement\foo.h"
 				>
 			</File>
 			<File
-				RelativePath=".\implement\foo.h"
+				RelativePath=".\foo.h"
 				>
 			</File>
 			<File
