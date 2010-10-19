@@ -28,7 +28,8 @@ LDLIBS = $(TESTABLE_TARGET) $(OOC_LIB)
 !IF "$(CONFIG)" == "Debug"
 OOC_LIB =
 CFLAGS = /DEBUG /D"WIN32" /Od /RTC1 /MDd /W3 /nologo /Zi /TC /openmp
-LDFLAGS = /DEBUG /MDd /openmp
+LDFLAGS = /DEBUG /MDd /openmp /nologo
+LINKEROPTIONS = /link /OPT:NOICF /OPT:NOREF
 !ENDIF
 
 all : $(TARGETS)
@@ -37,8 +38,11 @@ $(TARGETS) : objects  $(TESTABLE_TARGET)
 
 objects : $(TESTOBJECTS) $(FAKEOBJECTS)
 	
+.c.obj:
+	$(CC) $(CFLAGS) /Fd$* /c $<
+	
 .obj.exe:
-	$(LL) $(LDFLAGS) $< $(LDOBJECTS) $(LDLIBS)
+	$(LL) $(LDFLAGS) $< $(LDOBJECTS) $(LDLIBS) $(LINKEROPTIONS)
 
 clean :
 	del *.obj
