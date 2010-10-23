@@ -116,7 +116,7 @@ int			_ooc_isInitialized( const Class class_ptr );
  * @see		ooc_new_classptr()
  */
  
-#define		ooc_new( pClass, pPar ) ooc_new_classptr( & pClass ## Class, pPar )
+#define		ooc_new( pClass, pPar ) ((pClass) ooc_new_classptr( & pClass ## Class, pPar ))
 
 /** Creates a new object of a class using class table pointer.
  * Creates a new object of a class with the given class table pointer and construction parameters.
@@ -539,5 +539,12 @@ typedef	 void (* void_fn_Object_voidp)( void *, void * );
 typedef	 int  (* int_fn_Object_voidp )( void *, void * );
 
 typedef void_fn_voidp ooc_destroyer;
+
+/** Container item management flag. 
+ * Indicates that the contents of a container must be managed by the container itself.
+ * @see vector_new_type(), list_new_type()
+ */
+ 
+#define OOC_MANAGE TRUE
 
 #endif /* OOC_H */
