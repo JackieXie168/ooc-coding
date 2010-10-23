@@ -188,13 +188,18 @@ List_destructor( List self, ListVtable vtab )
 		p = next;
 		next = next->next;
 		
-		if( (! self->list_of_nodes) && self->destroy )
-			self->destroy( get_item_ptr(p) );
-		
-		ooc_delete( (Object) p );
+		if( self->list_of_nodes )
+		{
+			if( self->destroy )
+				self->destroy( p );
 		}
-	
-	ooc_unlock( self->modify );
+		else
+		{
+			if( self->destroy )
+				self->destroy( get_item_ptr(p) );
+			ooc_delete( (Object) p );
+		}
+	}
 	ooc_mutex_release( self->modify );
 }
 
@@ -324,7 +329,7 @@ list_new( list_item_destroyer destroyer )
 	p.list_of_nodes = FALSE;
 	p.type 			= NULL;
 	
-	return (List) ooc_new( List, & p );
+	return ooc_new( List, & p );
 }
 
 List
@@ -405,16 +410,15 @@ list_insert_before( List self, ListIterator location, void * new_item )
 	if( self->type )
 		ooc_check_cast( new_item, self->type );
 		
-	if( ! ooc_isInstanceOf( location, ListNode ) )
-		ooc_throw( exception_new( err_wrong_position ) );
-	 
 	if( self->first == NULL )
 	
 		return chain_first_node( self, create_new_node( self, ooc_pass( new_item ) ) );
 		
-	else
-	
+	else {
+		if( ! ooc_isInstanceOf( location, ListNode ) )
+			ooc_throw( exception_new( err_wrong_position ) );
 		return chain_before( self, location, create_new_node( self, ooc_pass( new_item ) ) );
+		}
 }
 
 ListIterator
@@ -427,16 +431,16 @@ list_insert_after( List self, ListIterator location, void * new_item )
 	if( self->type )
 		ooc_check_cast( new_item, self->type );
 		
-	if( ! ooc_isInstanceOf( location, ListNode ) )
-		ooc_throw( exception_new( err_wrong_position ) );
-	 
 	if( self->first == NULL )
 	
 		return chain_first_node( self, create_new_node( self, ooc_pass( new_item ) ) );
 		
 	else
-	
+	{
+		if( ! ooc_isInstanceOf( location, ListNode ) )
+			ooc_throw( exception_new( err_wrong_position ) );
 		return chain_after( self, location, create_new_node( self, ooc_pass( new_item ) ) );
+	}
 }
 
 void *
@@ -525,21 +529,52 @@ list_previous( ListIterator node )
 void
 list_swap( List self, ListIterator node1, ListIterator node2 )
 {
-	ListNode tmp_next, tmp_prev;
-	
 	assert( ooc_isInstanceOf( self, List ) );
 
 	if( ! ooc_isInstanceOf( node1, ListNode ) || ! ooc_isInstanceOf( node2, ListNode ) )
 		ooc_throw( exception_new( err_wrong_position ) );
 	
+	if( node1 == node2 )
+		return;
+		
 	ooc_lock( self->modify );
-
-	tmp_next 		= node1->next;
-	tmp_prev 		= node1->previous;
-	node1->next 	= node2->next;
-	node1->previous = node2->previous;
-	node2->next 	= tmp_next;
-	node2->previous = tmp_prev;
+	
+	if( self->list_of_nodes )
+	{ /* http://ptspts.blogspot.com/2010/01/how-to-swap-two-nodes-in-doubly-linked.html */
+		ListIterator tmp;
+	
+		tmp = node1->next;
+		node1->next = node2->next;
+		node2->next = tmp;
+		if ( node1->next )
+			node1->next->previous = node1;
+		if ( node2->next )
+			node2->next->previous = node2;
+		tmp = node1->previous;
+		node1->previous = node2->previous;
+		node2->previous = tmp;
+		if (node1->previous != NULL)
+			node1->previous->next = node1;
+		if (node2->previous != NULL)
+			node2->previous->next = node2;
+		
+		if( self->first == node1 )
+			self->first = node2;
+		else if ( self->first == node2 )
+			self->first = node1;
+	
+		if( self->last == node1 )
+			self->last = node2;
+		else if ( self->last == node2 )
+			self->last = node1;
+	}
+	else
+	{
+		void * tmp;
+		tmp = ((_ListNodeVoidp) node1 )->item;
+		((_ListNodeVoidp) node1 )->item = ((_ListNodeVoidp) node2 )->item;
+		((_ListNodeVoidp) node2 )->item = tmp;
+	}
 
 	ooc_unlock( self->modify );
 }

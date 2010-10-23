@@ -3,7 +3,6 @@
  */
 
 #include <omp.h>
-#include <Windows.h>
 
 #include "../libs/testcase.h"
 
