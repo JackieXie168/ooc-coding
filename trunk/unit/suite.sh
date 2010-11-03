@@ -14,3 +14,5 @@ valgrind --leak-check=yes --quiet ./refcountedtest
 valgrind --leak-check=yes --quiet ./vectortest
 
 valgrind --leak-check=yes --quiet ./listtest
+
+valgrind --leak-check=yes --quiet ./signaltest

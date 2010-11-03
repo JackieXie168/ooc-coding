@@ -538,6 +538,22 @@ remove_item( ListTest self )
 
 static
 void
+remove_last_item( ListTest self )
+{
+	Foo foo;
+	
+	list_append( self->foolist, foo_new_with_data( 0 ) );
+
+	foo = list_remove_item( self->foolist, list_first( self->foolist ) );
+	
+	assertNull( self->foolist->first );
+	assertNull( self->foolist->last );
+	
+	ooc_delete( (Object) foo );
+}
+
+static
+void
 delete_item( ListTest self )
 {
 	ListIterator 	iterator;
@@ -554,6 +570,18 @@ delete_item( ListTest self )
 	list_delete_item( self->foolist, iterator );
 		
 	check_sequential( self->foolist );	
+}
+
+static
+void
+delete_last_item( ListTest self )
+{
+	list_append( self->foolist, foo_new_with_data( 0 ) );
+
+	list_delete_item( self->foolist, list_first( self->foolist ) );
+	
+	assertNull( self->foolist->first );
+	assertNull( self->foolist->last );
 }
 
 static
@@ -927,7 +955,9 @@ struct TestCaseMethod methods[] =
 	TEST(insert_first),
 	TEST(insert_last),
 	TEST(remove_item),
+	TEST(remove_last_item),
 	TEST(delete_item),
+	TEST(delete_last_item),
 	TEST(unmanaged),
 	TEST(swap_1),
 	TEST(swap_2),
