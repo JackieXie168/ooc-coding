@@ -139,7 +139,7 @@ static const char * after_class = "after_class";
 
 static
 void
-print_func_name( TestCase self, const char * func )
+print_func_name( TestCase self, const char * func, const char * suffix )
 {
 	int			buffer_length;
 	int			display_length;
@@ -149,7 +149,7 @@ print_func_name( TestCase self, const char * func )
 	try {
 		ooc_lock( printing );
 		
-		buffer_length = 32 + strlen( func ) + 1 + strlen( ooc_get_type((Object)self)->name ) + 3;
+		buffer_length = 32 + strlen( func ) + 1 + strlen( suffix ) + 1 + strlen( ooc_get_type((Object)self)->name ) + 3;
 		
 		if( buffer_length < previous_display_length )
 			buffer_length = previous_display_length + 1;
@@ -158,8 +158,10 @@ print_func_name( TestCase self, const char * func )
 		
 		if( func == before_class || func == after_class )
 			sprintf( display_text,  "%s.%s()", ooc_get_type((Object)self)->name, func );
-		else
+		else if( strlen( suffix ) == 0 )
 			sprintf( display_text,  "[%d] %s.%s()", self->run , ooc_get_type((Object)self)->name, func );
+		else
+			sprintf( display_text,  "[%d] %s.%s.%s()", self->run , ooc_get_type((Object)self)->name, func, suffix );
 		
 		display_length = strlen( display_text );
 		if( display_length < previous_display_length ) {
@@ -189,14 +191,14 @@ testcase_run_methods(TestCase self)
 		current_test_failed = FALSE;
 		++self->run;
 		
-		print_func_name( self, "before" );
+		print_func_name( self, method->name, "before" );
 		TestCaseVirtual(self)->before(self);
 		
 		try
 		{
 			current_method_fail_count = 0;
 			
-			print_func_name( self, method->name );
+			print_func_name( self, method->name, "" );
 			
 			method->method(self);
 		}
@@ -214,7 +216,7 @@ testcase_run_methods(TestCase self)
 		}
 		end_try;
 		
-		print_func_name( self, "after" );
+		print_func_name( self, method->name, "after" );
 		TestCaseVirtual(self)->after(self);
 		
 		if( current_test_failed )
@@ -248,12 +250,12 @@ testcase_run( TestCase self)
 			
 		setbuf(stdout, NULL); /* Unbufferered sdout displays better the current operation */
 			
-		print_func_name( self, before_class );
+		print_func_name( self, before_class, "" );
 		TestCaseVirtual(self)->before_class(self);
 
 		testcase_run_methods(self);
 				
-		print_func_name( self, after_class );
+		print_func_name( self, after_class, "" );
 		TestCaseVirtual(self)->after_class(self);
 	}
 	catch_any {

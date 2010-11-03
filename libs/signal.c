@@ -54,7 +54,6 @@ static
 void
 SignalItem_initialize( Class this )
 {
-
 }
 
 /* Class finalizing
@@ -302,8 +301,8 @@ signal_queue_process_item( SignalQueued sq )
 /**	Processes the asynchronously emitted signals.
  * Must be called from the eventloop. Processes all buffered async signals.
  * @warning	The async signals emitted by the called handlers will be executed as well before return.
- * @warning This is a blocking operation! Only on thread is used for emitting the signals. If an other thread 
- * 			attempts to call signal_process_signals() parallely then that thraed will be bocked.
+ * @warning This is a blocking operation! Only one thread is used for emitting the signals. If an other thread 
+ * 			attempts to call signal_process_signals() parallely then that thread will be blocked.
  * @todo	Implement a multithreaded signal emission routine. 
  */
   
@@ -339,9 +338,8 @@ signal_register_signal( Signal * signal_p )
 	assert( ooc_isInstanceOf( * signal_p, Signal ) );
 	assert( ooc_isInstanceOf( signal_register, List ) );
 	
-	if( ! list_find_item( signal_register, NULL, (list_item_checker) signal_register_comparator, signal_p ) ) {
+	if( ! list_find_item( signal_register, NULL, (list_item_checker) signal_register_comparator, signal_p ) )
 		list_append( signal_register, signal_p );
-		};
 }
 
 static
@@ -464,7 +462,7 @@ signal_connect( void * source, Signal * signal_p, void * target, SignalHandler h
 /** Disconnects a signal handler from a signal.
  * The connected signal handler will be disconnected.
  * @param	source		The source Object of the signal.
- * @param	self		The Signal (must be in the source Object!).
+ * @param	signal_p	The address of the Signal (must be in the source Object!).
  * @param	target		The target Object.
  * @param	handler		The signal handler.
  * @see	signal_connect()
@@ -474,14 +472,14 @@ signal_connect( void * source, Signal * signal_p, void * target, SignalHandler h
  */
  
 void
-signal_disconnect( void * source, Signal self, void * target, SignalHandler handler )
+signal_disconnect( void * source, Signal * signal_p, void * target, SignalHandler handler )
 {
 	struct SignalItemObject si;
 	ListIterator found;
 
-	if( self ) {
+	if( *signal_p ) {
 		
-		assert( ooc_isInstanceOf( self, Signal ) );
+		assert( ooc_isInstanceOf( *signal_p, Signal ) );
 		
 		ooc_use( & si, SignalItem, NULL );
 		
@@ -489,10 +487,10 @@ signal_disconnect( void * source, Signal self, void * target, SignalHandler hand
 		si.target	= target;
 		si.handler	= handler;
 		
-		found = list_find_item( (List) self, NULL, (list_item_checker) signalitem_compare, & si );
+		found = list_find_item( (List) *signal_p, NULL, (list_item_checker) signalitem_compare, & si );
 		
 		if( found )
-			list_delete_item( (List) self, found );
+			list_delete_item( (List) *signal_p, found );
 		}
 }
 
