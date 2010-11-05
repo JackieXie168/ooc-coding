@@ -322,8 +322,6 @@ static
 void
 iterator( ListTest self )
 {
-	ListIterator iterator;
-	
 	list_append( self->foolist, foo_new() );
 	
 	assertTrue( self->foolist->first == list_first( self->foolist ) );
@@ -389,7 +387,7 @@ paralell_append( ListTest self )
 	for( i=0; i<check_size; i++ )
 		check[ i ] = 0;
 
-	#pragma omp parallel for private(i) schedule( guided, 10 )
+	#pragma omp parallel for private(i)
 	for( i=0; i<check_size; i++ )
 		list_append( self->foolist, foo_new_with_data( i ) );
 
@@ -775,8 +773,6 @@ static
 int
 foo_comparator( void * item, void * param )
 {
-	int current_value;
-	
 	assertTrue( param == foreach_param );
 	assertTrue( ooc_get_type( item ) == &FooClass );
 	
