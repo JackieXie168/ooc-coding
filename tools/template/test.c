@@ -175,7 +175,7 @@ int main(int argc, char * argv[])
 	int result;
 	
 	ooc_init_class( Sample );
-	sample = (Sample) ooc_new( Sample, &methods );
+	sample = ooc_new( Sample, &methods );
 	result = testcase_run((TestCase)sample);
 	ooc_delete( (Object) sample );
 	ooc_finalize_all();

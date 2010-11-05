@@ -267,7 +267,7 @@ signal_emit( Signal signal, void * parameter, ooc_destroyer param_destroy_fn )
 
 		assert( ooc_isInstanceOf( signal, Signal ) );
 		
-		sq = (SignalQueued) ooc_new( SignalQueued, NULL );
+		sq = ooc_new( SignalQueued, NULL );
 		
 		sq->emitted_signal 	= signal;
 		sq->parameter	  	= ooc_pass( parameter );
@@ -441,14 +441,14 @@ signal_connect( void * source, Signal * signal_p, void * target, SignalHandler h
 	SignalItem	si;
 	
 	if( * signal_p == NULL )
-		* signal_p = (Signal) ooc_new( Signal, source );
+		* signal_p = ooc_new( Signal, source );
 	
 	assert( ooc_isInstanceOf( *signal_p, Signal ) );
 	
 	if( (*signal_p)->owner != source )
 		ooc_throw( exception_new( err_bad_connect ) );
 	
-	si = (SignalItem) ooc_new( SignalItem, NULL );
+	si = ooc_new( SignalItem, NULL );
 	
 	si->source	= source;
 	si->target	= target;
@@ -531,7 +531,7 @@ signal_emit_sync( Signal signal, void * parameter, ooc_destroyer param_destroy_f
 		list_foreach( (List) signal, (list_item_executor) signalitem_emit_sync, parameter );
 		}
 	
-	if( param_destroy_fn )
+	if( param_destroy_fn && parameter )
 		param_destroy_fn( parameter );
 }
 

@@ -36,8 +36,10 @@ ClassMembers( Source, Base )
 	
 	int		counter_max;
 	int		counter;
+	
+	ooc_Mutex	modify;
 
-	Signal	counter_reached;
+	Signal	on_counter_reached;
 	
 EndOfClassMembers;
 
@@ -63,6 +65,8 @@ Source_constructor( Source self, const void * params )
 	assert( ooc_isInitialized( Source ) );
 	
 	chain_constructor( Source, self, NULL );
+	
+	ooc_mutex_init( self->modify );
 }
 
 static
@@ -70,6 +74,8 @@ void
 Source_destructor( Source self, SourceVtable vtab )
 {
 	signal_destroy_notify( (Object) self );
+
+	ooc_mutex_release( self->modify );
 }
 
 static
@@ -87,7 +93,7 @@ source_new( int index, int period )
 	
 	ooc_init_class( Source );
 	
-	self = ooc_new( Source, & period );
+	self = ooc_new( Source, NULL );
 	
 	self->index = index;
 	self->counter_max = period;
@@ -96,15 +102,50 @@ source_new( int index, int period )
 }
 
 static
+Signal *
+source_counter_reached_signal( Source self )
+{
+	return & self->on_counter_reached;
+}
+
+static char * signal_param = "Signal parameter";
+
+static
 void
 source_count( Source self )
 {
+	int must_emit = FALSE;
+	
 	assert( ooc_isInstanceOf( self, Source ) );
 	
+	ooc_lock( self->modify );
 	if( (++ self->counter) == self->counter_max ) {
 		self->counter = 0;
-		signal_emit( self->counter_reached, &self->counter, NULL );
+		must_emit = TRUE;
 		}
+	ooc_unlock( self->modify );
+	
+	if( must_emit )
+		signal_emit( self->on_counter_reached, signal_param, NULL );
+}
+
+static
+void
+source_count_sync( Source self )
+{
+	int must_emit = FALSE;
+	
+	assert( ooc_isInstanceOf( self, Source ) );
+	
+	ooc_lock( self->modify );
+	if( (++ self->counter) == self->counter_max ) {
+		self->counter = 0;
+		must_emit = TRUE;
+		}
+	ooc_unlock( self->modify );
+	
+	if( must_emit )
+		signal_emit_sync( self->on_counter_reached, signal_param, NULL );
 }
 
 #define MAX_SOURCES 10
@@ -121,6 +162,8 @@ EndOfVirtuals;
 ClassMembers( Listener, Base )
 
 	int		source_fired_count[ MAX_SOURCES ];
+	
+	ooc_Mutex	modify;
 	
 EndOfClassMembers;
 
@@ -146,6 +189,8 @@ Listener_constructor( Listener self, const void * params )
 	assert( ooc_isInitialized( Listener ) );
 	
 	chain_constructor( Listener, self, NULL );
+	
+	ooc_mutex_init( self->modify );
 }
 
 static
@@ -153,6 +198,8 @@ void
 Listener_destructor( Listener self, ListenerVtable vtab )
 {
 	signal_destroy_notify( (Object) self );	
+	
+	ooc_mutex_release( self->modify );
 }
 
 static
@@ -169,21 +216,23 @@ listener_new( void )
 {
 	ooc_init_class( Listener );
 			
-	return (Listener) ooc_new( Listener, NULL );
+	return ooc_new( Listener, NULL );
 }
 
 
 static
 void
-listener_counter_reached( Listener self, Source source, int * count )
+listener_counter_reached( Listener self, Source source, const char * param )
 {
 	assertTrue( ooc_isInstanceOf( self, Listener ) );
 	assertTrue( ooc_isInstanceOf( source, Source ) );
 	assertTrue( source->index < MAX_SOURCES && source->index >= 0 );
 
-	assertTrue( source->counter == *count );
+	assertTrue( param == signal_param );
 	
+	ooc_lock( self->modify );
 	++ ( self->source_fired_count[ source->index ] );
+	ooc_unlock( self->modify );
 }
 
 /*	=====================================================
@@ -329,14 +378,14 @@ signaltest_after_class( SignalTest self )
 
 void
 static
-signaltest_method1( SignalTest self )
+signaltest_2sources_1listener( SignalTest self )
 {
 	#define CYCLE 1000
 	
 	int i;
 	
-	signal_connect ( self->source1, & self->source1->counter_reached, self->listener1, (SignalHandler) listener_counter_reached );
-	signal_connect ( self->source2, & self->source2->counter_reached, self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source2, source_counter_reached_signal( self->source2 ), self->listener1, (SignalHandler) listener_counter_reached );
 	
 	#pragma omp parallel for private(i)
 	for( i=0; i<CYCLE; i++ ) {
@@ -356,6 +405,239 @@ signaltest_method1( SignalTest self )
 	#undef CYCLE
 }
 
+void
+static
+signaltest_1source_2listeners( SignalTest self )
+{
+	#define CYCLE 1000
+	
+	int i;
+	
+	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener2, (SignalHandler) listener_counter_reached );
+	
+	#pragma omp parallel for private(i)
+	for( i=0; i<CYCLE; i++ ) {
+		source_count( self->source1 );
+		if( i % 7  == 0 )
+			signal_process_signals();
+		}
+	signal_process_signals();
+	
+	assertTrue( self->listener1->source_fired_count[0] == CYCLE / SOURCE1_PERIOD );
+	for( i = 1; i<MAX_SOURCES; i++ )	
+		assertTrue( self->listener1->source_fired_count[i] == 0 );
+		
+	assertTrue( self->listener2->source_fired_count[0] == CYCLE / SOURCE1_PERIOD );
+	for( i = 1; i<MAX_SOURCES; i++ )	
+		assertTrue( self->listener2->source_fired_count[i] == 0 );
+		
+	#undef CYCLE
+}
+
+void
+static
+signaltest_2sources_2listeners( SignalTest self )
+{
+	#define CYCLE 1000
+	
+	int i;
+	
+	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener2, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source2, source_counter_reached_signal( self->source2 ), self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source2, source_counter_reached_signal( self->source2 ), self->listener2, (SignalHandler) listener_counter_reached );
+	
+	#pragma omp parallel for private(i)
+	for( i=0; i<CYCLE; i++ ) {
+		source_count( self->source1 );
+		source_count( self->source2 );
+		if( i % 7  == 0 )
+			signal_process_signals();
+		}
+	signal_process_signals();
+	
+	assertTrue( self->listener1->source_fired_count[0] == CYCLE / SOURCE1_PERIOD );
+	assertTrue( self->listener1->source_fired_count[1] == CYCLE / SOURCE2_PERIOD );
+	for( i = 2; i<MAX_SOURCES; i++ )	
+		assertTrue( self->listener1->source_fired_count[i] == 0 );
+		
+	assertTrue( self->listener2->source_fired_count[0] == CYCLE / SOURCE1_PERIOD );
+	assertTrue( self->listener2->source_fired_count[1] == CYCLE / SOURCE2_PERIOD );
+	for( i = 2; i<MAX_SOURCES; i++ )	
+		assertTrue( self->listener2->source_fired_count[i] == 0 );
+		
+	#undef CYCLE
+}
+
+void
+static
+signaltest_2sources_1listener_sync( SignalTest self )
+{
+	#define CYCLE 1000
+	
+	int i;
+	
+	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source2, source_counter_reached_signal( self->source2 ), self->listener1, (SignalHandler) listener_counter_reached );
+	
+	#pragma omp parallel for private(i)
+	for( i=0; i<CYCLE; i++ ) {
+		source_count_sync( self->source1 );
+		source_count_sync( self->source2 );
+		}
+
+	assertTrue( self->listener1->source_fired_count[0] == CYCLE / SOURCE1_PERIOD );
+	assertTrue( self->listener1->source_fired_count[1] == CYCLE / SOURCE2_PERIOD );
+
+	for( i = 2; i<MAX_SOURCES; i++ )	
+		assertTrue( self->listener1->source_fired_count[i] == 0 );
+		
+	#undef CYCLE
+}
+
+void
+static
+signaltest_1source_2listeners_sync( SignalTest self )
+{
+	#define CYCLE 1000
+	
+	int i;
+	
+	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener2, (SignalHandler) listener_counter_reached );
+	
+	#pragma omp parallel for private(i)
+	for( i=0; i<CYCLE; i++ ) {
+		source_count_sync( self->source1 );
+		}
+	
+	assertTrue( self->listener1->source_fired_count[0] == CYCLE / SOURCE1_PERIOD );
+	for( i = 1; i<MAX_SOURCES; i++ )	
+		assertTrue( self->listener1->source_fired_count[i] == 0 );
+		
+	assertTrue( self->listener2->source_fired_count[0] == CYCLE / SOURCE1_PERIOD );
+	for( i = 1; i<MAX_SOURCES; i++ )	
+		assertTrue( self->listener2->source_fired_count[i] == 0 );
+		
+	#undef CYCLE
+}
+
+void
+static
+signaltest_2sources_2listeners_sync( SignalTest self )
+{
+	#define CYCLE 1000
+	
+	int i;
+	
+	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener2, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source2, source_counter_reached_signal( self->source2 ), self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source2, source_counter_reached_signal( self->source2 ), self->listener2, (SignalHandler) listener_counter_reached );
+	
+	#pragma omp parallel for private(i)
+	for( i=0; i<CYCLE; i++ ) {
+		source_count_sync( self->source1 );
+		source_count_sync( self->source2 );
+		}
+		
+	assertTrue( self->listener1->source_fired_count[0] == CYCLE / SOURCE1_PERIOD );
+	assertTrue( self->listener1->source_fired_count[1] == CYCLE / SOURCE2_PERIOD );
+	for( i = 2; i<MAX_SOURCES; i++ )	
+		assertTrue( self->listener1->source_fired_count[i] == 0 );
+		
+	assertTrue( self->listener2->source_fired_count[0] == CYCLE / SOURCE1_PERIOD );
+	assertTrue( self->listener2->source_fired_count[1] == CYCLE / SOURCE2_PERIOD );
+	for( i = 2; i<MAX_SOURCES; i++ )	
+		assertTrue( self->listener2->source_fired_count[i] == 0 );
+		
+	#undef CYCLE
+}
+
+
+void
+static
+signaltest_disconnect_I( SignalTest self )
+{
+	#define CYCLE 1000
+	
+	int i;
+	
+	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener2, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source2, source_counter_reached_signal( self->source2 ), self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source2, source_counter_reached_signal( self->source2 ), self->listener2, (SignalHandler) listener_counter_reached );
+	
+	#pragma omp parallel for private(i)
+	for( i=0; i<CYCLE; i++ ) {
+		source_count_sync( self->source1 );
+		source_count_sync( self->source2 );
+		}
+		
+	signal_disconnect ( self->source2, source_counter_reached_signal( self->source2 ), self->listener1, (SignalHandler) listener_counter_reached );
+	signal_disconnect ( self->source2, source_counter_reached_signal( self->source2 ), self->listener2, (SignalHandler) listener_counter_reached );
+	
+	#pragma omp parallel for private(i)
+	for( i=0; i<CYCLE; i++ ) {
+		source_count_sync( self->source1 );
+		source_count_sync( self->source2 );
+		}
+		
+	assertTrue( self->listener1->source_fired_count[0] == CYCLE * 2 / SOURCE1_PERIOD );
+	assertTrue( self->listener1->source_fired_count[1] == CYCLE / SOURCE2_PERIOD );
+	for( i = 2; i<MAX_SOURCES; i++ )	
+		assertTrue( self->listener1->source_fired_count[i] == 0 );
+		
+	assertTrue( self->listener2->source_fired_count[0] == CYCLE  * 2 / SOURCE1_PERIOD );
+	assertTrue( self->listener2->source_fired_count[1] == CYCLE / SOURCE2_PERIOD );
+	for( i = 2; i<MAX_SOURCES; i++ )	
+		assertTrue( self->listener2->source_fired_count[i] == 0 );
+		
+	#undef CYCLE
+}
+
+void
+static
+signaltest_disconnect_II( SignalTest self )
+{
+	#define CYCLE 1000
+	
+	int i;
+	
+	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener2, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source2, source_counter_reached_signal( self->source2 ), self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source2, source_counter_reached_signal( self->source2 ), self->listener2, (SignalHandler) listener_counter_reached );
+	
+	#pragma omp parallel for private(i)
+	for( i=0; i<CYCLE; i++ ) {
+		source_count_sync( self->source1 );
+		source_count_sync( self->source2 );
+		}
+		
+	signal_disconnect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener2, (SignalHandler) listener_counter_reached );
+	signal_disconnect ( self->source2, source_counter_reached_signal( self->source2 ), self->listener2, (SignalHandler) listener_counter_reached );
+	
+	#pragma omp parallel for private(i)
+	for( i=0; i<CYCLE; i++ ) {
+		source_count_sync( self->source1 );
+		source_count_sync( self->source2 );
+		}
+		
+	assertTrue( self->listener1->source_fired_count[0] == CYCLE * 2 / SOURCE1_PERIOD );
+	assertTrue( self->listener1->source_fired_count[1] == CYCLE * 2 / SOURCE2_PERIOD );
+	for( i = 2; i<MAX_SOURCES; i++ )	
+		assertTrue( self->listener1->source_fired_count[i] == 0 );
+		
+	assertTrue( self->listener2->source_fired_count[0] == CYCLE / SOURCE1_PERIOD );
+	assertTrue( self->listener2->source_fired_count[1] == CYCLE / SOURCE2_PERIOD );
+	for( i = 2; i<MAX_SOURCES; i++ )	
+		assertTrue( self->listener2->source_fired_count[i] == 0 );
+		
+	#undef CYCLE
+}
+
 /** Test methods order table.
  * Put your test methods in this table in the order they should be executed
  * using the TEST(method) macro. 
@@ -365,8 +647,17 @@ signaltest_method1( SignalTest self )
 struct TestCaseMethod methods[] =
 {
 	
-	TEST(signaltest_method1),
-	
+	TEST(signaltest_2sources_1listener),
+	TEST(signaltest_1source_2listeners),
+	TEST(signaltest_2sources_2listeners),
+
+	TEST(signaltest_2sources_1listener_sync),
+	TEST(signaltest_1source_2listeners_sync),
+	TEST(signaltest_2sources_2listeners_sync),
+
+	TEST(signaltest_disconnect_I),
+	TEST(signaltest_disconnect_II),
+
 	{NULL, NULL} /* Do NOT delete this line! */
 };
 	
