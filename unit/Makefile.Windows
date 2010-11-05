@@ -10,7 +10,7 @@
 TESTABLE_PATH = ..\libs
 TESTABLE_LIB = libooc_d.lib
 
-TESTS = ooctest.c exceptiontest.c testcasetest.c refcountedtest.c vectortest.c
+TESTS = ooctest.c exceptiontest.c testcasetest.c refcountedtest.c vectortest.c listtest.c signaltest.c
 FAKES = foo.c fooexception.c bar.c barson.c bardaughter.c
 
 ###################################################

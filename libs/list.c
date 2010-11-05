@@ -236,25 +236,19 @@ create_new_node( List self, void * new_item )
 
 static
 ListIterator
-chain_first_node( List self, ListIterator new_node )
+chain_first_node( List self, ListIterator new_node ) /* List must be locked */
 {
-	ooc_lock( self->modify );
-
 	new_node->previous = new_node->next = NULL;
 	
 	self->first = self->last = new_node;
-
-	ooc_unlock( self->modify );
 
 	return new_node;
 }
 
 static
 ListIterator
-chain_before( List self, ListIterator location, ListIterator new_node )
+chain_before( List self, ListIterator location, ListIterator new_node ) /* List must be locked */
 {
-	ooc_lock( self->modify );
-
 	new_node->previous 	= location->previous;
 	new_node->next		= location;
 	
@@ -266,17 +260,13 @@ chain_before( List self, ListIterator location, ListIterator new_node )
 	if( location == self->first )
 		self->first = new_node;
 	
-	ooc_unlock( self->modify );
-
 	return new_node;	
 }
 
 static
 ListIterator
-chain_after( List self, ListIterator location, ListIterator new_node )
+chain_after( List self, ListIterator location, ListIterator new_node ) /* List must be locked */
 {
-	ooc_lock( self->modify );
-
 	new_node->previous 	= location;
 	new_node->next		= location->next;
 	
@@ -288,14 +278,12 @@ chain_after( List self, ListIterator location, ListIterator new_node )
 	if( location == self->last )
 		self->last = new_node;
 	
-	ooc_unlock( self->modify );
-
 	return new_node;
 }
 
 static
 ListIterator
-unchain( List self, ListIterator location )
+unchain( List self, ListIterator location ) /* List must NOT be locked */
 {
 	ooc_lock( self->modify );
 
@@ -365,6 +353,8 @@ _list_new_of_nodes( Class node, int manage )
 ListIterator
 list_append( List self, void * new_item )
 {
+	ListIterator iterator; 
+
 	ooc_manage( new_item, self->destroy );
 	 
 	assert( ooc_isInstanceOf( self, List ) );
@@ -372,18 +362,23 @@ list_append( List self, void * new_item )
 	if( self->type )
 		ooc_check_cast( new_item, self->type );
 		
+	ooc_lock( self->modify );
+
 	if( self->last == NULL )
-	
-		return chain_first_node( self, create_new_node( self, ooc_pass( new_item ) ) );
-		
+		iterator = chain_first_node( self, create_new_node( self, ooc_pass( new_item ) ) );
 	else
-	
-		return chain_after( self, self->last, create_new_node( self, ooc_pass( new_item ) ) );
+		iterator = chain_after( self, self->last, create_new_node( self, ooc_pass( new_item ) ) );
+
+	ooc_unlock( self->modify );
+
+	return iterator;
 }
 
 ListIterator
 list_prepend( List self, void * new_item )
 {
+	ListIterator iterator; 
+
 	ooc_manage( new_item, self->destroy );
 
 	assert( ooc_isInstanceOf( self, List ) );
@@ -391,18 +386,23 @@ list_prepend( List self, void * new_item )
 	if( self->type )
 		ooc_check_cast( new_item, self->type );
 		
+	ooc_lock( self->modify );
+
 	if( self->first == NULL )
-	
-		return chain_first_node( self, create_new_node( self, ooc_pass( new_item ) ) );
-		
+		iterator = chain_first_node( self, create_new_node( self, ooc_pass( new_item ) ) );
 	else
-	
-		return chain_before( self, self->first, create_new_node( self, ooc_pass( new_item ) ) );	
+		iterator = chain_before( self, self->first, create_new_node( self, ooc_pass( new_item ) ) );	
+
+	ooc_unlock( self->modify );
+
+	return iterator;
 }
 
 ListIterator
 list_insert_before( List self, ListIterator location, void * new_item )
 {
+	ListIterator iterator = NULL; 
+
 	ooc_manage( new_item, self->destroy );
 	 
 	assert( ooc_isInstanceOf( self, List ) );
@@ -410,20 +410,27 @@ list_insert_before( List self, ListIterator location, void * new_item )
 	if( self->type )
 		ooc_check_cast( new_item, self->type );
 		
+	ooc_lock( self->modify );
+
 	if( self->first == NULL )
-	
-		return chain_first_node( self, create_new_node( self, ooc_pass( new_item ) ) );
-		
-	else {
-		if( ! ooc_isInstanceOf( location, ListNode ) )
-			ooc_throw( exception_new( err_wrong_position ) );
-		return chain_before( self, location, create_new_node( self, ooc_pass( new_item ) ) );
-		}
+		iterator = chain_first_node( self, create_new_node( self, ooc_pass( new_item ) ) );
+	else 
+		if( ooc_isInstanceOf( location, ListNode ) )
+			iterator = chain_before( self, location, create_new_node( self, ooc_pass( new_item ) ) );
+
+	ooc_unlock( self->modify );
+
+	if( iterator == NULL )
+		ooc_throw( exception_new( err_wrong_position ) );
+
+	return iterator;
 }
 
 ListIterator
 list_insert_after( List self, ListIterator location, void * new_item )
 {
+	ListIterator iterator = NULL; 
+
 	ooc_manage( new_item, self->destroy );
 
 	assert( ooc_isInstanceOf( self, List ) );
@@ -431,16 +438,20 @@ list_insert_after( List self, ListIterator location, void * new_item )
 	if( self->type )
 		ooc_check_cast( new_item, self->type );
 		
+	ooc_lock( self->modify );
+
 	if( self->first == NULL )
-	
-		return chain_first_node( self, create_new_node( self, ooc_pass( new_item ) ) );
-		
+		iterator = chain_first_node( self, create_new_node( self, ooc_pass( new_item ) ) );
 	else
-	{
-		if( ! ooc_isInstanceOf( location, ListNode ) )
-			ooc_throw( exception_new( err_wrong_position ) );
-		return chain_after( self, location, create_new_node( self, ooc_pass( new_item ) ) );
-	}
+		if( ooc_isInstanceOf( location, ListNode ) )
+			iterator = chain_after( self, location, create_new_node( self, ooc_pass( new_item ) ) );
+
+	ooc_unlock( self->modify );
+
+	if( iterator == NULL )
+		ooc_throw( exception_new( err_wrong_position ) );
+
+	return iterator;
 }
 
 void *

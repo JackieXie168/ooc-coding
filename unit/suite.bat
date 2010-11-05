@@ -12,3 +12,5 @@ REM #########################################x
 REM @testcasetest
 @refcountedtest
 @vectortest
+@listtest
+@signaltest
