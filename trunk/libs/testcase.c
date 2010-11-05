@@ -151,7 +151,7 @@ print_func_name( TestCase self, const char * func, const char * suffix )
 		
 		buffer_length = 32 + strlen( func ) + 1 + strlen( suffix ) + 1 + strlen( ooc_get_type((Object)self)->name ) + 3;
 		
-		if( buffer_length < previous_display_length )
+		if( buffer_length < previous_display_length + 1 )
 			buffer_length = previous_display_length + 1;
 		
 		display_text = ooc_malloc( buffer_length );
@@ -174,8 +174,8 @@ print_func_name( TestCase self, const char * func, const char * suffix )
 		printf( "%s\r", display_text );
 	}
 	finally {
-		ooc_unlock( printing );
 		ooc_free( display_text );
+		ooc_unlock( printing );
 	}
 	end_try;
 }
