@@ -103,9 +103,12 @@ source_new( int index, int period )
 
 static
 Signal *
-source_counter_reached_signal( Source self )
+source_counter_reached_signal( void * self )
 {
-	return & self->on_counter_reached;
+	if( ! ooc_isInstanceOf( self, Source ) )
+		ooc_throw( exception_new( err_bad_cast ) );
+		
+	return & ((Source)self)->on_counter_reached;
 }
 
 static char * signal_param = "Signal parameter";
@@ -384,8 +387,8 @@ signaltest_2sources_1listener( SignalTest self )
 	
 	int i;
 	
-	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener1, (SignalHandler) listener_counter_reached );
-	signal_connect ( self->source2, source_counter_reached_signal( self->source2 ), self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source1, source_counter_reached_signal, self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source2, source_counter_reached_signal, self->listener1, (SignalHandler) listener_counter_reached );
 	
 	#pragma omp parallel for private(i)
 	for( i=0; i<CYCLE; i++ ) {
@@ -413,8 +416,8 @@ signaltest_1source_2listeners( SignalTest self )
 	
 	int i;
 	
-	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener1, (SignalHandler) listener_counter_reached );
-	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener2, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source1, source_counter_reached_signal, self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source1, source_counter_reached_signal, self->listener2, (SignalHandler) listener_counter_reached );
 	
 	#pragma omp parallel for private(i)
 	for( i=0; i<CYCLE; i++ ) {
@@ -443,10 +446,10 @@ signaltest_2sources_2listeners( SignalTest self )
 	
 	int i;
 	
-	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener1, (SignalHandler) listener_counter_reached );
-	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener2, (SignalHandler) listener_counter_reached );
-	signal_connect ( self->source2, source_counter_reached_signal( self->source2 ), self->listener1, (SignalHandler) listener_counter_reached );
-	signal_connect ( self->source2, source_counter_reached_signal( self->source2 ), self->listener2, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source1, source_counter_reached_signal, self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source1, source_counter_reached_signal, self->listener2, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source2, source_counter_reached_signal, self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source2, source_counter_reached_signal, self->listener2, (SignalHandler) listener_counter_reached );
 	
 	#pragma omp parallel for private(i)
 	for( i=0; i<CYCLE; i++ ) {
@@ -478,8 +481,8 @@ signaltest_2sources_1listener_sync( SignalTest self )
 	
 	int i;
 	
-	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener1, (SignalHandler) listener_counter_reached );
-	signal_connect ( self->source2, source_counter_reached_signal( self->source2 ), self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source1, source_counter_reached_signal, self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source2, source_counter_reached_signal, self->listener1, (SignalHandler) listener_counter_reached );
 	
 	#pragma omp parallel for private(i)
 	for( i=0; i<CYCLE; i++ ) {
@@ -504,8 +507,8 @@ signaltest_1source_2listeners_sync( SignalTest self )
 	
 	int i;
 	
-	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener1, (SignalHandler) listener_counter_reached );
-	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener2, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source1, source_counter_reached_signal, self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source1, source_counter_reached_signal, self->listener2, (SignalHandler) listener_counter_reached );
 	
 	#pragma omp parallel for private(i)
 	for( i=0; i<CYCLE; i++ ) {
@@ -531,10 +534,10 @@ signaltest_2sources_2listeners_sync( SignalTest self )
 	
 	int i;
 	
-	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener1, (SignalHandler) listener_counter_reached );
-	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener2, (SignalHandler) listener_counter_reached );
-	signal_connect ( self->source2, source_counter_reached_signal( self->source2 ), self->listener1, (SignalHandler) listener_counter_reached );
-	signal_connect ( self->source2, source_counter_reached_signal( self->source2 ), self->listener2, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source1, source_counter_reached_signal, self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source1, source_counter_reached_signal, self->listener2, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source2, source_counter_reached_signal, self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source2, source_counter_reached_signal, self->listener2, (SignalHandler) listener_counter_reached );
 	
 	#pragma omp parallel for private(i)
 	for( i=0; i<CYCLE; i++ ) {
@@ -564,10 +567,10 @@ signaltest_disconnect_I( SignalTest self )
 	
 	int i;
 	
-	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener1, (SignalHandler) listener_counter_reached );
-	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener2, (SignalHandler) listener_counter_reached );
-	signal_connect ( self->source2, source_counter_reached_signal( self->source2 ), self->listener1, (SignalHandler) listener_counter_reached );
-	signal_connect ( self->source2, source_counter_reached_signal( self->source2 ), self->listener2, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source1, source_counter_reached_signal, self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source1, source_counter_reached_signal, self->listener2, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source2, source_counter_reached_signal, self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source2, source_counter_reached_signal, self->listener2, (SignalHandler) listener_counter_reached );
 	
 	#pragma omp parallel for private(i)
 	for( i=0; i<CYCLE; i++ ) {
@@ -575,8 +578,8 @@ signaltest_disconnect_I( SignalTest self )
 		source_count_sync( self->source2 );
 		}
 		
-	signal_disconnect ( self->source2, source_counter_reached_signal( self->source2 ), self->listener1, (SignalHandler) listener_counter_reached );
-	signal_disconnect ( self->source2, source_counter_reached_signal( self->source2 ), self->listener2, (SignalHandler) listener_counter_reached );
+	signal_disconnect ( self->source2, source_counter_reached_signal, self->listener1, (SignalHandler) listener_counter_reached );
+	signal_disconnect ( self->source2, source_counter_reached_signal, self->listener2, (SignalHandler) listener_counter_reached );
 	
 	#pragma omp parallel for private(i)
 	for( i=0; i<CYCLE; i++ ) {
@@ -605,10 +608,10 @@ signaltest_disconnect_II( SignalTest self )
 	
 	int i;
 	
-	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener1, (SignalHandler) listener_counter_reached );
-	signal_connect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener2, (SignalHandler) listener_counter_reached );
-	signal_connect ( self->source2, source_counter_reached_signal( self->source2 ), self->listener1, (SignalHandler) listener_counter_reached );
-	signal_connect ( self->source2, source_counter_reached_signal( self->source2 ), self->listener2, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source1, source_counter_reached_signal, self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source1, source_counter_reached_signal, self->listener2, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source2, source_counter_reached_signal, self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source2, source_counter_reached_signal, self->listener2, (SignalHandler) listener_counter_reached );
 	
 	#pragma omp parallel for private(i)
 	for( i=0; i<CYCLE; i++ ) {
@@ -616,8 +619,8 @@ signaltest_disconnect_II( SignalTest self )
 		source_count_sync( self->source2 );
 		}
 		
-	signal_disconnect ( self->source1, source_counter_reached_signal( self->source1 ), self->listener2, (SignalHandler) listener_counter_reached );
-	signal_disconnect ( self->source2, source_counter_reached_signal( self->source2 ), self->listener2, (SignalHandler) listener_counter_reached );
+	signal_disconnect ( self->source1, source_counter_reached_signal, self->listener2, (SignalHandler) listener_counter_reached );
+	signal_disconnect ( self->source2, source_counter_reached_signal, self->listener2, (SignalHandler) listener_counter_reached );
 	
 	#pragma omp parallel for private(i)
 	for( i=0; i<CYCLE; i++ ) {

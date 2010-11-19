@@ -427,18 +427,24 @@ signal_destroy_notify( Object object )
 /** Connects a signal to a signal handler.
  * The connected signal handler will be executed when the signal is emitted.
  * @param	source		The source Object of the signal (the Object that holds the Signal as a member).
- * @param	signal_p	The address of the Signal (must be in the source Object!).
+ * @param	getter		The getter function, that returns address of the Signal of the source Object.
  * @param	target		The target Object (the object that is passed as the first parameter of the signal handler).
  * @param	handler		The signal handler.
  * @see	signal_disconnect()
  * @note	Multiple handlers can be connected to a signal, they are called in the order of connections in the case of signal emittion.
- * @note	For user's convenience there is no new operator for Signals, need to create new signals, just connect them. Never call ooc_new( Signal, NULL )!;
+ * @note	For user's convenience there is no new operator for Signals!
+ * 			No need to create new signals, just connect them. Never call ooc_new( Signal, NULL )!;
  */
  
 void
-signal_connect( void * source, Signal * signal_p, void * target, SignalHandler handler )
+signal_connect( void * source, SignalPGetter getter, void * target, SignalHandler handler )
 {
+	Signal * signal_p;
 	SignalItem	si;
+	
+	assert( getter != NULL );
+	
+	signal_p = getter( source );
 	
 	if( * signal_p == NULL )
 		* signal_p = ooc_new( Signal, source );
@@ -462,7 +468,7 @@ signal_connect( void * source, Signal * signal_p, void * target, SignalHandler h
 /** Disconnects a signal handler from a signal.
  * The connected signal handler will be disconnected.
  * @param	source		The source Object of the signal.
- * @param	signal_p	The address of the Signal (must be in the source Object!).
+ * @param	getter		The getter function, that returns address of the Signal of the source Object.
  * @param	target		The target Object.
  * @param	handler		The signal handler.
  * @see	signal_connect()
@@ -472,11 +478,16 @@ signal_connect( void * source, Signal * signal_p, void * target, SignalHandler h
  */
  
 void
-signal_disconnect( void * source, Signal * signal_p, void * target, SignalHandler handler )
+signal_disconnect( void * source, SignalPGetter getter, void * target, SignalHandler handler )
 {
 	struct SignalItemObject si;
 	ListIterator found;
+	Signal * signal_p;
+	
+	assert( getter != NULL );
 
+	signal_p = getter( source );
+	
 	if( *signal_p ) {
 		
 		assert( ooc_isInstanceOf( *signal_p, Signal ) );
