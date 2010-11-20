@@ -1,4 +1,4 @@
-SUBDIRS = libs docs tools tests unit
+SUBDIRS = libs docs tools unit
 
 EXTRA_DIST = ooc.sln config.h
 

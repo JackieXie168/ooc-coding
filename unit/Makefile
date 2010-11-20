@@ -17,6 +17,8 @@ LDFLAGS = -L../libs/$(CONFIGPATH) -fopenmp
 LDOBJECTS = $(FAKEOBJECTS)
 LDLIBS =
 
+all : debug
+
 debug : $(TARGETS)
 
 $(TARGETS) : $(FAKEOBJECTS) $(TESTABLE_TARGETS)

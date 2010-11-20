@@ -153,7 +153,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = libs docs tools tests unit
+SUBDIRS = libs docs tools unit
 EXTRA_DIST = ooc.sln config.h
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive

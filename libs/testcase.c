@@ -31,7 +31,9 @@
 
 AllocateClass( TestCase, Base );
 
+#ifndef NO_THREADS
 static ooc_Mutex	printing;
+#endif
 
 /* Class virtual function prototypes
  */
