@@ -536,7 +536,55 @@ remove_item( ListTest self )
 
 static
 void
+remove_first_item( ListTest self )
+{
+	ListIterator 	iterator;
+	Foo				foo;
+	
+	list_append( self->foolist, foo_new_with_data( 34 ) );
+	list_append( self->foolist, foo_new_with_data( 0 ) );
+	list_append( self->foolist, foo_new_with_data( 1 ) );
+	list_append( self->foolist, foo_new_with_data( 2 ) );
+	
+	foo = list_remove_first_item( self->foolist );
+	ooc_delete( (Object) foo );
+		
+	check_sequential( self->foolist );	
+}
+
+static
+void
 remove_last_item( ListTest self )
+{
+	ListIterator 	iterator;
+	Foo				foo;
+	
+	list_append( self->foolist, foo_new_with_data( 0 ) );
+	list_append( self->foolist, foo_new_with_data( 1 ) );
+	list_append( self->foolist, foo_new_with_data( 2 ) );
+	list_append( self->foolist, foo_new_with_data( 34 ) );
+	
+	foo = list_remove_last_item( self->foolist );
+	ooc_delete( (Object) foo );
+		
+	check_sequential( self->foolist );	
+}
+
+void
+remove_first_item_empty( ListTest self )
+{
+	assertNull( list_remove_first_item( self->foolist ) );
+}
+
+void
+remove_last_item_empty( ListTest self )
+{
+	assertNull( list_remove_last_item( self->foolist ) );
+}
+
+static
+void
+remove_item_single( ListTest self )
 {
 	Foo foo;
 	
@@ -572,7 +620,7 @@ delete_item( ListTest self )
 
 static
 void
-delete_last_item( ListTest self )
+delete_item_single( ListTest self )
 {
 	list_append( self->foolist, foo_new_with_data( 0 ) );
 
@@ -951,9 +999,13 @@ struct TestCaseMethod methods[] =
 	TEST(insert_first),
 	TEST(insert_last),
 	TEST(remove_item),
+	TEST(remove_item_single),
+	TEST(remove_first_item),
 	TEST(remove_last_item),
+	TEST(remove_first_item_empty),
+	TEST(remove_last_item_empty),
 	TEST(delete_item),
-	TEST(delete_last_item),
+	TEST(delete_item_single),
 	TEST(unmanaged),
 	TEST(swap_1),
 	TEST(swap_2),

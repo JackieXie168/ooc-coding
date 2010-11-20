@@ -298,12 +298,13 @@ signal_queue_process_item( SignalQueued sq )
 	return TRUE; /* delete this item from the queue */
 }
 
-/**	Processes the asynchronously emitted signals.
+/**	Processes all asynchronously emitted signals.
  * Must be called from the eventloop. Processes all buffered async signals.
  * @warning	The async signals emitted by the called handlers will be executed as well before return.
+ * @note	The signals are processed in a single thread.
  * @warning This is a blocking operation! Only one thread is used for emitting the signals. If an other thread 
  * 			attempts to call signal_process_signals() parallely then that thread will be blocked.
- * @todo	Implement a multithreaded signal emission routine. 
+ * @note	If you want to process the signals in threads, use signal_process_next() instead. 
  */
   
 void
@@ -321,6 +322,36 @@ signal_process_signals( void )
 		}
 	end_try;
 	
+}
+
+/**	Processes the next asynchronously emitted signals.
+ * Must be called from the eventloop. Processes the next buffered async signal in the signal queue.
+ * Only one emitted signal is processed.
+ * @return	TRUE is signal was processed, FALSE if there was no signal in the queue.
+ * @note	This opeartion is thread safe, can be called parallely.
+ * @see		signal_process_signals() 
+ */
+  
+int
+signal_process_next( void )
+{
+	SignalQueued volatile sq = NULL;
+		
+	assert( ooc_isInstanceOf( signal_queue, List ) );
+
+	try {
+		sq = list_remove_first_item( signal_queue );
+	
+		if( sq && !sq->invalid )
+			signal_emit_sync( sq->emitted_signal, sq->parameter, NULL );
+		
+		}
+	finally {
+		ooc_delete( (Object) sq );
+		}
+	end_try;
+	
+	return ( sq != NULL );
 }
 
 static
@@ -420,7 +451,7 @@ signal_destroy_notify( Object object )
   * @param 	source		The source Object that has activated the signal.
   * @param	param		The parameter the has been passed at the time of signal emittion.
   * @see signal_connect(), signal_emit(), signal_emit_sync()
-  * @note	The signal handler can throw an exception, but this exception will not be propagated. The signal emittion routines will return
+  * @warning	The signal handler can throw an exception, but this exception will not be propagated! The signal emittion routines will return
   * 		as if everything went normal. 
   */
 

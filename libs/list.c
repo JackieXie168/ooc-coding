@@ -283,10 +283,8 @@ chain_after( List self, ListIterator location, ListIterator new_node ) /* List m
 
 static
 ListIterator
-unchain( List self, ListIterator location ) /* List must NOT be locked */
+unchain( List self, ListIterator location ) /* List must be locked */
 {
-	ooc_lock( self->modify );
-
 	if( location->previous )
 		location->previous->next = location->next;
 		
@@ -299,8 +297,6 @@ unchain( List self, ListIterator location ) /* List must NOT be locked */
 	if( location == self->last )
 		self->last = location->previous;
 		
-	ooc_unlock( self->modify );
-
 	return location;
 }
 
@@ -462,11 +458,15 @@ list_remove_item( List self, ListIterator location )
 
 	assert( ooc_isInstanceOf( self, List ) );
 	
-	if( !ooc_isInstanceOf( location, ListNode ) || self->first == NULL )
+	if( !ooc_isInstanceOf( location, ListNode ) )
 		ooc_throw( exception_new( err_wrong_position ) );
+
+	ooc_lock( self->modify );
 
 	removed_node = unchain( self, location );
 	
+	ooc_unlock( self->modify );
+
 	if( self->list_of_nodes )
 		item = removed_node;
 	else {
@@ -474,6 +474,60 @@ list_remove_item( List self, ListIterator location )
 		ooc_delete( (Object) removed_node );
 		}
 
+	return item;
+}
+
+void *
+list_remove_first_item( List self )
+{
+	ListNode		removed_node = NULL;
+	void *			item = NULL;
+
+	assert( ooc_isInstanceOf( self, List ) );
+	
+	ooc_lock( self->modify );
+
+	if( self->first )
+		removed_node = unchain( self, self->first );
+	
+	ooc_unlock( self->modify );
+
+	if( removed_node ) {
+		if( self->list_of_nodes )
+			item = removed_node;
+		else {
+			item = get_item_ptr( removed_node );
+			ooc_delete( (Object) removed_node );
+			}
+		}
+		
+	return item;
+}
+
+void *
+list_remove_last_item( List self )
+{
+	ListNode		removed_node = NULL;
+	void *			item = NULL;
+
+	assert( ooc_isInstanceOf( self, List ) );
+	
+	ooc_lock( self->modify );
+
+	if( self->last )
+		removed_node = unchain( self, self->last );
+	
+	ooc_unlock( self->modify );
+
+	if( removed_node ) {
+		if( self->list_of_nodes )
+			item = removed_node;
+		else {
+			item = get_item_ptr( removed_node );
+			ooc_delete( (Object) removed_node );
+			}
+		}
+		
 	return item;
 }
 
