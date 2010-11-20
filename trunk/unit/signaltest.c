@@ -105,10 +105,7 @@ static
 Signal *
 source_counter_reached_signal( void * self )
 {
-	if( ! ooc_isInstanceOf( self, Source ) )
-		ooc_throw( exception_new( err_bad_cast ) );
-		
-	return & ((Source)self)->on_counter_reached;
+	return & ooc_cast( self, Source )->on_counter_reached;
 }
 
 static char * signal_param = "Signal parameter";
@@ -378,6 +375,23 @@ signaltest_after_class( SignalTest self )
 	Test methods
  */
 
+void
+static
+signaltest_bad_connect( SignalTest self )
+{
+	try {
+		signal_connect ( self->listener1 /* bad, ought to be a Source */, 
+						source_counter_reached_signal,
+						self->listener1,
+						(SignalHandler) listener_counter_reached );
+		fail();
+	}
+	catch_any {
+		assertTrue( exception_get_error_code( exception ) == err_bad_cast );
+	}
+	end_try;
+	
+}
 
 void
 static
@@ -641,6 +655,35 @@ signaltest_disconnect_II( SignalTest self )
 	#undef CYCLE
 }
 
+void
+static
+signaltest_process_parallel( SignalTest self )
+{
+	#define CYCLE 1000
+	
+	int i;
+	
+	signal_connect ( self->source1, source_counter_reached_signal, self->listener1, (SignalHandler) listener_counter_reached );
+	signal_connect ( self->source2, source_counter_reached_signal, self->listener1, (SignalHandler) listener_counter_reached );
+	
+	#pragma omp parallel for private(i)
+	for( i=0; i<CYCLE; i++ ) {
+		source_count( self->source1 );
+		source_count( self->source2 );
+		}
+
+	#pragma omp parallel
+	while( signal_process_next() );
+		
+	assertTrue( self->listener1->source_fired_count[0] == CYCLE / SOURCE1_PERIOD );
+	assertTrue( self->listener1->source_fired_count[1] == CYCLE / SOURCE2_PERIOD );
+
+	for( i = 2; i<MAX_SOURCES; i++ )	
+		assertTrue( self->listener1->source_fired_count[i] == 0 );
+		
+	#undef CYCLE
+}
+
 /** Test methods order table.
  * Put your test methods in this table in the order they should be executed
  * using the TEST(method) macro. 
@@ -649,6 +692,7 @@ signaltest_disconnect_II( SignalTest self )
  
 struct TestCaseMethod methods[] =
 {
+	TEST(signaltest_bad_connect),
 	
 	TEST(signaltest_2sources_1listener),
 	TEST(signaltest_1source_2listeners),
@@ -660,6 +704,8 @@ struct TestCaseMethod methods[] =
 
 	TEST(signaltest_disconnect_I),
 	TEST(signaltest_disconnect_II),
+
+	TEST(signaltest_process_parallel),
 
 	{NULL, NULL} /* Do NOT delete this line! */
 };
@@ -673,7 +719,7 @@ int main(int argc, char * argv[])
 	int result;
 	
 	ooc_init_class( SignalTest );
-	signaltest = (SignalTest) ooc_new( SignalTest, &methods );
+	signaltest = ooc_new( SignalTest, &methods );
 	result = testcase_run((TestCase)signaltest);
 	ooc_delete( (Object) signaltest );
 	ooc_finalize_all();

@@ -168,6 +168,22 @@ ListIterator    list_insert_after( List list, ListIterator position, void * item
  
 void *			list_remove_item( List list, ListIterator position );
 
+/** Removes the first item from the list.
+ * @param	list		The list
+ * @return	The item that was removed from the list, NULL if the list was empty.
+ * @note	This method does not delete the item! You are responsible to destroy the item when it is no longer needed!
+ */
+ 
+void *			list_remove_first_item( List list );
+
+/** Removes the last item from the list.
+ * @param	list		The list
+ * @return	The item that was removed from the list, NULL if the list was empty.
+ * @note	This method does not delete the item! You are responsible to destroy the item when it is no longer needed!
+ */
+ 
+void *			list_remove_last_item( List list );
+
 /** Deletes an item in the list.
  * This method removes and destroys the positioned item in the list.
  * @param	list		The list

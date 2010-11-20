@@ -23,6 +23,6 @@ void		signal_emit_sync( Signal, void * parameter, ooc_destroyer param_destroy_fn
 void		signal_destroy_notify( Object object );
 
 void		signal_process_signals( void );
-
+int			signal_process_next( void );
 
 #endif /*SIGNAL_H_*/
