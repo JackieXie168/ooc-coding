@@ -146,27 +146,12 @@ void
 static
 segfault( TestCaseTest self )
 {
-	int * bad_ptr = NULL;
-	
+	/* faking optimizing compilers: bad_ptr is volatile! */
+	volatile int * bad_ptr = NULL;
+
 	try {
 		int i = *bad_ptr;
-		fail();
-	}
-	catch_any {
-		assertTrue( ooc_isInstanceOf( exception, SegmentationFault ) );
-	}
-	end_try;
-}
-
-void
-static
-callnull( TestCaseTest self )
-{
-	void (* bad_ptr)(void) = NULL;
-	
-	try {
-		bad_ptr();
-		fail();
+		failMsg( "Can fail in Valgrind!" );
 	}
 	catch_any {
 		assertTrue( ooc_isInstanceOf( exception, SegmentationFault ) );
@@ -178,10 +163,11 @@ void
 static
 fpfault( TestCaseTest self )
 {
-	int zero = 0;
-	
+	/* faking optmizing compilers: zero is volatile! */
+	volatile int zero = 0;
+
 	try {
-		int i = 10/zero;
+		zero = zero / zero;
 		fail();
 	}
 	catch_any {
@@ -189,6 +175,23 @@ fpfault( TestCaseTest self )
 	}
 	end_try;	
 }
+
+void
+static
+callnull( TestCaseTest self )
+{
+	void (* bad_ptr)(void) = NULL;
+	
+	try {
+		bad_ptr(); /* may result a real segmentation fault in some cases :-( I don't understand ... :-( */
+		fail();
+	}
+	catch_any {
+		assertTrue( ooc_isInstanceOf( exception, SegmentationFault ) );
+	}
+	end_try;
+}
+
 
 /** Test methods order table.
  * Put your test methods in this table in the order they should be executed
@@ -200,8 +203,8 @@ struct TestCaseMethod methods[] =
 {
 	
 	TEST(segfault),
-	TEST(callnull),
 	TEST(fpfault),
+	TEST(callnull),
 	
 	{NULL, NULL} /* Do NOT delete this line! */
 };
