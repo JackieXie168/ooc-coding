@@ -17,11 +17,12 @@
  *  @brief TestCase class - base class for unit testing.
  * TestCase is a base class for unit testing. All of your Unit tests inherits TestCase.
  * The process to create a new unit test in your project:
- * -# Create a new test class with: ooc -new MyTest --from test
+ * -# Create a new test class with: ooc --new MyTest --source test
  * -# Override the necessary virtual methods
  * -# implement your test methods
  * -# create the test methods table
  * -# compile your test file as executable
+ * (you can use the makefile template from ooc/template/unit folder)
  * -# run the test file
  * 
  */ 
@@ -329,7 +330,7 @@ static	void	ArithmeticFault_constructor( ArithmeticFault self, const void * para
 static	void	ArithmeticFault_destructor( ArithmeticFault self, ArithmeticFaultVtable vtab ) {}
 static	int		ArithmeticFault_copy( ArithmeticFault self, const ArithmeticFault from ) { return OOC_COPY_DEFAULT; }
 
-/* Signal handler
+/* Unix Signal handler
  */
  
 static

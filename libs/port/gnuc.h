@@ -48,12 +48,17 @@
 
 #include <pthread.h>
 
-#define	ooc_Mutex				pthread_mutex_t
-#define ooc_mutex_init( x )		pthread_mutex_init( & x, NULL )
-#define ooc_mutex_release( x )	pthread_mutex_destroy( & x )
-#define ooc_lock( x ) 			pthread_mutex_lock( & x )	
-#define ooc_unlock( x ) 		pthread_mutex_unlock( & x )
-#define ooc_try_lock( x )		pthread_mutex_trylock( & x ) 
+/* Because omp_lock_t is implemented as 4 bytes of char[], we must implement ooc_Mutex as a pointer too
+in pthreads threading mode, to keep the binary compatibility between openmp and native 
+pthread threading. This let us mix the ooc libraries compiled with native -pthread settings 
+and user programs either with -pthread or with -fopenmp settings. */
+
+typedef	pthread_mutex_t *		ooc_Mutex;
+#define ooc_mutex_init( x )		pthread_mutex_init ( x = ooc_malloc( sizeof(pthread_mutex_t) ), NULL )
+#define ooc_mutex_release( x )	do { pthread_mutex_destroy( x ); ooc_free( x ); } while(0)
+#define ooc_lock( x ) 			pthread_mutex_lock( x )	
+#define ooc_unlock( x ) 		pthread_mutex_unlock( x )
+#define ooc_try_lock( x )		pthread_mutex_trylock( x ) 
 
 #endif
 

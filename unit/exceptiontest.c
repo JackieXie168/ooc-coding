@@ -196,8 +196,8 @@ static
 void
 test_rethrow( void )
 {
-	int inner_finalized = FALSE;
-	int outer_finalized = FALSE;
+	int volatile inner_finalized = FALSE;
+	int volatile outer_finalized = FALSE;
 	
 	try {
 		try {
@@ -228,9 +228,9 @@ static
 void
 test_throw_different( void )
 {
-	int inner_finalized = FALSE;
-	int outer_finalized = FALSE;
-	Exception first, second;
+	int volatile inner_finalized = FALSE;
+	int volatile outer_finalized = FALSE;
+	Exception volatile  first, second;
 	
 	first = foo_exception_new( 13 );
 	second = foo_exception_new( 26 );
