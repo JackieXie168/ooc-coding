@@ -15,9 +15,9 @@
  
 #include <setjmp.h>
 
-#define JMP_BUF		jmp_buf
-#define SETJMP		setjmp
-#define LONGJMP		longjmp
+#define JMP_BUF					jmp_buf
+#define SETJMP(buff)			__sigsetjmp ( buff, TRUE )
+#define LONGJMP(env, val)		longjmp( env, val )
 
 
 /* implementing static inline */

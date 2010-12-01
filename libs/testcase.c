@@ -183,6 +183,8 @@ print_func_name( TestCase self, const char * func, const char * suffix )
 	end_try;
 }
 
+static void signal_handler( int signum );
+
 static
 void
 testcase_run_methods(TestCase self)
@@ -193,17 +195,18 @@ testcase_run_methods(TestCase self)
 	{
 		current_test_failed = FALSE;
 		++self->run;
-		
-		print_func_name( self, method->name, "before" );
-		TestCaseVirtual(self)->before(self);
-		
+		current_method_fail_count = 0;
+
 		try
 		{
-			current_method_fail_count = 0;
-			
+			print_func_name( self, method->name, "before" );
+			TestCaseVirtual(self)->before(self);
+		
 			print_func_name( self, method->name, "" );
-			
 			method->method(self);
+			
+			print_func_name( self, method->name, "after" );
+			TestCaseVirtual(self)->after(self);
 		}
 		catch_any {
 			ooc_lock( printing );
@@ -218,9 +221,6 @@ testcase_run_methods(TestCase self)
 			ooc_unlock( printing );
 		}
 		end_try;
-		
-		print_func_name( self, method->name, "after" );
-		TestCaseVirtual(self)->after(self);
 		
 		if( current_test_failed )
 			self->failed++;
@@ -337,11 +337,12 @@ static
 void
 signal_handler( int signum )
 {
+	signal( SIGSEGV, signal_handler );
+	signal( SIGFPE, signal_handler );
+	
 	switch( signum ) {
-		case SIGSEGV :	signal( SIGSEGV, signal_handler );
-						ooc_throw( (Exception) ooc_new( SegmentationFault, NULL ) );
-		case SIGFPE	 :	signal( SIGFPE, signal_handler );
-						ooc_throw( (Exception) ooc_new( ArithmeticFault, NULL ) );
+		case SIGSEGV :	ooc_throw( (Exception) ooc_new( SegmentationFault, NULL ) );
+		case SIGFPE	 :	ooc_throw( (Exception) ooc_new( ArithmeticFault, NULL ) );
 		default 	 :	break;
 	}
 }
