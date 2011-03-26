@@ -88,9 +88,7 @@ OocTest_constructor( OocTest self, const void * params )
 {
 	assert( ooc_isInitialized( OocTest ) );
 	
-	chain_constructor( OocTest, self, NULL );
-	
-	self->TestCase.methods = (const struct TestCaseMethod *) params;
+	chain_constructor( OocTest, self, params );
 }
 
 /* Destructor

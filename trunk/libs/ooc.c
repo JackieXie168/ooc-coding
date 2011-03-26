@@ -16,8 +16,6 @@
 
 const struct ClassTable BaseClass;
 
-#define has_parent(x) (x->parent != &BaseClass)
-
 /*  Prototypes
  */
  
@@ -66,7 +64,7 @@ static
 void
 inherit_vtable_from_parent( const Class self )
 {
-	if( has_parent(self) ) {
+	if( ooc_class_has_parent(self) ) {
 
 		assert( self->vtab_size >= self->parent->vtab_size );
 		
@@ -92,7 +90,7 @@ _ooc_init_class( const Class self )
 {
 	if( self->vtable->_class == NULL ) {
 
-		if( has_parent( self ) )
+		if( ooc_class_has_parent( self ) )
 			_ooc_init_class( self->parent );
 
 		self->vtable->_class = self;
@@ -213,14 +211,14 @@ copy_object_members( Object to, const Object from, const Class type )
 {
 	size_t offset, length;
 							
-	if( has_parent( type ) )
+	if( ooc_class_has_parent( type ) )
 		copy_object_members( to, from, type->parent );
 		
 	switch( type->copy( to, from ) ) {
 		
 		case OOC_COPY_DONE:		break;
 		
-		case OOC_COPY_DEFAULT:	offset = has_parent( type ) ?  type->parent->size : sizeof( struct BaseObject );
+		case OOC_COPY_DEFAULT:	offset = ooc_class_has_parent( type ) ?  type->parent->size : sizeof( struct BaseObject );
 								length = type->size - offset; 
 					
 								if( length )
@@ -281,7 +279,7 @@ ooc_destroy_object( Object self )
 		type->dtor( self, vtab );
 	
 		/* destruct the parents */
-		while( has_parent( type ) ) {
+		while( ooc_class_has_parent( type ) ) {
 			type = type->parent;
 			type->dtor( self, vtab );
 			}

@@ -52,6 +52,7 @@ pdf:
 install:
 install-html:
 install-pdf:
+distdir:
 
 # Building the targets
 

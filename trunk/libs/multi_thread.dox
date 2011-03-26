@@ -109,7 +109,7 @@ Mix the flags as needed!
 
 @section thread_prims Threading primitives in ooc.
 @warning 	You should use the ooc threading primitives only for the development of the ooc itself!
-			For example modifying th ecore or adding new container classes, etc.
+			For example modifying the core or adding new container classes, etc.
 ooc defines some threading primitives that should be used in the ooc code itself. These are limited to the 
 locking / unlocking mutexes. Forking and thread creation is not part of the ooc system, you should use
 it in your own code with the native threading libraries or with a generalized solution (e.g. OpenMP).

@@ -83,9 +83,7 @@ Sample_constructor( Sample self, const void * params )
 {
 	assert( ooc_isInitialized( Sample ) );
 	
-	chain_constructor( Sample, self, NULL );
-	
-	self->TestCase.methods = (const struct TestCaseMethod *) params;
+	chain_constructor( Sample, self, params );
 }
 
 /* Destructor

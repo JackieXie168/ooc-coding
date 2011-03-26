@@ -85,9 +85,7 @@ RefCountedTest_constructor( RefCountedTest self, const void * params )
 {
 	assert( ooc_isInitialized( RefCountedTest ) );
 	
-	chain_constructor( RefCountedTest, self, NULL );
-	
-	self->TestCase.methods = (const struct TestCaseMethod *) params;
+	chain_constructor( RefCountedTest, self, params );
 }
 
 /* Destructor

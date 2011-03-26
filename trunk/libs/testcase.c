@@ -187,6 +187,54 @@ static void signal_handler( int signum );
 
 static
 void
+testcase_run_before_class_recursive(TestCase self, Class type)
+{
+	TestCaseVtable vtab = (TestCaseVtable) type->vtable;
+	
+	if( ooc_class_has_parent( type ) )
+		testcase_run_before_class_recursive( self, type->parent );
+	
+	vtab->before_class(self);
+}
+
+static
+void
+testcase_run_after_class_recursive(TestCase self, Class type)
+{
+	TestCaseVtable vtab = (TestCaseVtable) type->vtable;
+	
+	vtab->after_class( self );
+	
+	if( ooc_class_has_parent( type ) )
+		testcase_run_after_class_recursive( self, type->parent );
+}
+
+static
+void
+testcase_run_before_recursive(TestCase self, Class type)
+{
+	TestCaseVtable vtab = (TestCaseVtable) type->vtable;
+	
+	if( ooc_class_has_parent( type ) )
+		testcase_run_before_recursive( self, type->parent );
+	
+	vtab->before(self);
+}
+
+static
+void
+testcase_run_after_recursive(TestCase self, Class type)
+{
+	TestCaseVtable vtab = (TestCaseVtable) type->vtable;
+	
+	vtab->after( self );
+	
+	if( ooc_class_has_parent( type ) )
+		testcase_run_after_recursive( self, type->parent );
+}
+
+static
+void
 testcase_run_methods(TestCase self)
 {
 	const struct TestCaseMethod * method = self->methods;
@@ -200,13 +248,13 @@ testcase_run_methods(TestCase self)
 		try
 		{
 			print_func_name( self, method->name, "before" );
-			TestCaseVirtual(self)->before(self);
+			testcase_run_before_recursive( self, ooc_get_type( (Object) self ) );
 		
 			print_func_name( self, method->name, "" );
 			method->method(self);
 			
 			print_func_name( self, method->name, "after" );
-			TestCaseVirtual(self)->after(self);
+			testcase_run_after_recursive( self, ooc_get_type( (Object) self ) );
 		}
 		catch_any {
 			ooc_lock( printing );
@@ -251,15 +299,15 @@ testcase_run( TestCase self)
 		if( ! ooc_isInstanceOf(self, TestCase) )
 			ooc_throw( exception_new(err_bad_cast) );
 			
-		setbuf(stdout, NULL); /* Unbufferered sdout displays better the current operation */
+		setbuf(stdout, NULL); /* Unbufferered stdout displays better the current operation */
 			
 		print_func_name( self, before_class, "" );
-		TestCaseVirtual(self)->before_class(self);
+		testcase_run_before_class_recursive( self, ooc_get_type( (Object) self ) );
 
 		testcase_run_methods(self);
 				
 		print_func_name( self, after_class, "" );
-		TestCaseVirtual(self)->after_class(self);
+		testcase_run_after_class_recursive( self, ooc_get_type( (Object) self ) );
 	}
 	catch_any {
 		ooc_lock( printing );

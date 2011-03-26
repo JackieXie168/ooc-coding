@@ -96,9 +96,7 @@ ListTest_constructor( ListTest self, const void * params )
 {
 	assert( ooc_isInitialized( ListTest ) );
 	
-	chain_constructor( ListTest, self, NULL );
-	
-	self->TestCase.methods = (const struct TestCaseMethod *) params;
+	chain_constructor( ListTest, self, params );
 }
 
 /* Destructor
