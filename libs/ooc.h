@@ -239,6 +239,15 @@ void		ooc_release( Object object );
  
 Class		ooc_get_type( const Object object );
  
+/** Checks if a Class has a parent class.
+ * This is a convenient macro. 
+ * @param	this		The Class that should be checked.
+ * @return	@c TRUE or @c FALSE. Returns @c TRUE if the Class has a parent class.
+ * 			Does not throw an Exception.
+ */
+ 
+#define ooc_class_has_parent(x) (x->parent != &BaseClass)
+
 /** Checks if a Class is inherited from an other Class via class table pointers
  * This is a convenient macro. 
  * @param	this		The Class that should be checked.

@@ -301,9 +301,7 @@ SignalTest_constructor( SignalTest self, const void * params )
 {
 	assert( ooc_isInitialized( SignalTest ) );
 	
-	chain_constructor( SignalTest, self, NULL );
-	
-	self->TestCase.methods = (const struct TestCaseMethod *) params;
+	chain_constructor( SignalTest, self, params );
 }
 
 /* Destructor

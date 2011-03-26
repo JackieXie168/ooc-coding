@@ -27,6 +27,11 @@ EndOfVirtuals;
 ClassMembers( TestCaseTest, TestCase )
 
 	int		data;
+	
+	int		before_class_counter;
+	int		before_counter;
+	int		after_counter;
+	int		after_class_counter;
 
 EndOfClassMembers;
 
@@ -80,9 +85,7 @@ TestCaseTest_constructor( TestCaseTest self, const void * params )
 {
 	assert( ooc_isInitialized( TestCaseTest ) );
 	
-	chain_constructor( TestCaseTest, self, NULL );
-	
-	self->TestCase.methods = (const struct TestCaseMethod *) params;
+	chain_constructor( TestCaseTest, self, params );
 }
 
 /* Destructor
@@ -113,28 +116,28 @@ static
 void
 testcasetest_before_class( TestCaseTest self )
 {
-	return;
+	self->before_class_counter++;
 }
 
 static
 void
 testcasetest_before( TestCaseTest self )
 {
-	return;
+	self->before_counter++;
 }
 
 static
 void
 testcasetest_after( TestCaseTest self )
 {
-	return;
+	self->after_counter++;
 }
 
 static
 void
 testcasetest_after_class( TestCaseTest self )
 {
-	return;
+	self->after_class_counter++;
 }
 
 
@@ -208,11 +211,10 @@ struct TestCaseMethod methods[] =
 	
 	{NULL, NULL} /* Do NOT delete this line! */
 };
-	
-/* Runs the test as an executable
- */
- 
-int main(int argc, char * argv[])
+
+static
+int
+run_testcasetest( void )
 {
 	TestCaseTest testcasetest;
 	int result;
@@ -222,5 +224,245 @@ int main(int argc, char * argv[])
 	result = testcase_run((TestCase)testcasetest);
 	ooc_delete( (Object) testcasetest );
 	ooc_finalize_all();
+	
 	return result;
 }
+
+/*****************************************************
+ * Testing the derived TestCase class
+ */
+ 
+DeclareClass( TestCaseTestChild, TestCaseTest );
+
+Virtuals( TestCaseTestChild, TestCaseTest )
+EndOfVirtuals;
+
+/* Declaring the members of the class. 
+ * They are all private.
+ */
+
+ClassMembers( TestCaseTestChild, TestCaseTest )
+
+	int		before_class_counter;
+	int		before_counter;
+	int		after_counter;
+	int		after_class_counter;
+
+EndOfClassMembers;
+
+/* Allocating the class description table and the vtable
+ */
+
+AllocateClass( TestCaseTestChild, TestCaseTest );
+
+
+/* Class initializing
+ */
+
+static void testcasetestchild_before_class( TestCaseTestChild self );
+static void testcasetestchild_before( TestCaseTestChild self );
+static void testcasetestchild_after( TestCaseTestChild self );
+static void testcasetestchild_after_class( TestCaseTestChild self );
+
+static
+void
+TestCaseTestChild_initialize( Class this )
+{
+	TestCaseVtable vtab = (TestCaseVtable) this->vtable;
+	
+	((TestCaseVtable)vtab)->before_class	= 	(test_method_type) testcasetestchild_before_class;
+	((TestCaseVtable)vtab)->before			= 	(test_method_type) testcasetestchild_before;
+	((TestCaseVtable)vtab)->after			= 	(test_method_type) testcasetestchild_after;
+	((TestCaseVtable)vtab)->after_class		= 	(test_method_type) testcasetestchild_after_class;
+
+	ooc_init_class( Exception );
+}
+
+/* Class finalizing
+ */
+
+static
+void
+TestCaseTestChild_finalize( Class this )
+{
+}
+
+/* Constructor
+ */
+
+static
+void
+TestCaseTestChild_constructor( TestCaseTestChild self, const void * params )
+{
+	assert( ooc_isInitialized( TestCaseTestChild ) );
+	
+	chain_constructor( TestCaseTestChild, self, params );
+}
+
+/* Destructor
+ */
+
+static
+void
+TestCaseTestChild_destructor( TestCaseTestChild self, TestCaseTestChildVtable vtab )
+{
+}
+
+/* Copy constuctor
+ */
+
+static
+int
+TestCaseTestChild_copy( TestCaseTestChild self, const TestCaseTestChild from )
+{
+	/* Prevent object duplication */
+	return OOC_NO_COPY;
+}
+
+/*  =====================================================
+ *  Test setup
+ */
+ 
+static
+void
+testcasetestchild_before_class( TestCaseTestChild self )
+{
+	assertTrue( self->TestCaseTest.before_class_counter == 1 );
+	
+	self->before_class_counter++;
+}
+
+static
+void
+testcasetestchild_before( TestCaseTestChild self )
+{
+	assertTrue( self->TestCaseTest.before_counter == self->before_counter + 1 );
+	
+	self->before_counter++;
+}
+
+static
+void
+testcasetestchild_after( TestCaseTestChild self )
+{
+	self->after_counter++;
+	
+	assertTrue( self->TestCaseTest.after_counter == self->after_counter - 1 );	
+}
+
+static
+void
+testcasetestchild_after_class( TestCaseTestChild self )
+{
+	assertTrue( self->TestCaseTest.after_class_counter == 0 );
+	
+	self->after_class_counter++;
+}
+
+
+/*	=====================================================
+	Test methods
+ */
+
+void
+static
+testcasetestchild_first_run( TestCaseTestChild self )
+{
+	assertTrue( self->TestCaseTest.before_class_counter == 1 );
+	assertTrue( self->TestCaseTest.before_counter == 1 );
+	assertTrue( self->TestCaseTest.after_counter == 0 );
+	assertTrue( self->TestCaseTest.after_class_counter == 0 );
+	
+	assertTrue( self->before_class_counter == 1 );
+	assertTrue( self->before_counter == 1 );
+	assertTrue( self->after_counter == 0 );
+	assertTrue( self->after_class_counter == 0 );
+}
+
+void
+static
+testcasetestchild_second_run( TestCaseTestChild self )
+{
+	assertTrue( self->TestCaseTest.before_class_counter == 1 );
+	assertTrue( self->TestCaseTest.before_counter == 2 );
+	assertTrue( self->TestCaseTest.after_counter == 1 );
+	assertTrue( self->TestCaseTest.after_class_counter == 0 );
+
+	assertTrue( self->before_class_counter == 1 );
+	assertTrue( self->before_counter == 2 );
+	assertTrue( self->after_counter == 1 );
+	assertTrue( self->after_class_counter == 0 );
+}
+
+void
+static
+testcasetestchild_third_run( TestCaseTestChild self )
+{
+	assertTrue( self->TestCaseTest.before_class_counter == 1 );
+	assertTrue( self->TestCaseTest.before_counter == 3 );
+	assertTrue( self->TestCaseTest.after_counter == 2 );
+	assertTrue( self->TestCaseTest.after_class_counter == 0 );
+	
+	assertTrue( self->before_class_counter == 1 );
+	assertTrue( self->before_counter == 3 );
+	assertTrue( self->after_counter == 2 );
+	assertTrue( self->after_class_counter == 0 );	
+}
+
+/** Test methods order table.
+ * Put your test methods in this table in the order they should be executed
+ * using the TEST(method) macro. 
+ * 
+ */
+ 
+struct TestCaseMethod childmethods[] =
+{
+	
+	TEST(testcasetestchild_first_run),
+	TEST(testcasetestchild_second_run),
+	TEST(testcasetestchild_third_run),
+	
+	{NULL, NULL} /* Do NOT delete this line! */
+};
+	
+/* Runs the test as an executable
+ */
+
+static
+int
+run_testcasetestchild()
+{
+	TestCaseTestChild testcasetestchild;
+	int result;
+	
+	ooc_init_class( TestCaseTestChild );
+	testcasetestchild = (TestCaseTestChild) ooc_new( TestCaseTestChild, &childmethods );
+	result = testcase_run((TestCase)testcasetestchild);
+	
+	assertTrue( testcasetestchild->before_class_counter == 1 );
+	assertTrue( testcasetestchild->TestCaseTest.before_class_counter == 1 );
+	assertTrue( testcasetestchild->after_class_counter == 1 );
+	assertTrue( testcasetestchild->TestCaseTest.after_class_counter == 1 );
+	
+	ooc_delete( (Object) testcasetestchild );
+	ooc_finalize_all();
+	return result;
+}
+
+/* Runs the test as an executable
+ */
+ 
+int main(int argc, char * argv[])
+{
+	int result;
+	
+	result = run_testcasetest();
+	
+	if( result == 0 )
+		result = run_testcasetestchild();
+	
+	return result;
+}
+
+
+

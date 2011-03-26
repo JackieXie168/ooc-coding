@@ -90,9 +90,7 @@ VectorTest_constructor( VectorTest self, const void * params )
 {
 	assert( ooc_isInitialized( VectorTest ) );
 	
-	chain_constructor( VectorTest, self, NULL );
-	
-	self->TestCase.methods = (const struct TestCaseMethod *) params;
+	chain_constructor( VectorTest, self, params );
 }
 
 /* Destructor

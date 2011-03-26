@@ -80,9 +80,7 @@ ExceptionTest_constructor( ExceptionTest self, const void * params )
 {
 	assert( ooc_isInitialized( ExceptionTest ) );
 	
-	chain_constructor( ExceptionTest, self, NULL );
-	
-	self->TestCase.methods = (const struct TestCaseMethod *) params;
+	chain_constructor( ExceptionTest, self, params );
 }
 
 /* Destructor
