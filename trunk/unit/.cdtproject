@@ -57,24 +57,24 @@
 <buildTargets>
 <target name="debug" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 <buildCommand>make</buildCommand>
-<buildArguments/>
+<buildArguments>-f MakefileEclipse.linux</buildArguments>
 <buildTarget>debug</buildTarget>
 <stopOnError>false</stopOnError>
-<useDefaultCommand>true</useDefaultCommand>
+<useDefaultCommand>false</useDefaultCommand>
 </target>
 <target name="release" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 <buildCommand>make</buildCommand>
-<buildArguments/>
+<buildArguments>-f MakefileEclipse.linux</buildArguments>
 <buildTarget>release</buildTarget>
 <stopOnError>false</stopOnError>
-<useDefaultCommand>true</useDefaultCommand>
+<useDefaultCommand>false</useDefaultCommand>
 </target>
 <target name="clean" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 <buildCommand>make</buildCommand>
-<buildArguments/>
+<buildArguments>-f MakefileEclipse.linux</buildArguments>
 <buildTarget>clean</buildTarget>
 <stopOnError>false</stopOnError>
-<useDefaultCommand>true</useDefaultCommand>
+<useDefaultCommand>false</useDefaultCommand>
 </target>
 </buildTargets>
 </item>

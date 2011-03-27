@@ -11,24 +11,6 @@ LDOBJECTS = $(FAKEOBJECTS)
 CC = gcc
 LL = gcc
 
-# Automake targets
-
-check : check-debug
-
-check-debug : make_targets
-check-debug : TESTABLE_TARGETS = ../libs/libooc_d.a
-check-debug : CPPFLAGS =
-check-debug : CFLAGS = -O0 -g3 -fopenmp
-check-debug : LDFLAGS = -L../libs -fopenmp
-check-debug : LDLIBS = -looc_d
-
-check-release : make_targets
-check-release : TESTABLE_TARGETS = ../libs/libooc.a
-check-release : CPPFLAGS =
-check-release : CFLAGS = -O2 -fopenmp
-check-release : LDFLAGS = -L../libs -fopenmp
-check-release : LDLIBS = -looc
-
 # Eclipse targets
 
 debug : make_targets
@@ -44,15 +26,6 @@ release : CPPFLAGS =
 release : CFLAGS = -O2 -fopenmp
 release : LDFLAGS = -L../libs/Release_gomp -fopenmp
 release : LDLIBS = -looc
-
-# Unused targets
-all:
-html:
-pdf:
-install:
-install-html:
-install-pdf:
-distdir:
 
 # Building the targets
 
