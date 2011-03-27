@@ -152,18 +152,23 @@ print_func_name( TestCase self, const char * func, const char * suffix )
 	try {
 		ooc_lock( printing );
 		
-		buffer_length = 32 + strlen( func ) + 1 + strlen( suffix ) + 1 + strlen( ooc_get_type((Object)self)->name ) + 3;
-		
+		if( func != NULL )
+			buffer_length = 32 + strlen( func ) + 1 + strlen( suffix ) + 1 + strlen( ooc_get_type((Object)self)->name ) + 3;
+		else
+			buffer_length = 1;
+			
 		if( buffer_length < previous_display_length + 1 )
 			buffer_length = previous_display_length + 1;
 		
 		display_text = ooc_malloc( buffer_length );
 		
-		if( func == before_class || func == after_class )
+		if( func == NULL )
+			display_text[0] = '\0';
+		else if( func == before_class || func == after_class )
 			sprintf( display_text,  "%s.%s()", ooc_get_type((Object)self)->name, func );
 		else if( strlen( suffix ) == 0 )
 			sprintf( display_text,  "[%d] %s.%s()", self->run , ooc_get_type((Object)self)->name, func );
-		else
+		else 
 			sprintf( display_text,  "[%d] %s.%s.%s()", self->run , ooc_get_type((Object)self)->name, func, suffix );
 		
 		display_length = strlen( display_text );
@@ -308,6 +313,8 @@ testcase_run( TestCase self)
 				
 		print_func_name( self, after_class, "" );
 		testcase_run_after_class_recursive( self, ooc_get_type( (Object) self ) );
+		
+		print_func_name( self, NULL, NULL ); /* following a succesfull run cleans the last function name */
 	}
 	catch_any {
 		ooc_lock( printing );
