@@ -38,6 +38,7 @@ AC_CONFIG_FILES([Makefile
                  libs/Makefile
                  libs/ooc.pc
                  docs/Makefile
-                 tools/Makefile])
+                 tools/Makefile
+                 unit/Makefile])
 
 AC_OUTPUT

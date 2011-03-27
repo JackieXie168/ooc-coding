@@ -25,24 +25,6 @@ LDOBJECTS = $(FAKEOBJECTS)
 CC = gcc 
 LL = gcc
 
-# Automake targets
-
-check : check-debug
-
-check-debug : make_targets
-check-debug : TESTABLE_TARGETS = 			# Set the testable targets here! Preferably a sinlge static library.
-check-debug : CPPFLAGS =					# Preprocessor flags
-check-debug : CFLAGS = -O0 -g3 -fopenmp		# Compiler flags for the test files
-check-debug : LDFLAGS = -L???? -fopenmp		# Set the path for the testable targets and othe linkable libs
-check-debug : LDLIBS = -l????				# set the library name for the testable targets and other linkable libs
-
-check-release : make_targets
-check-release : TESTABLE_TARGETS =
-check-release : CPPFLAGS =
-check-release : CFLAGS = -O2 -fopenmp
-check-release : LDFLAGS = -L??? -fopenmp
-check-release : LDLIBS = -l???
-
 # Eclipse targets
 
 debug : make_targets
@@ -58,14 +40,6 @@ release : CPPFLAGS =
 release : CFLAGS = -O2 -fopenmp
 release : LDFLAGS = -L??? -fopenmp
 release : LDLIBS = -l???
-
-# Unused targets
-all:
-html:
-pdf:
-install:
-install-html:
-install-pdf:
 
 # Building the targets
 
