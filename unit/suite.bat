@@ -2,7 +2,7 @@
 REM
 REM Running test cases as a test suite
 REM 
-REM Windows version - without memory leak
+REM Windows version - without checking memory leak
 REM
 REM #########################################x
 
