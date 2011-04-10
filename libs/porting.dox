@@ -115,6 +115,7 @@ The following headers must be available:
 	- string.h (for memcpy() )
 	- stdlib.h (for the functions below )
 	- assert.h (for the assert macro )
+	- setjmp.h (for jmp_buf, setjmp, longjmp or equivalents)
 
 The following memory handling functions must be available:
 	- void * malloc( size_t size )

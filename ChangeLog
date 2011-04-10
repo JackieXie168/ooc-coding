@@ -1,3 +1,8 @@
+1.0
+Unit testing support
+More precise tests for the ooc libraries
+(on Linux use: make check)
+
 0.9.g
 Separate header files for each compilers / ports. Makes porting ooc much easier.
 Multithreading support.
