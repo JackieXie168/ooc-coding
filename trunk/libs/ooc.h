@@ -246,7 +246,7 @@ Class		ooc_get_type( const Object object );
  * 			Does not throw an Exception.
  */
  
-#define ooc_class_has_parent(x) (x->parent != &BaseClass)
+#define ooc_class_has_parent(this) (this->parent != &BaseClass)
 
 /** Checks if a Class is inherited from an other Class via class table pointers
  * This is a convenient macro. 
