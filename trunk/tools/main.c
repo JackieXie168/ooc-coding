@@ -146,12 +146,20 @@ settings_release( Settings self )
 	char * win_template_dir( const char * executable )
 	{
 		char * td;
+		char * full_path;
+		char * exec_dir;
+		
+		full_path = g_find_program_in_path( executable );
 
-		char * exec_dir	= g_path_get_dirname ( executable );
+		if( full_path )
+		{
+			exec_dir = g_path_get_dirname ( full_path );
 
-		td = g_build_filename( exec_dir, "template", NULL );
+			td = g_build_filename( exec_dir, "template", NULL );
 
-		g_free( exec_dir );
+			g_free( exec_dir );
+		}
+		g_free( full_path );
 
 		return td;
 	}
