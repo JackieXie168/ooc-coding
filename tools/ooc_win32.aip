@@ -22,44 +22,172 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiDirsComponent">
     <ROW Directory="APPDIR" Directory_Parent="TARGETDIR" DefaultDir="APPDIR:." IsPseudoRoot="1"/>
+    <ROW Directory="SHORTCUTDIR" Directory_Parent="TARGETDIR" DefaultDir="SHORTC~1|SHORTCUTDIR" IsPseudoRoot="1"/>
     <ROW Directory="TARGETDIR" DefaultDir="SourceDir"/>
+    <ROW Directory="api_DIR" Directory_Parent="docs_DIR" DefaultDir="api"/>
+    <ROW Directory="docs_DIR" Directory_Parent="APPDIR" DefaultDir="docs"/>
+    <ROW Directory="html_DIR" Directory_Parent="api_DIR" DefaultDir="html"/>
+    <ROW Directory="implement_1_DIR" Directory_Parent="ooc_DIR" DefaultDir="implem~1|implement"/>
     <ROW Directory="implement_DIR" Directory_Parent="template_DIR" DefaultDir="implem~1|implement"/>
     <ROW Directory="lib_DIR" Directory_Parent="APPDIR" DefaultDir="lib"/>
+    <ROW Directory="ooc.html_DIR" Directory_Parent="docs_DIR" DefaultDir="ooc~1.htm|ooc.html"/>
+    <ROW Directory="ooc_DIR" Directory_Parent="APPDIR" DefaultDir="ooc"/>
+    <ROW Directory="port_DIR" Directory_Parent="ooc_DIR" DefaultDir="port"/>
     <ROW Directory="template_DIR" Directory_Parent="APPDIR" DefaultDir="template"/>
     <ROW Directory="unit_DIR" Directory_Parent="template_DIR" DefaultDir="unit"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
+    <ROW Component="Class_manipulation_tool.html" ComponentId="{2D4218E5-AA05-4BC1-9EFA-D1981C71AA83}" Directory_="ooc.html_DIR" Attributes="0" KeyPath="Class_manipulation_tool.html" Type="0"/>
     <ROW Component="Makefile.am" ComponentId="{4DB1EFA8-C8A2-4331-963E-905E64B5F164}" Directory_="unit_DIR" Attributes="0" KeyPath="Makefile.am" Type="0"/>
+    <ROW Component="SHORTCUTDIR" ComponentId="{E746CB27-5823-4491-BA5A-72B663C58064}" Directory_="SHORTCUTDIR" Attributes="0"/>
+    <ROW Component="annotated.html" ComponentId="{9313FCB6-1036-4B17-8BE5-AA712C003E33}" Directory_="html_DIR" Attributes="0" KeyPath="annotated.html" Type="0"/>
+    <ROW Component="anyc.h" ComponentId="{686424D1-6B3A-437C-B264-89C8F0122915}" Directory_="port_DIR" Attributes="0" KeyPath="anyc.h" Type="0"/>
+    <ROW Component="exception.h" ComponentId="{84758494-DF08-4DED-9606-2AE90BAD25C5}" Directory_="ooc_DIR" Attributes="0" KeyPath="exception.h" Type="0"/>
+    <ROW Component="exception.h_1" ComponentId="{95C87522-650D-493A-8291-A3DD489E1DC9}" Directory_="implement_1_DIR" Attributes="0" KeyPath="exception.h_1" Type="0"/>
+    <ROW Component="index.html" ComponentId="{18023CB5-AA0B-483A-9AD3-B81E2C908152}" Directory_="ooc.html_DIR" Attributes="0" KeyPath="index.html_1"/>
+    <ROW Component="index.html_1" ComponentId="{DBA26023-D4BE-497D-A07E-F8C688223034}" Directory_="html_DIR" Attributes="0" KeyPath="index.html"/>
     <ROW Component="libooc.lib" ComponentId="{154059B5-27A1-4F87-ADDD-F42445B1DD31}" Directory_="lib_DIR" Attributes="0" KeyPath="libooc.lib" Type="0"/>
     <ROW Component="libooc_d.pdb_1" ComponentId="{E527DE54-4518-4019-BA62-51827EA6AF0C}" Directory_="lib_DIR" Attributes="0" KeyPath="libooc_d.pdb" Type="4"/>
     <ROW Component="minimal.c" ComponentId="{7A4F27F2-8F83-41D0-B283-0C5C4566E4CD}" Directory_="template_DIR" Attributes="0" KeyPath="minimal.c" Type="0"/>
-    <ROW Component="ooc.exe" ComponentId="{97B9C832-9CC8-4959-ACBC-E8F640F2746C}" Directory_="APPDIR" Attributes="0" KeyPath="ooc.exe"/>
+    <ROW Component="ooc.exe" ComponentId="{459FBCF1-85BB-443D-9109-180D69D6B99E}" Directory_="APPDIR" Attributes="0" KeyPath="ooc.exe"/>
+    <ROW Component="ooc.pdf" ComponentId="{1922A1D2-3DB5-4BE8-801C-550BD6905DBB}" Directory_="docs_DIR" Attributes="0" KeyPath="ooc.pdf" Type="0"/>
     <ROW Component="sample.h" ComponentId="{BA4F1B4A-7011-4433-8736-A9323DEE9EA8}" Directory_="implement_DIR" Attributes="0" KeyPath="sample.h" Type="0"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
-    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0" Components="Makefile.am libooc.lib libooc_d.pdb_1 minimal.c ooc.exe sample.h"/>
+    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0" Components="Class_manipulation_tool.html Makefile.am SHORTCUTDIR annotated.html anyc.h exception.h exception.h_1 index.html index.html_1 libooc.lib libooc_d.pdb_1 minimal.c ooc.exe ooc.pdf sample.h"/>
     <ATTRIBUTE name="CurrentFeature" value="MainFeature"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
+    <ROW File="Class_manipulation_tool.html" Component_="Class_manipulation_tool.html" FileName="Class-~1.htm|Class-manipulation-tool.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\ooc.html\Class-manipulation-tool.html" SelfReg="false" NextFile="Exception_handling.html"/>
+    <ROW File="Exception_handling.html" Component_="Class_manipulation_tool.html" FileName="Except~1.htm|Exception-handling.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\ooc.html\Exception-handling.html" SelfReg="false" NextFile="fig_003aex1.html"/>
+    <ROW File="GNU_Free_Documentation_License.html" Component_="Class_manipulation_tool.html" FileName="GNU-Fr~1.htm|GNU-Free-Documentation-License.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\ooc.html\GNU-Free-Documentation-License.html" SelfReg="false" NextFile="Implementing_Classes.html"/>
+    <ROW File="Implementing_Classes.html" Component_="Class_manipulation_tool.html" FileName="Implem~1.htm|Implementing-Classes.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\ooc.html\Implementing-Classes.html" SelfReg="false" NextFile="index.html_1"/>
+    <ROW File="Indices.html" Component_="Class_manipulation_tool.html" FileName="Indice~1.htm|Indices.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\ooc.html\Indices.html" SelfReg="false" NextFile="Introduction.html"/>
+    <ROW File="Introduction.html" Component_="Class_manipulation_tool.html" FileName="Introd~1.htm|Introduction.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\ooc.html\Introduction.html" SelfReg="false" NextFile="Memory_handling.html"/>
     <ROW File="Makefile.Windows" Component_="Makefile.am" FileName="Makefi~1.Win|Makefile.Windows" Attributes="0" SourcePath="template\unit\Makefile.Windows" SelfReg="false" NextFile="MakefileEclipse.linux"/>
     <ROW File="Makefile.am" Component_="Makefile.am" FileName="Makefile.am" Attributes="0" SourcePath="template\unit\Makefile.am" SelfReg="false" NextFile="Makefile.Windows"/>
     <ROW File="MakefileEclipse.linux" Component_="Makefile.am" FileName="Makefi~1.lin|MakefileEclipse.linux" Attributes="0" SourcePath="template\unit\MakefileEclipse.linux" SelfReg="false" NextFile="suite.bat"/>
+    <ROW File="Memory_handling.html" Component_="Class_manipulation_tool.html" FileName="Memory~1.htm|Memory-handling.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\ooc.html\Memory-handling.html" SelfReg="false" NextFile="Objects_and_Classes.html"/>
+    <ROW File="Objects_and_Classes.html" Component_="Class_manipulation_tool.html" FileName="Object~1.htm|Objects-and-Classes.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\ooc.html\Objects-and-Classes.html" SelfReg="false" NextFile="ooc_doc_data.png"/>
+    <ROW File="Table_of_Figures.html" Component_="Class_manipulation_tool.html" FileName="Table-~1.htm|Table-of-Figures.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\ooc.html\Table-of-Figures.html" SelfReg="false" NextFile="Using_Classes.html"/>
+    <ROW File="Using_Classes.html" Component_="Class_manipulation_tool.html" FileName="Using-~1.htm|Using-Classes.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\ooc.html\Using-Classes.html" SelfReg="false" NextFile="exception.h"/>
+    <ROW File="annotated.html" Component_="annotated.html" FileName="annota~1.htm|annotated.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\annotated.html" SelfReg="false" NextFile="classException.html"/>
+    <ROW File="anyc.h" Component_="anyc.h" FileName="anyc.h" Attributes="0" SourcePath="..\libs\port\anyc.h" SelfReg="false" NextFile="gnuc.h"/>
+    <ROW File="classException.html" Component_="annotated.html" FileName="classE~1.htm|classException.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\classException.html" SelfReg="false" NextFile="classList.html"/>
+    <ROW File="classList.html" Component_="annotated.html" FileName="classL~1.htm|classList.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\classList.html" SelfReg="false" NextFile="classListNode.html"/>
+    <ROW File="classListNode.html" Component_="annotated.html" FileName="classL~2.htm|classListNode.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\classListNode.html" SelfReg="false" NextFile="classRefCounted.html"/>
+    <ROW File="classRefCounted.html" Component_="annotated.html" FileName="classR~1.htm|classRefCounted.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\classRefCounted.html" SelfReg="false" NextFile="classSignal.html"/>
+    <ROW File="classSignal.html" Component_="annotated.html" FileName="classS~1.htm|classSignal.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\classSignal.html" SelfReg="false" NextFile="classTestCase.html"/>
+    <ROW File="classTestCase.html" Component_="annotated.html" FileName="classT~1.htm|classTestCase.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\classTestCase.html" SelfReg="false" NextFile="classVector.html"/>
+    <ROW File="classVector.html" Component_="annotated.html" FileName="classV~1.htm|classVector.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\classVector.html" SelfReg="false" NextFile="doxygen.css"/>
+    <ROW File="doxygen.css" Component_="annotated.html" FileName="doxygen.css" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\doxygen.css" SelfReg="false" NextFile="doxygen.png"/>
+    <ROW File="doxygen.png" Component_="annotated.html" FileName="doxygen.png" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\doxygen.png" SelfReg="false" NextFile="exception_8h.html"/>
+    <ROW File="exception.h" Component_="exception.h" FileName="except~1.h|exception.h" Attributes="0" SourcePath="..\libs\exception.h" SelfReg="false" NextFile="list.h"/>
+    <ROW File="exception.h_1" Component_="exception.h_1" FileName="except~1.h|exception.h" Attributes="0" SourcePath="..\libs\implement\exception.h" SelfReg="false" NextFile="list.h_1"/>
+    <ROW File="exception_8h.html" Component_="annotated.html" FileName="except~1.htm|exception_8h.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\exception_8h.html" SelfReg="false" NextFile="exception_8h_dep_incl.map"/>
+    <ROW File="exception_8h_dep_incl.map" Component_="annotated.html" FileName="except~1.map|exception_8h__dep__incl.map" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\exception_8h__dep__incl.map" SelfReg="false" NextFile="exception_8h_dep_incl.md5"/>
+    <ROW File="exception_8h_dep_incl.md5" Component_="annotated.html" FileName="except~1.md5|exception_8h__dep__incl.md5" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\exception_8h__dep__incl.md5" SelfReg="false" NextFile="exception_8h_dep_incl.png"/>
+    <ROW File="exception_8h_dep_incl.png" Component_="annotated.html" FileName="except~1.png|exception_8h__dep__incl.png" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\exception_8h__dep__incl.png" SelfReg="false" NextFile="exception_8h_incl.map"/>
+    <ROW File="exception_8h_incl.map" Component_="annotated.html" FileName="except~2.map|exception_8h__incl.map" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\exception_8h__incl.map" SelfReg="false" NextFile="exception_8h_incl.md5"/>
+    <ROW File="exception_8h_incl.md5" Component_="annotated.html" FileName="except~2.md5|exception_8h__incl.md5" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\exception_8h__incl.md5" SelfReg="false" NextFile="exception_8h_incl.png"/>
+    <ROW File="exception_8h_incl.png" Component_="annotated.html" FileName="except~2.png|exception_8h__incl.png" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\exception_8h__incl.png" SelfReg="false" NextFile="files.html"/>
+    <ROW File="fig_003aex1.html" Component_="Class_manipulation_tool.html" FileName="fig_00~1.htm|fig_003aex1.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\ooc.html\fig_003aex1.html" SelfReg="false" NextFile="GNU_Free_Documentation_License.html"/>
+    <ROW File="files.html" Component_="annotated.html" FileName="files~1.htm|files.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\files.html" SelfReg="false" NextFile="ftv2blank.png"/>
+    <ROW File="ftv2blank.png" Component_="annotated.html" FileName="ftv2bl~1.png|ftv2blank.png" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\ftv2blank.png" SelfReg="false" NextFile="ftv2doc.png"/>
+    <ROW File="ftv2doc.png" Component_="annotated.html" FileName="ftv2doc.png" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\ftv2doc.png" SelfReg="false" NextFile="ftv2folderclosed.png"/>
+    <ROW File="ftv2folderclosed.png" Component_="annotated.html" FileName="ftv2fo~1.png|ftv2folderclosed.png" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\ftv2folderclosed.png" SelfReg="false" NextFile="ftv2folderopen.png"/>
+    <ROW File="ftv2folderopen.png" Component_="annotated.html" FileName="ftv2fo~2.png|ftv2folderopen.png" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\ftv2folderopen.png" SelfReg="false" NextFile="ftv2lastnode.png"/>
+    <ROW File="ftv2lastnode.png" Component_="annotated.html" FileName="ftv2la~1.png|ftv2lastnode.png" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\ftv2lastnode.png" SelfReg="false" NextFile="ftv2link.png"/>
+    <ROW File="ftv2link.png" Component_="annotated.html" FileName="ftv2link.png" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\ftv2link.png" SelfReg="false" NextFile="ftv2mlastnode.png"/>
+    <ROW File="ftv2mlastnode.png" Component_="annotated.html" FileName="ftv2ml~1.png|ftv2mlastnode.png" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\ftv2mlastnode.png" SelfReg="false" NextFile="ftv2mnode.png"/>
+    <ROW File="ftv2mnode.png" Component_="annotated.html" FileName="ftv2mn~1.png|ftv2mnode.png" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\ftv2mnode.png" SelfReg="false" NextFile="ftv2node.png"/>
+    <ROW File="ftv2node.png" Component_="annotated.html" FileName="ftv2node.png" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\ftv2node.png" SelfReg="false" NextFile="ftv2plastnode.png"/>
+    <ROW File="ftv2plastnode.png" Component_="annotated.html" FileName="ftv2pl~1.png|ftv2plastnode.png" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\ftv2plastnode.png" SelfReg="false" NextFile="ftv2pnode.png"/>
+    <ROW File="ftv2pnode.png" Component_="annotated.html" FileName="ftv2pn~1.png|ftv2pnode.png" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\ftv2pnode.png" SelfReg="false" NextFile="ftv2vertline.png"/>
+    <ROW File="ftv2vertline.png" Component_="annotated.html" FileName="ftv2ve~1.png|ftv2vertline.png" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\ftv2vertline.png" SelfReg="false" NextFile="globals.html"/>
+    <ROW File="globals.html" Component_="annotated.html" FileName="global~1.htm|globals.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\globals.html" SelfReg="false" NextFile="globals_defs.html"/>
+    <ROW File="globals_defs.html" Component_="annotated.html" FileName="global~2.htm|globals_defs.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\globals_defs.html" SelfReg="false" NextFile="globals_enum.html"/>
+    <ROW File="globals_enum.html" Component_="annotated.html" FileName="global~3.htm|globals_enum.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\globals_enum.html" SelfReg="false" NextFile="globals_eval.html"/>
+    <ROW File="globals_eval.html" Component_="annotated.html" FileName="global~4.htm|globals_eval.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\globals_eval.html" SelfReg="false" NextFile="globals_func.html"/>
+    <ROW File="globals_func.html" Component_="annotated.html" FileName="global~5.htm|globals_func.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\globals_func.html" SelfReg="false" NextFile="globals_type.html"/>
+    <ROW File="globals_type.html" Component_="annotated.html" FileName="global~6.htm|globals_type.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\globals_type.html" SelfReg="false" NextFile="globals_vars.html"/>
+    <ROW File="globals_vars.html" Component_="annotated.html" FileName="global~7.htm|globals_vars.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\globals_vars.html" SelfReg="false" NextFile="graph_legend.dot"/>
+    <ROW File="gnuc.h" Component_="anyc.h" FileName="gnuc.h" Attributes="0" SourcePath="..\libs\port\gnuc.h" SelfReg="false" NextFile="msvc.h"/>
+    <ROW File="graph_legend.dot" Component_="annotated.html" FileName="graph_~1.dot|graph_legend.dot" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\graph_legend.dot" SelfReg="false" NextFile="graph_legend.html"/>
+    <ROW File="graph_legend.html" Component_="annotated.html" FileName="graph_~1.htm|graph_legend.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\graph_legend.html" SelfReg="false" NextFile="graph_legend.png"/>
+    <ROW File="graph_legend.png" Component_="annotated.html" FileName="graph_~1.png|graph_legend.png" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\graph_legend.png" SelfReg="false" NextFile="index.html"/>
+    <ROW File="index.html" Component_="index.html_1" FileName="index~1.htm|index.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\index.html" SelfReg="false" NextFile="list_8h.html"/>
+    <ROW File="index.html_1" Component_="index.html" FileName="index~1.htm|index.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\ooc.html\index.html" SelfReg="false" NextFile="Indices.html"/>
     <ROW File="libooc.lib" Component_="libooc.lib" FileName="libooc.lib" Attributes="0" SourcePath="..\libs\Release\libooc.lib" SelfReg="false" NextFile="libooc_st.lib"/>
     <ROW File="libooc_d.lib" Component_="libooc.lib" FileName="libooc_d.lib" Attributes="0" SourcePath="..\libs\Debug\libooc_d.lib" SelfReg="false" NextFile="libooc_st_d.lib"/>
     <ROW File="libooc_d.pdb" Component_="libooc_d.pdb_1" FileName="libooc_d.pdb" Attributes="0" SourcePath="..\libs\Debug\libooc_d.pdb" SelfReg="false" NextFile="libooc_d.lib"/>
     <ROW File="libooc_st.lib" Component_="libooc.lib" FileName="libooc~1.lib|libooc_st.lib" Attributes="0" SourcePath="..\libs\Release_st\libooc_st.lib" SelfReg="false" NextFile="libooc_st_d.pdb"/>
     <ROW File="libooc_st_d.lib" Component_="libooc.lib" FileName="libooc~2.lib|libooc_st_d.lib" Attributes="0" SourcePath="..\libs\Debug_st\libooc_st_d.lib" SelfReg="false" NextFile="libooc.lib"/>
-    <ROW File="libooc_st_d.pdb" Component_="libooc_d.pdb_1" FileName="libooc~1.pdb|libooc_st_d.pdb" Attributes="0" SourcePath="..\libs\Debug_st\libooc_st_d.pdb" SelfReg="false"/>
+    <ROW File="libooc_st_d.pdb" Component_="libooc_d.pdb_1" FileName="libooc~1.pdb|libooc_st_d.pdb" Attributes="0" SourcePath="..\libs\Debug_st\libooc_st_d.pdb" SelfReg="false" NextFile="ooc.pdf"/>
+    <ROW File="list.h" Component_="exception.h" FileName="list.h" Attributes="0" SourcePath="..\libs\list.h" SelfReg="false" NextFile="ooc.h"/>
+    <ROW File="list.h_1" Component_="exception.h_1" FileName="list.h" Attributes="0" SourcePath="..\libs\implement\list.h" SelfReg="false" NextFile="refcounted.h_1"/>
+    <ROW File="list_8h.html" Component_="annotated.html" FileName="list_8~1.htm|list_8h.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\list_8h.html" SelfReg="false" NextFile="list_8h_dep_incl.map"/>
+    <ROW File="list_8h_dep_incl.map" Component_="annotated.html" FileName="list_8~1.map|list_8h__dep__incl.map" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\list_8h__dep__incl.map" SelfReg="false" NextFile="list_8h_dep_incl.md5"/>
+    <ROW File="list_8h_dep_incl.md5" Component_="annotated.html" FileName="list_8~1.md5|list_8h__dep__incl.md5" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\list_8h__dep__incl.md5" SelfReg="false" NextFile="list_8h_dep_incl.png"/>
+    <ROW File="list_8h_dep_incl.png" Component_="annotated.html" FileName="list_8~1.png|list_8h__dep__incl.png" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\list_8h__dep__incl.png" SelfReg="false" NextFile="list_8h_incl.map"/>
+    <ROW File="list_8h_incl.map" Component_="annotated.html" FileName="list_8~2.map|list_8h__incl.map" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\list_8h__incl.map" SelfReg="false" NextFile="list_8h_incl.md5"/>
+    <ROW File="list_8h_incl.md5" Component_="annotated.html" FileName="list_8~2.md5|list_8h__incl.md5" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\list_8h__incl.md5" SelfReg="false" NextFile="list_8h_incl.png"/>
+    <ROW File="list_8h_incl.png" Component_="annotated.html" FileName="list_8~2.png|list_8h__incl.png" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\list_8h__incl.png" SelfReg="false" NextFile="main.html"/>
+    <ROW File="main.html" Component_="annotated.html" FileName="main~1.htm|main.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\main.html" SelfReg="false" NextFile="multi_thread_8dox.html"/>
     <ROW File="minimal.c" Component_="minimal.c" FileName="minimal.c" Attributes="0" SourcePath="template\minimal.c" SelfReg="false" NextFile="private.c"/>
-    <ROW File="ooc.exe" Component_="ooc.exe" FileName="ooc.exe" Attributes="0" SourcePath="Release\ooc.exe" SelfReg="false" NextFile="libooc_d.pdb"/>
+    <ROW File="msvc.h" Component_="anyc.h" FileName="msvc.h" Attributes="0" SourcePath="..\libs\port\msvc.h" SelfReg="false" NextFile="ooc.exe"/>
+    <ROW File="multi_thread_8dox.html" Component_="annotated.html" FileName="multi_~1.htm|multi__thread_8dox.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\multi__thread_8dox.html" SelfReg="false" NextFile="ooc_8h.html"/>
+    <ROW File="ooc.exe" Component_="ooc.exe" FileName="ooc.exe" Attributes="0" SourcePath="Release\ooc.exe" SelfReg="false"/>
+    <ROW File="ooc.h" Component_="exception.h" FileName="ooc.h" Attributes="0" SourcePath="..\libs\ooc.h" SelfReg="false" NextFile="refcounted.h"/>
+    <ROW File="ooc.pdf" Component_="ooc.pdf" FileName="ooc.pdf" Attributes="0" SourcePath="..\..\..\..\Letöltések\ooc.pdf" SelfReg="false" NextFile="annotated.html"/>
+    <ROW File="ooc_8h.html" Component_="annotated.html" FileName="ooc_8h~1.htm|ooc_8h.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\ooc_8h.html" SelfReg="false" NextFile="ooc_8h_dep_incl.map"/>
+    <ROW File="ooc_8h_dep_incl.map" Component_="annotated.html" FileName="ooc_8h~1.map|ooc_8h__dep__incl.map" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\ooc_8h__dep__incl.map" SelfReg="false" NextFile="ooc_8h_dep_incl.md5"/>
+    <ROW File="ooc_8h_dep_incl.md5" Component_="annotated.html" FileName="ooc_8h~1.md5|ooc_8h__dep__incl.md5" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\ooc_8h__dep__incl.md5" SelfReg="false" NextFile="ooc_8h_dep_incl.png"/>
+    <ROW File="ooc_8h_dep_incl.png" Component_="annotated.html" FileName="ooc_8h~1.png|ooc_8h__dep__incl.png" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\ooc_8h__dep__incl.png" SelfReg="false" NextFile="ooc_8h_incl.map"/>
+    <ROW File="ooc_8h_incl.map" Component_="annotated.html" FileName="ooc_8h~2.map|ooc_8h__incl.map" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\ooc_8h__incl.map" SelfReg="false" NextFile="ooc_8h_incl.md5"/>
+    <ROW File="ooc_8h_incl.md5" Component_="annotated.html" FileName="ooc_8h~2.md5|ooc_8h__incl.md5" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\ooc_8h__incl.md5" SelfReg="false" NextFile="ooc_8h_incl.png"/>
+    <ROW File="ooc_8h_incl.png" Component_="annotated.html" FileName="ooc_8h~2.png|ooc_8h__incl.png" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\ooc_8h__incl.png" SelfReg="false" NextFile="pages.html"/>
+    <ROW File="ooc_doc_data.png" Component_="Class_manipulation_tool.html" FileName="ooc_do~1.png|ooc_doc_data.png" Attributes="0" SourcePath="..\..\..\..\Letöltések\ooc.html\ooc_doc_data.png" SelfReg="false" NextFile="Table_of_Figures.html"/>
+    <ROW File="page_MT.html" Component_="annotated.html" FileName="page_M~1.htm|page_MT.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\page_MT.html" SelfReg="false" NextFile="porting.html"/>
+    <ROW File="pages.html" Component_="annotated.html" FileName="pages~1.htm|pages.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\pages.html" SelfReg="false" NextFile="page_MT.html"/>
+    <ROW File="porting.html" Component_="annotated.html" FileName="portin~1.htm|porting.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\porting.html" SelfReg="false" NextFile="refcounted_8h.html"/>
     <ROW File="private.c" Component_="minimal.c" FileName="private.c" Attributes="0" SourcePath="template\private.c" SelfReg="false" NextFile="private.h"/>
     <ROW File="private.h" Component_="minimal.c" FileName="private.h" Attributes="0" SourcePath="template\private.h" SelfReg="false" NextFile="sample.c"/>
+    <ROW File="refcounted.h" Component_="exception.h" FileName="refcou~1.h|refcounted.h" Attributes="0" SourcePath="..\libs\refcounted.h" SelfReg="false" NextFile="signal.h"/>
+    <ROW File="refcounted.h_1" Component_="exception.h_1" FileName="refcou~1.h|refcounted.h" Attributes="0" SourcePath="..\libs\implement\refcounted.h" SelfReg="false" NextFile="anyc.h"/>
+    <ROW File="refcounted_8h.html" Component_="annotated.html" FileName="refcou~1.htm|refcounted_8h.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\refcounted_8h.html" SelfReg="false" NextFile="refcounted_8h_incl.map"/>
+    <ROW File="refcounted_8h_incl.map" Component_="annotated.html" FileName="refcou~1.map|refcounted_8h__incl.map" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\refcounted_8h__incl.map" SelfReg="false" NextFile="refcounted_8h_incl.md5"/>
+    <ROW File="refcounted_8h_incl.md5" Component_="annotated.html" FileName="refcou~1.md5|refcounted_8h__incl.md5" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\refcounted_8h__incl.md5" SelfReg="false" NextFile="refcounted_8h_incl.png"/>
+    <ROW File="refcounted_8h_incl.png" Component_="annotated.html" FileName="refcou~1.png|refcounted_8h__incl.png" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\refcounted_8h__incl.png" SelfReg="false" NextFile="signal_8h.html"/>
     <ROW File="sample.c" Component_="minimal.c" FileName="sample.c" Attributes="0" SourcePath="template\sample.c" SelfReg="false" NextFile="sample.h_1"/>
     <ROW File="sample.h" Component_="sample.h" FileName="sample.h" Attributes="0" SourcePath="template\implement\sample.h" SelfReg="false" NextFile="minimal.c"/>
     <ROW File="sample.h_1" Component_="minimal.c" FileName="sample.h" Attributes="0" SourcePath="template\sample.h" SelfReg="false" NextFile="test.c"/>
+    <ROW File="signal.h" Component_="exception.h" FileName="signal.h" Attributes="0" SourcePath="..\libs\signal.h" SelfReg="false" NextFile="testcase.h"/>
+    <ROW File="signal_8h.html" Component_="annotated.html" FileName="signal~1.htm|signal_8h.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\signal_8h.html" SelfReg="false" NextFile="signal_8h_incl.map"/>
+    <ROW File="signal_8h_incl.map" Component_="annotated.html" FileName="signal~1.map|signal_8h__incl.map" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\signal_8h__incl.map" SelfReg="false" NextFile="signal_8h_incl.md5"/>
+    <ROW File="signal_8h_incl.md5" Component_="annotated.html" FileName="signal~1.md5|signal_8h__incl.md5" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\signal_8h__incl.md5" SelfReg="false" NextFile="signal_8h_incl.png"/>
+    <ROW File="signal_8h_incl.png" Component_="annotated.html" FileName="signal~1.png|signal_8h__incl.png" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\signal_8h__incl.png" SelfReg="false" NextFile="structArithmeticFaultObject.html"/>
+    <ROW File="structArithmeticFaultObject.html" Component_="annotated.html" FileName="struct~1.htm|structArithmeticFaultObject.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\structArithmeticFaultObject.html" SelfReg="false" NextFile="structSegmentationFaultObject.html"/>
+    <ROW File="structSegmentationFaultObject.html" Component_="annotated.html" FileName="struct~2.htm|structSegmentationFaultObject.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\structSegmentationFaultObject.html" SelfReg="false" NextFile="tabs.css"/>
     <ROW File="suite.bat" Component_="Makefile.am" FileName="suite.bat" Attributes="0" SourcePath="template\unit\suite.bat" SelfReg="false" NextFile="suite.sh"/>
-    <ROW File="suite.sh" Component_="Makefile.am" FileName="suite.sh" Attributes="0" SourcePath="template\unit\suite.sh" SelfReg="false" NextFile="ooc.exe"/>
+    <ROW File="suite.sh" Component_="Makefile.am" FileName="suite.sh" Attributes="0" SourcePath="template\unit\suite.sh" SelfReg="false" NextFile="libooc_d.pdb"/>
+    <ROW File="tab_b.gif" Component_="annotated.html" FileName="tab_b.gif" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\tab_b.gif" SelfReg="false" NextFile="tab_l.gif"/>
+    <ROW File="tab_l.gif" Component_="annotated.html" FileName="tab_l.gif" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\tab_l.gif" SelfReg="false" NextFile="tab_r.gif"/>
+    <ROW File="tab_r.gif" Component_="annotated.html" FileName="tab_r.gif" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\tab_r.gif" SelfReg="false" NextFile="testcase_8h.html"/>
+    <ROW File="tabs.css" Component_="annotated.html" FileName="tabs.css" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\tabs.css" SelfReg="false" NextFile="tab_b.gif"/>
     <ROW File="test.c" Component_="minimal.c" FileName="test.c" Attributes="0" SourcePath="template\test.c" SelfReg="false" NextFile="Makefile.am"/>
+    <ROW File="testcase.h" Component_="exception.h" FileName="testcase.h" Attributes="0" SourcePath="..\libs\testcase.h" SelfReg="false" NextFile="vector.h"/>
+    <ROW File="testcase_8h.html" Component_="annotated.html" FileName="testca~1.htm|testcase_8h.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\testcase_8h.html" SelfReg="false" NextFile="testcase_8h_incl.map"/>
+    <ROW File="testcase_8h_incl.map" Component_="annotated.html" FileName="testca~1.map|testcase_8h__incl.map" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\testcase_8h__incl.map" SelfReg="false" NextFile="testcase_8h_incl.md5"/>
+    <ROW File="testcase_8h_incl.md5" Component_="annotated.html" FileName="testca~1.md5|testcase_8h__incl.md5" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\testcase_8h__incl.md5" SelfReg="false" NextFile="testcase_8h_incl.png"/>
+    <ROW File="testcase_8h_incl.png" Component_="annotated.html" FileName="testca~1.png|testcase_8h__incl.png" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\testcase_8h__incl.png" SelfReg="false" NextFile="todo.html"/>
+    <ROW File="todo.html" Component_="annotated.html" FileName="todo~1.htm|todo.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\todo.html" SelfReg="false" NextFile="tree.html"/>
+    <ROW File="tree.html" Component_="annotated.html" FileName="tree~1.htm|tree.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\tree.html" SelfReg="false" NextFile="vector_8h.html"/>
+    <ROW File="vector.h" Component_="exception.h" FileName="vector.h" Attributes="0" SourcePath="..\libs\vector.h" SelfReg="false" NextFile="exception.h_1"/>
+    <ROW File="vector_8h.html" Component_="annotated.html" FileName="vector~1.htm|vector_8h.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\vector_8h.html" SelfReg="false" NextFile="vector_8h_incl.map"/>
+    <ROW File="vector_8h_incl.map" Component_="annotated.html" FileName="vector~1.map|vector_8h__incl.map" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\vector_8h__incl.map" SelfReg="false" NextFile="vector_8h_incl.md5"/>
+    <ROW File="vector_8h_incl.md5" Component_="annotated.html" FileName="vector~1.md5|vector_8h__incl.md5" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\vector_8h__incl.md5" SelfReg="false" NextFile="vector_8h_incl.png"/>
+    <ROW File="vector_8h_incl.png" Component_="annotated.html" FileName="vector~1.png|vector_8h__incl.png" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\vector_8h__incl.png" SelfReg="false" NextFile="Class_manipulation_tool.html"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
     <ROW BuildKey="DefaultBuild" BuildName="DefaultBuild" BuildOrder="1" BuildType="0" PackageFolder=".." PackageFileName="ooc_setup" Languages="en" InstallationType="4"/>
@@ -102,6 +230,9 @@
     <ROW Dialog_="VerifyReadyDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_PATCH" Ordering="199"/>
     <ROW Dialog_="ResumeDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_RESUME" Ordering="299"/>
   </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCreateFolderComponent">
+    <ROW Directory_="SHORTCUTDIR" Component_="SHORTCUTDIR"/>
+  </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCustActComponent">
     <ROW Action="AI_DOWNGRADE" Type="19" Target="4010"/>
     <ROW Action="AI_PREPARE_UPGRADE" Type="65" Source="aicustact.dll" Target="PrepareUpgrade"/>
@@ -113,9 +244,9 @@
     <ROW Action="SET_TARGETDIR_TO_APPDIR" Type="51" Source="TARGETDIR" Target="[APPDIR]"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiEnvComponent">
-    <ROW Environment="INCLUDE" Name="+-INCLUDE" Value="[~];[APPDIR]\ooc" Component_="Makefile.am"/>
+    <ROW Environment="INCLUDE" Name="+-INCLUDE" Value="[~];[APPDIR]" Component_="Makefile.am"/>
     <ROW Environment="LIB" Name="=-*LIB" Value="[~];[APPDIR]\lib" Component_="Makefile.am"/>
-    <ROW Environment="PATH" Name="+-*PATH" Value="[~];[APPDIR]" Component_="ooc.exe"/>
+    <ROW Environment="PATH" Name="+-*PATH" Value="[~];[APPDIR]" Component_="Makefile.am"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
     <ROW Action="AI_DOWNGRADE" Condition="AI_NEWERPRODUCTFOUND AND (UILevel &lt;&gt; 5)" Sequence="210"/>
@@ -131,6 +262,11 @@
   <COMPONENT cid="caphyon.advinst.msicomp.MsiLaunchConditionsComponent">
     <ROW Condition="( Version9X OR (VersionNT AND (NOT VersionNT64)) )" Description="[ProductName] cannot be installed on [WindowsTypeNT64Display]" DescriptionLocId="AI.LaunchCondition.NoNT64" IsPredefined="true" Builds="DefaultBuild"/>
     <ROW Condition="VersionNT" Description="[ProductName] cannot be installed on [WindowsType9XDisplay]" DescriptionLocId="AI.LaunchCondition.No9X" IsPredefined="true" Builds="DefaultBuild"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiShortsComponent">
+    <ROW Shortcut="ooc_API_docs_HTML" Directory_="SHORTCUTDIR" Name="oocAPI~1|ooc API docs (HTML)" Component_="index.html_1" Target="[#index.html]" Description="API documentation for ooc." Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="html_DIR"/>
+    <ROW Shortcut="ooc_manual_HTML" Directory_="SHORTCUTDIR" Name="oocman~2|ooc manual (HTML)" Component_="index.html" Target="[#index.html_1]" Description="General manual for ooc." Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="ooc.html_DIR"/>
+    <ROW Shortcut="ooc_manual_PDF" Directory_="SHORTCUTDIR" Name="oocman~1|ooc manual (PDF)" Component_="ooc.pdf" Target="[#ooc.pdf]" Description="General manual for ooc." Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="docs_DIR"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiThemeComponent">
     <ATTRIBUTE name="UsedTheme" value="classic"/>
