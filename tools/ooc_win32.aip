@@ -46,6 +46,7 @@
     <ROW Component="exception.h_1" ComponentId="{95C87522-650D-493A-8291-A3DD489E1DC9}" Directory_="implement_1_DIR" Attributes="0" KeyPath="exception.h_1" Type="0"/>
     <ROW Component="index.html" ComponentId="{18023CB5-AA0B-483A-9AD3-B81E2C908152}" Directory_="ooc.html_DIR" Attributes="0" KeyPath="index.html_1"/>
     <ROW Component="index.html_1" ComponentId="{DBA26023-D4BE-497D-A07E-F8C688223034}" Directory_="html_DIR" Attributes="0" KeyPath="index.html"/>
+    <ROW Component="lgpl.html" ComponentId="{AC23E3E3-B0F7-45E2-96A4-376068C2880B}" Directory_="docs_DIR" Attributes="0" KeyPath="lgpl.html"/>
     <ROW Component="libooc.lib" ComponentId="{154059B5-27A1-4F87-ADDD-F42445B1DD31}" Directory_="lib_DIR" Attributes="0" KeyPath="libooc.lib" Type="0"/>
     <ROW Component="libooc_d.pdb_1" ComponentId="{E527DE54-4518-4019-BA62-51827EA6AF0C}" Directory_="lib_DIR" Attributes="0" KeyPath="libooc_d.pdb" Type="4"/>
     <ROW Component="minimal.c" ComponentId="{7A4F27F2-8F83-41D0-B283-0C5C4566E4CD}" Directory_="template_DIR" Attributes="0" KeyPath="minimal.c" Type="0"/>
@@ -54,7 +55,7 @@
     <ROW Component="sample.h" ComponentId="{BA4F1B4A-7011-4433-8736-A9323DEE9EA8}" Directory_="implement_DIR" Attributes="0" KeyPath="sample.h" Type="0"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
-    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0" Components="Class_manipulation_tool.html Makefile.am SHORTCUTDIR annotated.html anyc.h exception.h exception.h_1 index.html index.html_1 libooc.lib libooc_d.pdb_1 minimal.c ooc.exe ooc.pdf sample.h"/>
+    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0" Components="Class_manipulation_tool.html Makefile.am SHORTCUTDIR annotated.html anyc.h exception.h exception.h_1 index.html index.html_1 lgpl.html libooc.lib libooc_d.pdb_1 minimal.c ooc.exe ooc.pdf sample.h"/>
     <ATTRIBUTE name="CurrentFeature" value="MainFeature"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
@@ -118,6 +119,7 @@
     <ROW File="graph_legend.png" Component_="annotated.html" FileName="graph_~1.png|graph_legend.png" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\graph_legend.png" SelfReg="false" NextFile="index.html"/>
     <ROW File="index.html" Component_="index.html_1" FileName="index~1.htm|index.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\index.html" SelfReg="false" NextFile="list_8h.html"/>
     <ROW File="index.html_1" Component_="index.html" FileName="index~1.htm|index.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\ooc.html\index.html" SelfReg="false" NextFile="Indices.html"/>
+    <ROW File="lgpl.html" Component_="lgpl.html" FileName="lgpl~1.htm|lgpl.html" Attributes="0" SourcePath="..\lgpl.html" SelfReg="false"/>
     <ROW File="libooc.lib" Component_="libooc.lib" FileName="libooc.lib" Attributes="0" SourcePath="..\libs\Release\libooc.lib" SelfReg="false" NextFile="libooc_st.lib"/>
     <ROW File="libooc_d.lib" Component_="libooc.lib" FileName="libooc_d.lib" Attributes="0" SourcePath="..\libs\Debug\libooc_d.lib" SelfReg="false" NextFile="libooc_st_d.lib"/>
     <ROW File="libooc_d.pdb" Component_="libooc_d.pdb_1" FileName="libooc_d.pdb" Attributes="0" SourcePath="..\libs\Debug\libooc_d.pdb" SelfReg="false" NextFile="libooc_d.lib"/>
@@ -137,7 +139,7 @@
     <ROW File="minimal.c" Component_="minimal.c" FileName="minimal.c" Attributes="0" SourcePath="template\minimal.c" SelfReg="false" NextFile="private.c"/>
     <ROW File="msvc.h" Component_="anyc.h" FileName="msvc.h" Attributes="0" SourcePath="..\libs\port\msvc.h" SelfReg="false" NextFile="ooc.exe"/>
     <ROW File="multi_thread_8dox.html" Component_="annotated.html" FileName="multi_~1.htm|multi__thread_8dox.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\multi__thread_8dox.html" SelfReg="false" NextFile="ooc_8h.html"/>
-    <ROW File="ooc.exe" Component_="ooc.exe" FileName="ooc.exe" Attributes="0" SourcePath="Release\ooc.exe" SelfReg="false"/>
+    <ROW File="ooc.exe" Component_="ooc.exe" FileName="ooc.exe" Attributes="0" SourcePath="Release\ooc.exe" SelfReg="false" NextFile="lgpl.html"/>
     <ROW File="ooc.h" Component_="exception.h" FileName="ooc.h" Attributes="0" SourcePath="..\libs\ooc.h" SelfReg="false" NextFile="refcounted.h"/>
     <ROW File="ooc.pdf" Component_="ooc.pdf" FileName="ooc.pdf" Attributes="0" SourcePath="..\..\..\..\Letöltések\ooc.pdf" SelfReg="false" NextFile="annotated.html"/>
     <ROW File="ooc_8h.html" Component_="annotated.html" FileName="ooc_8h~1.htm|ooc_8h.html" Attributes="0" SourcePath="..\..\..\..\Letöltések\api\html\ooc_8h.html" SelfReg="false" NextFile="ooc_8h_dep_incl.map"/>
@@ -264,6 +266,7 @@
     <ROW Condition="VersionNT" Description="[ProductName] cannot be installed on [WindowsType9XDisplay]" DescriptionLocId="AI.LaunchCondition.No9X" IsPredefined="true" Builds="DefaultBuild"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiShortsComponent">
+    <ROW Shortcut="Licensing" Directory_="SHORTCUTDIR" Name="Licens~1|Licensing" Component_="lgpl.html" Target="[#lgpl.html]" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="docs_DIR"/>
     <ROW Shortcut="ooc_API_docs_HTML" Directory_="SHORTCUTDIR" Name="oocAPI~1|ooc API docs (HTML)" Component_="index.html_1" Target="[#index.html]" Description="API documentation for ooc." Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="html_DIR"/>
     <ROW Shortcut="ooc_manual_HTML" Directory_="SHORTCUTDIR" Name="oocman~2|ooc manual (HTML)" Component_="index.html" Target="[#index.html_1]" Description="General manual for ooc." Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="ooc.html_DIR"/>
     <ROW Shortcut="ooc_manual_PDF" Directory_="SHORTCUTDIR" Name="oocman~1|ooc manual (PDF)" Component_="ooc.pdf" Target="[#ooc.pdf]" Description="General manual for ooc." Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="docs_DIR"/>
