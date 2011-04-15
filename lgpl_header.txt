@@ -1,5 +1,5 @@
 /*
- * implement/refcounted.h
+ * ${file_name}
  * 
  * Copyright (c) 2011, old_fashioned. All rights reserved.
  *
@@ -19,19 +19,4 @@
  * MA 02110-1301  USA
  */
 
-#ifndef IMPL_REFCOUNTED_H_
-#define IMPL_REFCOUNTED_H_
 
-#include "../refcounted.h"
-
-ClassMembers( RefCounted, Base )
-
-	int			counter;
-
-#ifndef NO_THREADS
-	ooc_Mutex	access;
-#endif
-
-EndOfClassMembers;
-
-#endif /* IMPL_REFCOUNTED_H_ */
