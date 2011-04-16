@@ -1,0 +1,45 @@
+
+SOURCES = $(wildcard *.c)
+
+TESTS = $(filter $(wildcard *test.c), $(SOURCES))
+FAKES = $(filter-out $(TESTS), $(SOURCES))
+FAKEOBJECTS = $(patsubst %.c, %.o, $(FAKES))
+TARGETS = $(patsubst %.c, %, $(TESTS))
+
+LDOBJECTS = $(FAKEOBJECTS)
+
+CC = gcc
+LL = gcc
+
+# Eclipse targets
+
+debug : make_targets
+debug : TESTABLE_TARGETS = ../libs/Debug_gomp/libooc.a
+debug : CPPFLAGS =
+debug : CFLAGS = -O0 -g3 -fopenmp
+debug : LDFLAGS = -L../libs/Debug_gomp -fopenmp
+debug : LDLIBS = -looc
+
+release : make_targets
+release : TESTABLE_TARGETS = ../libs/Release_gomp/libooc.a
+release : CPPFLAGS =
+release : CFLAGS = -O2 -fopenmp
+release : LDFLAGS = -L../libs/Release_gomp -fopenmp
+release : LDLIBS = -looc
+
+# Building the targets
+
+make_targets : $(TARGETS)
+
+$(TARGETS) : $(FAKEOBJECTS) $(TESTABLE_TARGETS)
+
+%.o : %.c
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
+
+% : %.o
+	$(LL) $(LDFLAGS) $< $(LDOBJECTS) $(LDLIBS) -o $@
+
+clean :
+	rm -f *.o
+	rm -f $(TARGETS)
+
