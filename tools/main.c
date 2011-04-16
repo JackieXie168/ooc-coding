@@ -192,7 +192,7 @@ print_help( void )
 {
 	char * help_msg = \
 			"ooc tool - Helper for Object Oriented C programming - version %s\n"
-			"(c) Tibor Miseta,  this software is licensed under GNU GPL 3\n"
+			"(c) Tibor Miseta,  this software is licensed under GNU LGPL 3\n"
 			"Use: ooc OPERATION [ MODIFIERS ]\n"
 			"OPERATION can be:\n"
 			"    -n ClassName\n"

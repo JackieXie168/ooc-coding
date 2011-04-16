@@ -10,6 +10,8 @@ There are other object oriented C aproaches out there you might be interested in
 (for example GObject), however ooc is easy to use, and in addition supports the
 use of exceptions.
 
+ooc helps you make unit testing easier with a special TestCase class.
+
 Install on Linux/Unix:
 ======================
 
@@ -34,6 +36,14 @@ Compile your own code:
 Install on Windows or other platforms:
 ======================================
 
+Download the Windows installer package: ooc_win32.msi and install it.
+This installer will install the occ files that are necessary for program development with ooc.
+It installs the header files, libraries, documentation and the ooc tool.
+Also sets the LIB, INCLUDE and PATH environment variables.
+Check the Start menu -> All Programs for the ooc folder.
+
+Or alternatively you can compile from source code:
+
 Make sure, you have installed:
 	Visual C++ 2008 Express
 	glib for win32
@@ -46,8 +56,6 @@ You can build ooc now.
 (You might need to modify the property sheets in the tools projetc, according
 to your glib installation.)
 
-There is no installer :-( (yet).
-
 An other possibility to copy the source files into your project directory
 compile and link them together with your project.
 For the ooc core functions (class and object management, exception handling) copy:
@@ -59,6 +67,9 @@ For the ooc core functions (class and object management, exception handling) cop
 
 If you'd like to use the other stuff as well, copy the rest.
 
+Install on platforms:
+======================================
+Not ready yet.
 
 ======================================
 
