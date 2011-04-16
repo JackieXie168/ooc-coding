@@ -2,6 +2,7 @@
 Unit testing support
 More precise tests for the ooc libraries
 (on Linux use: make check)
+Licensing changed to LGPL v3.
 
 0.9.g
 Separate header files for each compilers / ports. Makes porting ooc much easier.
