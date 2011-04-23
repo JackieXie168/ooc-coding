@@ -24,8 +24,8 @@
 #define COMPILING_OOC_C
 
 #include "ooc.h"
-
 #include "exception.h"
+#include "implement/swstack.h"
 
 /** @file ooc.h
  * @brief Object Oriented C - macros and definitions.
@@ -106,34 +106,81 @@ static Class 		class_register = NULL;		/* Points to the most recently initialize
 static ooc_Mutex	class_register_change;
 #endif
 
+/* Implementation of the software stack
+ * 
+ **********************************************************/
+ 
+static TLS void *		_ooc_sw_stack_static[ OOC_SW_STACK_SIZE ];			
+	   TLS void * *		_ooc_swstack_pointer = NULL;
+	   TLS void * *		_ooc_swstack_end;
+static TLS void * *		_ooc_swstack_begin;
+
+static
 void
-_ooc_init_class( const Class self )
+ooc_swstack_init( size_t dynamic_swstack_size )
 {
-	if( self->vtable->_class == NULL ) {
+	if(	dynamic_swstack_size == 0 ) {
+		_ooc_swstack_begin		= ooc_malloc( sizeof(void*) * dynamic_swstack_size );
+		_ooc_swstack_end		= & _ooc_swstack_begin[ dynamic_swstack_size ];
+		}
+	else {
+		_ooc_swstack_begin		= & _ooc_sw_stack_static[ 0 ];
+		_ooc_swstack_end 		= & _ooc_sw_stack_static[ OOC_SW_STACK_SIZE ];
+		}
+	_ooc_swstack_pointer = _ooc_swstack_begin;
+}
 
-		if( ooc_class_has_parent( self ) )
-			_ooc_init_class( self->parent );
+static
+void
+ooc_swstack_release( void )
+{
+	if( _ooc_swstack_begin != & _ooc_sw_stack_static[ 0 ] )
+		ooc_free( _ooc_swstack_begin );
+}
 
-		self->vtable->_class = self;
-		self->vtable->_delete= Base_delete;
-
-		invalidate_vtable( self );
-
-		inherit_vtable_from_parent( self );
-
-		self->init( self );
-
-		if( class_register == NULL )					/* Race condition, but however we declared _ooc_init_class() as non-thread-safe */
-			ooc_mutex_init( class_register_change );
+void
+_ooc_init_class( const Class self_param )
+{
+	Class self = self_param;
+	
+	if( _ooc_swstack_pointer == NULL )
+		ooc_swstack_init( 0 );
+	
+	
+	while( ooc_class_has_parent( self ) ) {
+		ooc_swstack_push( (void*) self );
+		self = self->parent;
+		}
+	
+	for(;;) {
+		if( self->vtable->_class == NULL ) {
+		
+			self->vtable->_class = self;
+			self->vtable->_delete= Base_delete;
+	
+			invalidate_vtable( self );
+	
+			inherit_vtable_from_parent( self );
+	
+			self->init( self );
+	
+			if( class_register == NULL )					/* Race condition, but however we declared _ooc_init_class() as non-thread-safe */
+				ooc_mutex_init( class_register_change );
+				
+			ooc_lock( class_register_change );
+			if( class_register ) 
+				class_register->vtable->_class_register_next = self;
+			self->vtable->_class_register_prev = class_register;
+			self->vtable->_class_register_next = NULL;
+			class_register = self;
+			ooc_unlock( class_register_change );
+			}
 			
-		ooc_lock( class_register_change );
-		if( class_register ) 
-			class_register->vtable->_class_register_next = self;
-		self->vtable->_class_register_prev = class_register;
-		self->vtable->_class_register_next = NULL;
-		class_register = self;
-		ooc_unlock( class_register_change );
-	}
+		if( self == self_param )
+			break;	
+		else
+			self = ooc_swstack_pop();
+		}
 }
 
 void
@@ -228,28 +275,39 @@ ooc_new_classptr( const Class type, const void * params )
 
 static
 void
-copy_object_members( Object to, const Object from, const Class type )
+copy_object_members( Object to, const Object from, const Class type_param )
 {
 	size_t offset, length;
 							
-	if( ooc_class_has_parent( type ) )
-		copy_object_members( to, from, type->parent );
+	Class type = type_param;
+	
+	while( ooc_class_has_parent( type ) ) {
+		ooc_swstack_push( (void*) type );
+		type = type->parent;
+		}
+	
+	for(;;) {
+		switch( type->copy( to, from ) ) {
+			
+			case OOC_COPY_DONE:		break;
+			
+			case OOC_COPY_DEFAULT:	offset = ooc_class_has_parent( type ) ?  type->parent->size : sizeof( struct BaseObject );
+									length = type->size - offset; 
+						
+									if( length )
+										memcpy( ((char*)to)+offset, ((char*)from)+offset, length );
+									break;
+								
+			case OOC_NO_COPY:
+			default:				ooc_throw( exception_new( err_can_not_be_duplicated ) );
+									break;
+			};
 		
-	switch( type->copy( to, from ) ) {
-		
-		case OOC_COPY_DONE:		break;
-		
-		case OOC_COPY_DEFAULT:	offset = ooc_class_has_parent( type ) ?  type->parent->size : sizeof( struct BaseObject );
-								length = type->size - offset; 
-					
-								if( length )
-									memcpy( ((char*)to)+offset, ((char*)from)+offset, length );
-								break;
-							
-		case OOC_NO_COPY:
-		default:				ooc_throw( exception_new( err_can_not_be_duplicated ) );
-								break;
-		};
+		if( type == type_param )
+			break;
+		else
+			type = ooc_swstack_pop();
+		}
 }
 
 Object
@@ -416,7 +474,6 @@ ooc_get_type( const Object self )
 
 	return ( Class ) ( self->_vtab->_class );
 }
-
 
 /* Implementation of memory handling
  *

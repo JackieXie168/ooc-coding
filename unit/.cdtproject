@@ -55,14 +55,14 @@
 </item>
 <item id="org.eclipse.cdt.make.core.buildtargets">
 <buildTargets>
-<target name="debug" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+<target name="debug_gomp" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 <buildCommand>make</buildCommand>
 <buildArguments>-f MakefileEclipse.linux</buildArguments>
 <buildTarget>debug</buildTarget>
 <stopOnError>false</stopOnError>
 <useDefaultCommand>false</useDefaultCommand>
 </target>
-<target name="release" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+<target name="release_gomp" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 <buildCommand>make</buildCommand>
 <buildArguments>-f MakefileEclipse.linux</buildArguments>
 <buildTarget>release</buildTarget>

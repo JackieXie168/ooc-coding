@@ -52,7 +52,7 @@
 #ifndef NO_THREADS
 
 /* implementing Thread Local Storage */
-#define TLS static __thread
+#define TLS __thread
 
 #ifdef _OPENMP
 
@@ -85,7 +85,7 @@ typedef	pthread_mutex_t *		ooc_Mutex;
 
 #else /* threadless implementation */
 
-#define TLS static
+#define TLS
 
 #define	ooc_Mutex				void
 #define ooc_mutex_init( x )

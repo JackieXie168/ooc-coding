@@ -39,6 +39,7 @@ error_codes
 {
 	err_no_error		= 0,			/**< no error */
 	err_out_of_memory,					/**< no memory for allocating an object */
+	err_swstack_overflow,				/**< The software stack overflows */
 	err_bad_throw,						/**< bad use of throw (rethow whithout try, wrong code, etc.) */
 	err_bad_cast,						/**< bad cast of an object */
 	err_undefined_virtual,				/**< calling of an undefined virtual function */

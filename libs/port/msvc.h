@@ -48,7 +48,7 @@
 #ifndef NO_THREADS
 
 /* implementing Thread Local Storage */
-#define TLS static _declspec( thread )
+#define TLS _declspec( thread )
 
 #ifdef _OPENMP
 
@@ -81,7 +81,7 @@ typedef	CRITICAL_SECTION *		ooc_Mutex;
 
 #else /* threadless implementation */
 
-#define TLS static
+#define TLS
 
 #define	ooc_Mutex				void
 #define ooc_mutex_init( x )

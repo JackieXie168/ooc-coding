@@ -186,7 +186,7 @@ exception_get_user_code( const Exception self )
  *
  ***********************************************************/
 
-TLS struct ooc_try_block * try_pt = NULL;
+static TLS struct ooc_try_block * try_pt = NULL;
 
 /* status values */
 #define	CAUGHT		001
@@ -306,7 +306,7 @@ ooc_end_try( void )
 /* Managing objects
  */
  
-TLS struct ooc_Manageable * managed = NULL;
+static TLS struct ooc_Manageable * managed = NULL;
  
 void
 ooc_chain_manageable( struct ooc_Manageable * manageable )
