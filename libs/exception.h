@@ -57,6 +57,9 @@ error_codes
  * error code.
  * @param	error	ooc system error code.
  * @return	New Exception object.
+ * @note	In case of the lack of dynamic memory handling (e.g. mcc18) this method is a fake!
+ *			Simply returns a statically allocated Exception object, and overwrites the previous contents of it!
+ *			(This way we can avoid recoding the whole ooc stuff for these platforms.)
  */
   
 Exception	exception_new( enum error_codes error );

@@ -26,6 +26,7 @@
 /* This is a class implementation file
  */
 
+#include "exception.h"
 #include "implement/exception.h"
 
 /** @class Exception
@@ -160,16 +161,31 @@ Exception_copy( Exception self, const Exception from )
  */
 
 
+#ifndef OOC_NO_DYNAMIC_MEM
+
 Exception
 exception_new( enum error_codes err_code )
 {
 	return (Exception) ooc_new( Exception, &err_code );
 }
 
+#else
+
+static TLS struct ExceptionObject static_exception;
+
+Exception
+exception_new( enum error_codes err_code )
+{
+	ooc_use( (void*)  &static_exception, Exception, (void*) &err_code );
+	return &static_exception;
+}
+
+#endif
+
 int
 exception_get_error_code( const Exception self )
 {
-	assert( ooc_isInstanceOf( self, Exception ));
+	assert( ooc_isInstanceOf( self, Exception ) );
 
 	return self->code;
 }
@@ -219,7 +235,11 @@ ooc_throw( Exception exc_obj_ptr )
 		
 		/* if we are in an exception handling, then its a rethrow with the new Exception */
 		if( try_pt->exc_obj != NULL ) {
+#ifndef OOC_NO_DYNAMIC_MEM
 			ooc_delete( (Object) try_pt->exc_obj );
+#else
+			ooc_release( (Object) try_pt->exc_obj );
+#endif
 			try_pt->exc_obj = exc_obj_ptr;
 			try_pt->status |= RETHROWN;
 			}
@@ -256,7 +276,7 @@ ooc_exception_caught( const Class exc_class )
 
 	if( exc_class )
 		/* check if the actual exception is of the desired class */
-		ret_exc = _ooc_isInstanceOf( try_pt->exc_obj, exc_class ) ? try_pt->exc_obj : NULL;
+		ret_exc = _ooc_isInstanceOf( (Object) try_pt->exc_obj, exc_class ) ? try_pt->exc_obj : NULL;
 	else
 		/* Parameter is NULL: catch anything, let's return the Exception pointer */
 		ret_exc = try_pt->exc_obj;
@@ -293,7 +313,11 @@ ooc_end_try( void )
 				}
 			else {
 				/* if we have caught, and handled, just rewind the buffer stack */
+#ifndef OOC_NO_DYNAMIC_MEM
 				ooc_delete( (Object) try_pt->exc_obj );
+#else
+				ooc_release( (Object) try_pt->exc_obj );
+#endif
 				try_pt = try_pt->previous;
 				}
 

@@ -23,9 +23,7 @@
 #ifndef OOC_H
 #define OOC_H
 
-#ifndef NULL
-#define NULL    ((void *)0)
-#endif
+#include <stddef.h>
 
 #ifndef FALSE
 #define FALSE   0
@@ -41,8 +39,18 @@
 #elif defined( __GNUC__ )
 	#include "port/gnuc.h"
 	
+#elif defined( __18CXX  )
+	#include "port/mcc18.h"
+	
 #else
 	#include "port/anyc.h"
+#endif
+
+/* Type qualifiers
+ */
+
+#ifndef ROM
+#define ROM const
 #endif
 
 /* Base objects and types
@@ -51,7 +59,7 @@
 /** Class description table.
  */
 
-typedef const struct ClassTable * Class;
+typedef ROM struct ClassTable * Class;
 
 /** ooc Object.
  */
@@ -129,6 +137,8 @@ int			_ooc_isInitialized( const Class class_ptr );
 
 /*@{*/
   
+#ifndef OOC_NO_DYNAMIC_MEM
+
 /** Creates a new object of a class.
  * Creates a new object of a class with the given construction parameters.
  * @param	pClass	The name of the class.
@@ -177,6 +187,8 @@ void		ooc_delete( Object object );
  */
 
 void		ooc_delete_and_null( Object * object_ptr );
+
+#endif /* OOC_NO_DYNAMIC_MEM */
 
 /** Creates an Object of a Class using existing memory block.
  * Creates a new object of a class with the given construction parameters using the memory block provided.
@@ -241,7 +253,7 @@ void		ooc_release( Object object );
  * @see		_ooc_isInstanceOf()
  */
  
-#define     ooc_isInstanceOf( pObj, pClass )  _ooc_isInstanceOf( pObj, & pClass ## Class )
+#define     ooc_isInstanceOf( pObj, pClass )  _ooc_isInstanceOf( (Object) pObj, & pClass ## Class )
 
 /** Run-time safe upcast of an Object.
  * Safely upcasts the Object to the specified type. Throws an Exception if not possible. This is a macro.
@@ -289,7 +301,7 @@ int			_ooc_isClassOf( const Class this, const Class base );
  * @see		ooc_isInstanceOf() for more convenient use.
  */
  
-int			_ooc_isInstanceOf( const void * object, const Class base );
+int			_ooc_isInstanceOf( const Object object, const Class base );
 
 /** Run-time safe check, if an Object can be upcast to an other type.
  * Safely chaecks if the Object could be upcast to the specified type.
@@ -311,6 +323,8 @@ void		ooc_check_cast( void * object, const Class target );
  */
 /*@{*/
 
+#ifndef OOC_NO_DYNAMIC_MEM
+
 void *		ooc_malloc( size_t size );					/**< Memory allocation. Allocates memory like malloc(), but throws an Exception on error */
 void *		ooc_calloc( size_t num, size_t size );		/**< Memory allocation and clear. Allocates memory like calloc(), but throws an Exception on error */
 void *		ooc_realloc( void *ptr, size_t size );		/**< Memory reallocation. Reallocates memory like realloc(), but throws an Exception on error */
@@ -318,6 +332,8 @@ void *		ooc_memdup( const void *ptr, size_t size );	/**< Memory duplication. Dup
 char *		ooc_strdup( const char * s );				/**< C string duplication. Duplicates a C string with a new alloc, throws an Exception on error */
 void 		ooc_free( void * mem );						/**< Memory free. Frees memory allocated by ooc_malloc(), ooc_calloc() or ooc_realloc() */
 void 		ooc_free_and_null( void ** mem );			/**< Memory free and nulling pointer. Frees memory via a pointer, and NULL the pointer thread safely */
+
+#endif
 
 /** Pointer read and null.
  * Reads a pointer via a pointer, and nulls thread safely.
@@ -364,7 +380,9 @@ struct BaseVtable_stru
 	Class			_class;
 	Class			_class_register_prev;
 	Class			_class_register_next; 
+#ifndef OOC_NO_DYNAMIC_MEM
 	void   			(* _delete )( Object );
+#endif
 };
 
 struct BaseObject											
@@ -372,7 +390,7 @@ struct BaseObject
 	Vtable	_vtab;
 };
 
-extern const struct ClassTable BaseClass;
+extern ROM struct ClassTable BaseClass;
 
 
 /*	Virtual functions access macro declaration
@@ -431,7 +449,7 @@ extern const struct ClassTable BaseClass;
 
 #define	DeclareClass( pClass, pParent )  							\
 	typedef struct pClass ## Object * pClass;				\
-	extern const struct ClassTable pClass ## Class
+	extern ROM struct ClassTable pClass ## Class
 
 
 /** Class virtual functions declaration macro.
@@ -519,9 +537,9 @@ extern const struct ClassTable BaseClass;
 	_define_vtab_access( pClass, pParent )					\
 															\
 	/* Allocating the class description table */			\
-	const struct ClassTable pClass ## Class = {				\
+	ROM struct ClassTable pClass ## Class = {				\
 		sizeof( struct pClass ## Object ),					\
-		# pClass,											\
+		(const char *) #pClass,								\
 		& pParent ## Class,	                                \
 		(Vtable) & pClass ## VtableInstance,				\
 		sizeof( struct pClass ## Vtable_stru ),				\
@@ -577,5 +595,13 @@ typedef void_fn_voidp ooc_destroyer;
  */
  
 #define OOC_MANAGE TRUE
+
+/* Memmory handling macros
+ */
+
+#ifndef GEN_PTR
+#define GEN_PTR char *
+#endif
+
 
 #endif /* OOC_H */

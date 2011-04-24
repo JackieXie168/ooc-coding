@@ -291,11 +291,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\exception.h"
+				RelativePath=".\implement\exception.h"
 				>
 			</File>
 			<File
-				RelativePath=".\implement\exception.h"
+				RelativePath=".\exception.h"
 				>
 			</File>
 			<File
@@ -303,11 +303,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\list.h"
+				>
+			</File>
+			<File
 				RelativePath=".\implement\list.h"
 				>
 			</File>
 			<File
-				RelativePath=".\list.h"
+				RelativePath=".\port\mcc18.h"
 				>
 			</File>
 			<File
@@ -319,11 +323,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\implement\refcounted.h"
+				RelativePath=".\refcounted.h"
 				>
 			</File>
 			<File
-				RelativePath=".\refcounted.h"
+				RelativePath=".\implement\refcounted.h"
 				>
 			</File>
 			<File
