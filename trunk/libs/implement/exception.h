@@ -23,7 +23,9 @@
 #ifndef	IMPL_EXCEPTION_H
 #define IMPL_EXCEPTION_H
 
-#include "../exception.h"
+#ifndef EXCEPTION_H
+#error Do #include "exception.h" right before #include "implement/exception.h"
+#endif
 
 /** Exception class data members.
  * These members are protected members, so the derived classes

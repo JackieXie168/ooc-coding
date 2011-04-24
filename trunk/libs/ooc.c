@@ -35,12 +35,14 @@
  * Used for root Class in ooc. It must be a superclass for all classes.
  */
 
-const struct ClassTable BaseClass;
+ROM struct ClassTable BaseClass;
 
 /*  Prototypes
  */
  
+#ifndef OOC_NO_DYNAMIC_MEM
 static void Base_delete( Object );
+#endif
 
 /* Class initialization
  */
@@ -90,12 +92,13 @@ inherit_vtable_from_parent( const Class self )
 		assert( self->vtab_size >= self->parent->vtab_size );
 		
 		/* Inherit the overridden operators */
+#ifndef OOC_NO_DYNAMIC_MEM
 		self->vtable->_delete = self->parent->vtable->_delete;
-		
+#endif		
 		/* Inherit the virtual functions */
 		if( self->parent->vtab_size > virtual_function_alignment )
-		    memcpy( ((char*) self->vtable)+ virtual_function_alignment,			/* destination */
-			    ((char*) self->parent->vtable) + virtual_function_alignment,	/* source */
+		    memcpy( ((GEN_PTR) self->vtable)+ virtual_function_alignment,			/* destination */
+			    ((GEN_PTR) self->parent->vtable) + virtual_function_alignment,	/* source */
 			    self->parent->vtab_size - virtual_function_alignment );			/* bytes to copy */
 		}
 }
@@ -115,8 +118,9 @@ _ooc_init_class( const Class self )
 			_ooc_init_class( self->parent );
 
 		self->vtable->_class = self;
+#ifndef OOC_NO_DYNAMIC_MEM
 		self->vtable->_delete= Base_delete;
-
+#endif
 		invalidate_vtable( self );
 
 		inherit_vtable_from_parent( self );
@@ -203,6 +207,8 @@ ooc_use_classptr( void * mem, const Class type, const void * params )
 	ooc_build_object( object, type, params );
 }
 	
+#ifndef OOC_NO_DYNAMIC_MEM
+
 Object
 ooc_new_classptr( const Class type, const void * params )
 {
@@ -222,6 +228,8 @@ ooc_new_classptr( const Class type, const void * params )
 	return ooc_pass( object );
 	}
 }
+
+#endif /* OOC_NO_DYNAMIC_MEM */
 
 /*	Copying an existing object
  */
@@ -243,7 +251,7 @@ copy_object_members( Object to, const Object from, const Class type )
 								length = type->size - offset; 
 					
 								if( length )
-									memcpy( ((char*)to)+offset, ((char*)from)+offset, length );
+									memcpy( ((GEN_PTR)to)+offset, ((GEN_PTR)from)+offset, length );
 								break;
 							
 		case OOC_NO_COPY:
@@ -251,6 +259,8 @@ copy_object_members( Object to, const Object from, const Class type )
 								break;
 		};
 }
+
+#ifndef OOC_NO_DYNAMIC_MEM
 
 Object
 ooc_duplicate( const Object from )
@@ -276,6 +286,7 @@ ooc_duplicate( const Object from )
 	}
 }
 
+#endif /* OOC_NO_DYNAMIC_MEM */
 
 /*	Deletes an object
  */
@@ -313,6 +324,8 @@ ooc_release( Object self )
 	ooc_destroy_object( self );
 }
 
+#ifndef OOC_NO_DYNAMIC_MEM
+
 void
 ooc_delete( Object self )
 {
@@ -337,6 +350,8 @@ Base_delete( Object self )
 	
 	free( self );
 }
+
+#endif /* OOC_NO_DYNAMIC_MEM */
 
 /* Type checking helpers
  *
@@ -364,10 +379,8 @@ ooc_isClassChildOf( const Class checkable, const Class base )
 }
 
 int
-_ooc_isInstanceOf( const void * _self, const Class base )
+_ooc_isInstanceOf( const Object self, const Class base )
 {
-	Object self = (Object) _self;
-
 	assert( _ooc_isInitialized( base ) );
 
 	if( ! self )
@@ -421,6 +434,8 @@ ooc_get_type( const Object self )
 /* Implementation of memory handling
  *
  ***********************************************************/
+
+#ifndef OOC_NO_DYNAMIC_MEM
 
 void *
 ooc_malloc( size_t size )
@@ -504,6 +519,7 @@ ooc_free_and_null( void ** mem )
 		free( mem_ptr );
 }
 
+#endif /* OOC_NO_DYNAMIC_MEM */
 
 /*	Helper: pointer read-out while nulling
  */
