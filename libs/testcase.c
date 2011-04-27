@@ -24,9 +24,13 @@
  */
 
 #include "testcase.h"
+#include "exception.h"
 #include "implement/exception.h"
 
+#ifdef OOC_HAS_UNIX_SIGNALS
 #include <signal.h>
+#endif
+
 #include <string.h>
 
 /** @class TestCase
@@ -109,7 +113,7 @@ TestCase_constructor( TestCase self, const void * params )
 	
 	chain_constructor( TestCase, self, NULL );
 
-	self->methods = (const struct TestCaseMethod *) params;
+	self->methods = (ROM struct TestCaseMethod *) params;
 }
 
 /* Destructor
@@ -132,6 +136,13 @@ TestCase_copy( TestCase self, const TestCase from )
 	return OOC_COPY_DEFAULT;
 }
 
+/* Signal handler prototype
+ */
+ 
+#ifdef OOC_HAS_UNIX_SIGNALS
+static void signal_handler( int signum );
+#endif
+
 
 /*	=====================================================
 	Class member functions
@@ -144,7 +155,7 @@ static int current_method_fail_count;
  */
  
 void
-testcase_fail( const char * filename, int line, const char * message )
+testcase_fail( ROM char * filename, int line, ROM char * message )
 {
 	current_test_failed = TRUE;
 	
@@ -158,14 +169,20 @@ testcase_fail( const char * filename, int line, const char * message )
 	ooc_unlock( printing );
 }
 
-static const char * before_class = "before_class";
-static const char * after_class = "after_class";
+static ROM char * before_class = "before_class";
+static ROM char * after_class = "after_class";
+
+#ifdef OOC_NO_DYNAMIC_MEM
+char print_buffer[PRINT_BUFFER_SIZE];
+#endif
 
 static
 void
-print_func_name( TestCase self, const char * func, const char * suffix )
+print_func_name( TestCase self, ROM char * func, ROM char * suffix )
 {
+#ifndef OOC_NO_DYNAMIC_MEM
 	int			buffer_length;
+#endif
 	int			display_length;
 	static int	previous_display_length = 0;
 	char *	volatile display_text = NULL;
@@ -173,6 +190,7 @@ print_func_name( TestCase self, const char * func, const char * suffix )
 	try {
 		ooc_lock( printing );
 		
+#ifndef OOC_NO_DYNAMIC_MEM
 		if( func != NULL )
 			buffer_length = 32 + strlen( func ) + 1 + strlen( suffix ) + 1 + strlen( ooc_get_type((Object)self)->name ) + 3;
 		else
@@ -182,12 +200,15 @@ print_func_name( TestCase self, const char * func, const char * suffix )
 			buffer_length = previous_display_length + 1;
 		
 		display_text = ooc_malloc( buffer_length );
+else
+		display_text = print_buffer;
+#endif
 		
 		if( func == NULL )
 			display_text[0] = '\0';
 		else if( func == before_class || func == after_class )
 			sprintf( display_text,  "%s.%s()", ooc_get_type((Object)self)->name, func );
-		else if( strlen( suffix ) == 0 )
+		else if( strlen( (char *) suffix ) == 0 )
 			sprintf( display_text,  "[%d] %s.%s()", self->run , ooc_get_type((Object)self)->name, func );
 		else 
 			sprintf( display_text,  "[%d] %s.%s.%s()", self->run , ooc_get_type((Object)self)->name, func, suffix );
@@ -203,13 +224,13 @@ print_func_name( TestCase self, const char * func, const char * suffix )
 		printf( "%s\r", display_text );
 	}
 	finally {
+#ifndef OOC_NO_DYNAMIC_MEM
 		ooc_free( display_text );
+#endif
 		ooc_unlock( printing );
 	}
 	end_try;
 }
-
-static void signal_handler( int signum );
 
 static
 void
@@ -263,7 +284,7 @@ static
 void
 testcase_run_methods(TestCase self)
 {
-	const struct TestCaseMethod * method = self->methods;
+	ROM struct TestCaseMethod * method = self->methods;
 	
 	while(method->method)
 	{
@@ -303,11 +324,6 @@ testcase_run_methods(TestCase self)
 	}	
 }
 
-/* Signal handler prototype
- */
- 
-static void signal_handler( int signum );
-
 /** Run the TestCase.
  * 
  */
@@ -315,12 +331,14 @@ static void signal_handler( int signum );
 int
 testcase_run( TestCase self)
 {
+#ifdef OOC_HAS_UNIX_SIGNALS
 	ooc_init_class( SegmentationFault );
 	ooc_init_class( ArithmeticFault );
 	
 	signal( SIGSEGV, signal_handler );
 	signal( SIGFPE, signal_handler );
-	
+#endif
+
 	try {
 		if( ! ooc_isInstanceOf(self, TestCase) )
 			ooc_throw( exception_new(err_bad_cast) );
@@ -357,6 +375,8 @@ testcase_run( TestCase self)
 	
 	return 	(self->failed == 0 ) ? 0 : 1;
 }
+
+#ifdef OOC_HAS_UNIX_SIGNALS
 
 /** Segmentation fault exception.
 */
@@ -422,3 +442,5 @@ signal_handler( int signum )
 		default 	 :	break;
 	}
 }
+
+#endif /* OOC_HAS_UNIX_SIGNALS */

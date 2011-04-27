@@ -83,6 +83,11 @@
  */
 #define abort() for(;;)
 
+/* Definition of missing library functions
+ */
+
+#define setbuf(stream, param)
+
 #ifdef COMPILING_OOC_C
 
 /*	Helper: pointer read-out while nulling
