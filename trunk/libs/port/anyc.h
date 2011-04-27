@@ -59,6 +59,10 @@
 #define ooc_unlock( x )
 #define ooc_try_lock( x )		TRUE 
 
+/* Compilation control
+ */
+
+#define OOC_HAS_UNIX_SIGNALS
 
 #ifdef COMPILING_OOC_C
 

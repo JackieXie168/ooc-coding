@@ -218,6 +218,19 @@ void		ooc_delete_and_null( Object * object_ptr );
   
 void		ooc_use_classptr( void * mem, const Class class_ptr, const void * param );
 
+/**	Copies an Object to an another location.
+ * Calling the copy constructor of the @c Object, copies the content into an other location.
+ * @param	to		The destination location of the copied object. The caller must ensure, that
+ * 					the destination location is large enough to hold the newly created Object!
+ * @param	from	The original Object to be copied.
+ * @return	The newly created Object.
+ * @note	May throw an Exception.
+ * @warning If in a multi-threaded application your @c Object needs to be in a consistent
+ * state while copying, you must lock it yourself. @c ooc_copy() does not do any locking.
+ */
+
+Object		ooc_copy( void * to, const Object from );
+
 /** Destroys an Object, but does not free the memory.
  * Calls the Object's destructor, but does not free the memory block used by the Object.
  * @param	object		The Object to be released.

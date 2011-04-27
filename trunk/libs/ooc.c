@@ -260,6 +260,20 @@ copy_object_members( Object to, const Object from, const Class type )
 		};
 }
 
+STIN
+void
+ooc_make_a_copy( Object to, const Object from, const Class type )
+{
+	/* Initializes the Object header */
+	to->_vtab = from->_vtab;
+		assert( sizeof( struct BaseObject ) == sizeof( struct BaseVtable * ) );
+		/* If struct BaseObject has been changed, additional copying is missing here!
+			memcpy( duplicate, from, sizeof(struct BaseObject)); would be a general solution, but much slover! */
+
+	/* Calls the copy constructor */
+	copy_object_members( to, from, type );
+}
+
 #ifndef OOC_NO_DYNAMIC_MEM
 
 Object
@@ -273,20 +287,26 @@ ooc_duplicate( const Object from )
 	{
 	ooc_manage_object( duplicate );
 
-	/* Initializes the Object header */
-	duplicate->_vtab = from->_vtab;
-		assert( sizeof( struct BaseObject ) == sizeof( struct BaseVtable * ) );
-		/* If struct BaseObject has been changed, additional copying is missing here!
-			memcpy( duplicate, from, sizeof(struct BaseObject)); would be a general solution, but much slover! */
-
-	/* Calls the copy constructor */
-	copy_object_members( duplicate, from, type );
+	ooc_make_a_copy( duplicate, from, type );
 
 	return ooc_pass( duplicate );
 	}
 }
 
 #endif /* OOC_NO_DYNAMIC_MEM */
+
+Object
+ooc_copy( void * to, const Object from )
+{
+	Class	type = from->_vtab->_class;
+
+	ooc_manage( to, (ooc_destroyer) ooc_release );
+
+	ooc_make_a_copy( to, from, type );
+
+	return ooc_pass( to );
+}
+
 
 /*	Deletes an object
  */

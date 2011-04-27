@@ -96,6 +96,11 @@ typedef	pthread_mutex_t *		ooc_Mutex;
 
 #endif
 
+/* Compilation control
+ */
+
+#define OOC_HAS_UNIX_SIGNALS
+
 
 #ifdef COMPILING_OOC_C
 

@@ -34,14 +34,14 @@ typedef void (*test_method_type)(TestCase);
 
 struct TestCaseMethod
 {
-	ROM char *			name;
+	const char *		name;
 	test_method_type	method;
 };
 
 #define TEST(name) {#name, (test_method_type)name}
 
 ClassMembers( TestCase, Base )
-	ROM struct TestCaseMethod	*	methods;
+	const struct TestCaseMethod	*	methods;
 	int								failed;
 	int								run;
 EndOfClassMembers;
@@ -62,7 +62,7 @@ EndOfVirtuals;
 /* Methods
  */
  
-void testcase_fail( ROM char * filename, int line, ROM char * message );
+void testcase_fail( const char * filename, int line, const char * message );
 int testcase_run( TestCase );
 
 /* Assertions
@@ -86,14 +86,8 @@ int testcase_run( TestCase );
 
 /* Exceptions
  */
-
-#ifdef OOC_HAS_UNIX_SIGNALS
+ 
 DeclareClass( SegmentationFault, Exception );
 DeclareClass( ArithmeticFault, Exception );
-#endif
-
-#ifdef OOC_NO_DYNAMIC_MEM
-#define PRINT_BUFFER_SIZE 128
-#endif
 
 #endif  /* TESTCASE_H */

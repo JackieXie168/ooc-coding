@@ -92,6 +92,10 @@ typedef	CRITICAL_SECTION *		ooc_Mutex;
 
 #endif
 
+/* Compilation control
+ */
+
+#define OOC_HAS_UNIX_SIGNALS
 
 #ifdef COMPILING_OOC_C
 
@@ -104,5 +108,8 @@ typedef	CRITICAL_SECTION *		ooc_Mutex;
 			__asm	xchg	[EBX], EAX
 
 #endif /* COMPILING_OOC_C */
+
+/* Disable some depreciated warnings */
+#pragma warning( disable:4996 )
 
 #endif /*MSVC_H_*/

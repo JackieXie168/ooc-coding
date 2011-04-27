@@ -3,7 +3,7 @@ magic_cookie={66E99B07-E706-4689-9E80-9B2582898A13}
 file_version=1.0
 device=PIC18F452
 [PATH_INFO]
-BuildDirPolicy=BuildDirIsSourceDir
+BuildDirPolicy=BuildDirIsProjectDir
 dir_src=
 dir_bin=
 dir_tmp=
@@ -19,7 +19,7 @@ filter_lib=*.lib
 filter_lkr=*.lkr
 [CAT_SUBFOLDERS]
 subfolder_src=
-subfolder_inc=implement;port
+subfolder_inc=implement
 subfolder_obj=
 subfolder_lib=
 subfolder_lkr=
@@ -28,10 +28,14 @@ file_000=.
 file_001=.
 file_002=.
 file_003=.
-file_004=port
+file_004=.
 file_005=.
-file_006=implement
+file_006=.
 file_007=.
+file_008=implement
+file_009=implement
+file_010=implement
+file_011=implement
 [GENERATED_FILES]
 file_000=no
 file_001=no
@@ -41,6 +45,10 @@ file_004=no
 file_005=no
 file_006=no
 file_007=no
+file_008=no
+file_009=no
+file_010=no
+file_011=no
 [OTHER_FILES]
 file_000=no
 file_001=no
@@ -50,22 +58,30 @@ file_004=no
 file_005=no
 file_006=no
 file_007=no
+file_008=no
+file_009=no
+file_010=no
+file_011=no
 [FILE_INFO]
-file_000=ooc.c
-file_001=exception.c
-file_002=testcase.c
-file_003=ooc.h
-file_004=port\mcc18.h
-file_005=exception.h
-file_006=implement\exception.h
-file_007=testcase.h
+file_000=ooctest.c
+file_001=barson.c
+file_002=bar.c
+file_003=bardaughter.c
+file_004=foo.h
+file_005=bar.h
+file_006=bardaughter.h
+file_007=barson.h
+file_008=implement\bar.h
+file_009=implement\bardaughter.h
+file_010=implement\barson.h
+file_011=implement\foo.h
 [SUITE_INFO]
 suite_guid={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
-suite_state=build-library generic-device
+suite_state=
 [TOOL_SETTINGS]
 TS{DD2213A8-6310-47B1-8376-9430CDFC013F}=
-TS{BFD27FBA-4A02-4C0E-A5E5-B812F3E7707C}=/m"$(BINDIR_)$(TARGETBASE).map" /w /o"$(BINDIR_)$(TARGETBASE).cof"
-TS{C2AF05E7-1416-4625-923D-E114DB6E2B96}=-mL -Ou- -Ot- -Ob- -Op- -Or- -Od- -Opa-
+TS{BFD27FBA-4A02-4C0E-A5E5-B812F3E7707C}=/o"$(BINDIR_)$(TARGETBASE).cof" /M"$(BINDIR_)$(TARGETBASE).map" /W
+TS{C2AF05E7-1416-4625-923D-E114DB6E2B96}=-Ou- -Ot- -Ob- -Op- -Or- -Od- -Opa-
 TS{ADE93A55-C7C7-4D4D-A4BA-59305F7D0391}=
 [INSTRUMENTED_TRACE]
 enable=0
