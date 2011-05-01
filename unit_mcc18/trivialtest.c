@@ -27,6 +27,11 @@
  * @note	Run as: valgrind --leak-check=yes --quiet ./ooctest
  */ 
 
+#ifndef __18CXX
+#define strcmppgm(a, b) strcmp(a, b)
+#define strcmppgm2ram(a, b) strcmp(a, b)
+#endif
+
 DeclareClass( OocTest, TestCase );
 
 Virtuals( OocTest, TestCase )
@@ -44,6 +49,7 @@ EndOfClassMembers;
 
 /* Allocating the class description table and the vtable
  */
+
 
 AllocateClass( OocTest, TestCase );
 
@@ -178,25 +184,25 @@ void
 test_class_table( void )
 {
 	assertTrue( FooClass.size == sizeof(struct FooObject)/sizeof(char) );
-	assertZero( strcmp( FooClass.name, (char*) "Foo" ) );
+	assertZero( strcmppgm( FooClass.name, "Foo" ) );
 	assertTrue( FooClass.parent == & BaseClass );
 	assertNotNull( FooClass.vtable );
 	assertTrue( FooClass.vtab_size == sizeof(struct FooVtable_stru)/sizeof(char) );
 
 	assertTrue( BarClass.size == sizeof(struct BarObject)/sizeof(char) );
-	assertZero( strcmp( BarClass.name, (char*) "Bar" ) );
+	assertZero( strcmppgm( BarClass.name, "Bar" ) );
 	assertTrue( BarClass.parent == & BaseClass );
 	assertNotNull( BarClass.vtable );
 	assertTrue( BarClass.vtab_size == sizeof(struct BarVtable_stru)/sizeof(char) );
 
 	assertTrue( BarSonClass.size == sizeof(struct BarSonObject)/sizeof(char) );
-	assertZero( strcmp( BarSonClass.name, (char*) "BarSon" ) );
+	assertZero( strcmppgm( BarSonClass.name, "BarSon" ) );
 	assertTrue( BarSonClass.parent == & BarClass );
 	assertNotNull( BarSonClass.vtable );
 	
 	assertTrue( BarBadGrandSonClass.vtab_size == sizeof(struct BarBadGrandSonVtable_stru)/sizeof(char) );
 	assertTrue( BarBadGrandSonClass.size == sizeof(struct BarBadGrandSonObject)/sizeof(char) );
-	assertZero( strcmp( BarBadGrandSonClass.name, (char*) "BarBadGrandSon" ) );
+	assertZero( strcmppgm( BarBadGrandSonClass.name, "BarBadGrandSon" ) );
 	assertTrue( BarBadGrandSonClass.parent == & BarSonClass );
 	assertTrue( BarBadGrandSonClass.vtable == (Vtable) & BarBadGrandSonVtableInstance);
 	assertTrue( BarBadGrandSonClass.vtab_size == sizeof(struct BarBadGrandSonVtable_stru)/sizeof(char) );
@@ -304,29 +310,17 @@ static
 void
 test_virtual_initialization( void )
 {
-#ifndef OOC_NO_DYNAMIC_MEM
-	BarBadGrandSon bbgs;
-#else
-	static struct BarBadGrandSonObject bbgso;
+	struct BarBadGrandSonObject bbgso;
 	BarBadGrandSon bbgs = & bbgso;
-#endif
 	
 	ooc_init_class( BarBadGrandSon );
 	
-#ifndef OOC_NO_DYNAMIC_MEM
-	bbgs = (BarBadGrandSon) ooc_new( BarBadGrandSon, NULL );
-#else
 	ooc_use( &bbgso, BarBadGrandSon, NULL );
-#endif
 	{
-#ifndef OOC_NO_DYNAMIC_MEM
-		ooc_manage_object( bbgs );
-#else
 		ooc_manage( bbgs , (ooc_destroyer) ooc_release);
-#endif
 	
-		BarBadGrandSonVirtual( bbgs )->BarSon.barson_virtual( bbgs );
-		BarBadGrandSonVirtual( bbgs )->BarSon.Bar.bar_virtual( bbgs );
+		BarBadGrandSonVirtual( bbgs )->BarSon.barson_virtual( (struct BarSonObject *) bbgs );
+		BarBadGrandSonVirtual( bbgs )->BarSon.Bar.bar_virtual((struct BarObject *) bbgs );
 		
 		try {
 			BarBadGrandSonVirtual( bbgs )->uninitialized_virtual();
@@ -336,11 +330,7 @@ test_virtual_initialization( void )
 			assertTrue( exception_get_error_code( exception ) == err_undefined_virtual );
 		end_try;
 		
-#ifndef OOC_NO_DYNAMIC_MEM
-		ooc_delete( ooc_pass( (Object) bbgs ) );
-#else
 		ooc_release( ooc_pass( (Object) bbgs ) );
-#endif
 	}
 	
 	ooc_finalize_class( BarBadGrandSon );
@@ -385,36 +375,9 @@ static	int	FooLife_copy( FooLife self, const FooLife from )
 													  return OOC_COPY_DEFAULT; }
 
 void
-test_lifecycle( void )
-{
-#ifndef OOC_NO_DYNAMIC_MEM
-
-	FooLife foolife1, foolife2;
-	
-		foolife_last_called = foolife_nothing;
-	ooc_init_class( FooLife );
-		assertTrue( foolife_last_called == foolife_init );
-	foolife1 = (FooLife) ooc_new( FooLife, NULL );
-		assertTrue( foolife_last_called == foolife_ctor );
-	foolife2 = (FooLife) ooc_duplicate( (Object) foolife1 );
-		assertTrue( foolife_last_called == foolife_copy );
-	ooc_delete( (Object) foolife1 );
-		assertTrue( foolife_last_called == foolife_dtor );
-	ooc_finalize_class( FooLife );
-		assertTrue( foolife_last_called == foolife_finz );
-	
-	/* prevent leaking foolife2 */
-	ooc_init_class( FooLife );
-	ooc_delete( (Object) foolife2 );
-	ooc_finalize_class( FooLife );
-
-#endif
-}
-
-void
 test_lifecycle_static( void )
 {
-	static struct FooLifeObject foolife1, foolife2;
+	struct FooLifeObject foolife1, foolife2;
 	
 		foolife_last_called = foolife_nothing;
 	ooc_init_class( FooLife );
@@ -436,35 +399,10 @@ test_lifecycle_static( void )
 
 static
 void
-test_new( void )
-{
-#ifndef OOC_NO_DYNAMIC_MEM
-
-	Foo foo;
-	
-	foo = foo_new();
-	assertNull( foo->text );
-	assertZero( foo->data );
-	ooc_delete( (Object) foo );
-	
-	foo = foo_new_with_data( 100 );
-	assertNull( foo->text );
-	assertTrue( foo->data == 100 );
-	ooc_delete( (Object) foo );
-
-	foo = foo_new_with_const_text( "copyable test text" );
-	assertZero( strcmp( foo->text, "copyable test text" ) );
-	assertZero( foo->data );
-	ooc_delete( (Object) foo );
-
-#endif
-}
-
-static
-void
 test_use( void )
 {
-	static struct FooObject foo;
+	struct FooObject foo;
+	char testtext[] = "copyable test text";
 	
 	foo_use( &foo );
 	assertNull( foo.text );
@@ -476,8 +414,8 @@ test_use( void )
 	assertTrue( foo.data == 100 );
 	ooc_release( (Object) &foo );
 
-	foo_use_with_text( &foo, (char*) "copyable test text" );
-	assertZero( strcmp( foo.text, (char *) "copyable test text" ) );
+	foo_use_with_text( &foo, testtext );
+ 	assertZero( strcmp( foo.text, testtext ) );
 	assertZero( foo.data );
 	ooc_release( (Object) &foo );
 
@@ -487,29 +425,370 @@ test_use( void )
 	ooc_release( (Object) &foo );
 }
 
+/* Test constructors and inheritance
+ */
+ 
+static ROM char ctorcheck_params[] = "CtorCheck parameters";
+
+DeclareClass( CtorCheck, Base );
+
+ClassMembers( CtorCheck, Base )
+	int ctor_called;
+	int	dtor_called;
+	int copy_called;
+	int child_ctor_called;
+	int	child_dtor_called;
+	int child_copy_called;
+	int copy_operation;
+	int	data;
+EndOfClassMembers;
+
+Virtuals( CtorCheck, Base )
+EndOfVirtuals;
+
+AllocateClass( CtorCheck, Base );
+
+
+static	void	CtorCheck_initialize( Class this ) {}
+static	void	CtorCheck_finalize( Class this ) {}
+
+static	void	CtorCheck_constructor( CtorCheck self, const void * params )
+{
+	assertTrue( ooc_isInitialized( CtorCheck ) );
+	assertTrue( params == (const void *) ctorcheck_params );
+	assertFalse( self->ctor_called );
+	self->ctor_called = TRUE;
+}
+
+static	void	CtorCheck_destructor( CtorCheck self, CtorCheckVtable vtab )
+{
+	extern Vtable CtorCheckSonVtableInstance;
+	assertNull( self->Base._vtab );
+	assertTrue( vtab == (CtorCheckVtable) & CtorCheckSonVtableInstance );
+	assertTrue( self->child_dtor_called );
+	assertFalse( self->dtor_called );
+	self->dtor_called = TRUE;
+}
+static	int		CtorCheck_copy( CtorCheck self, const CtorCheck from )
+{
+	assertFalse( self->copy_called );
+	self->copy_called = TRUE;
+	return OOC_COPY_DONE;
+}
+
+DeclareClass( CtorCheckSon, CtorCheck );
+
+Virtuals( CtorCheckSon, CtorCheck )
+EndOfVirtuals;
+
+#define CCS_ARRAY_LEN 28
+
+ClassMembers( CtorCheckSon, CtorCheck )
+	int		array[ CCS_ARRAY_LEN ];
+EndOfClassMembers;
+
+AllocateClass( CtorCheckSon, CtorCheck );
+
+static	void	CtorCheckSon_initialize( Class this ) {}
+static	void	CtorCheckSon_finalize( Class this ) {}
+
+static	void	CtorCheckSon_constructor( CtorCheckSon self, const void * params )
+{
+	assertTrue( ooc_isInitialized( CtorCheckSon ) );
+	assertTrue( params == (const void *) ctorcheck_params );
+	assertFalse( self->CtorCheck.child_ctor_called );	
+	assertFalse( self->CtorCheck.ctor_called );
+	chain_constructor( CtorCheckSon, self, params );
+	assertTrue( self->CtorCheck.ctor_called );
+	self->CtorCheck.child_ctor_called = TRUE;
+}
+
+static	void	CtorCheckSon_destructor( CtorCheckSon self, CtorCheckSonVtable vtab )
+{
+	assertNull( self->CtorCheck.Base._vtab );
+	assertTrue( vtab == & CtorCheckSonVtableInstance );
+	assertFalse( self->CtorCheck.child_dtor_called );
+	assertFalse( self->CtorCheck.dtor_called );
+	self->CtorCheck.child_dtor_called = TRUE;
+}
+
+static	int		CtorCheckSon_copy( CtorCheckSon self, const CtorCheckSon from )
+{
+	assertTrue( self->CtorCheck.copy_called );
+	self->CtorCheck.child_copy_called = TRUE;
+	return from->CtorCheck.copy_operation;
+}
+
+static
+void
+test_ctor_use( void )
+{
+	struct CtorCheckSonObject ccso;
+	
+	ooc_init_class(	CtorCheckSon );
+	
+	memset( &ccso, 0xAA, sizeof(struct CtorCheckSonObject)/sizeof(char) );
+	
+	ooc_use( &ccso, CtorCheckSon, (const void *) &ctorcheck_params );
+	
+	assertTrue( ooc_isInstanceOf( &ccso, CtorCheckSon ) );
+	assertTrue( ccso.CtorCheck.ctor_called );
+	assertTrue( ccso.CtorCheck.child_ctor_called );
+	assertFalse( ccso.CtorCheck.dtor_called );
+	assertFalse( ccso.CtorCheck.child_dtor_called );
+	assertZero( ccso.CtorCheck.data );
+	
+	ooc_release( (Object) &ccso );
+	assertTrue( ccso.CtorCheck.dtor_called );
+	assertTrue( ccso.CtorCheck.child_dtor_called );
+
+	ooc_release( (Object) &ccso );
+	ooc_finalize_class( CtorCheckSon );
+}
+
+static
+void
+test_copy_static( void )
+{
+	static struct CtorCheckSonObject ccso, duplicate;
+	
+	ooc_init_class(	CtorCheckSon );
+	
+	ooc_use( &ccso, CtorCheckSon, (const void *) ctorcheck_params );
+	memset( (GEN_PTR) &ccso.array, 0xAA, CCS_ARRAY_LEN );
+
+	ccso.CtorCheck.copy_operation = OOC_COPY_DEFAULT;
+	memset( (GEN_PTR) &duplicate, 0x55, sizeof(struct CtorCheckSonObject)/sizeof(char) );
+	ooc_copy( &duplicate, (Object) &ccso );
+	assertTrue( ooc_isInstanceOf( &duplicate, CtorCheckSon ) );
+	assertZero( memcmp( (GEN_PTR) &ccso.array, (GEN_PTR) &duplicate.array, CCS_ARRAY_LEN ) );
+	ooc_release( (Object) &duplicate );
+
+	ccso.CtorCheck.copy_operation = OOC_COPY_DONE;
+	memset( (GEN_PTR) &duplicate, 0x55, sizeof(struct CtorCheckSonObject)/sizeof(char) );
+	ooc_copy( &duplicate, (Object) &ccso );
+	assertTrue( duplicate.CtorCheck.copy_called );
+	assertTrue( duplicate.CtorCheck.child_copy_called );
+	ooc_release( (Object) &duplicate );
+
+	ccso.CtorCheck.copy_operation = OOC_NO_COPY;
+	try {
+		memset( (GEN_PTR) &duplicate, 0x55, sizeof(struct CtorCheckSonObject)/sizeof(char) );
+		ooc_copy( &duplicate, (Object) &ccso );
+		fail();
+	}
+	catch_any {
+		assertTrue( exception_get_error_code( exception ) == err_can_not_be_duplicated );
+	}
+	end_try;
+	
+	ooc_release( (Object) &ccso );
+	ooc_finalize_class( CtorCheckSon );
+}
+
+static
+void
+test_ptr_read_and_null( void )
+{
+	void	*mem, *tmp;
+	char	old[] = "data";
+
+	mem = old;
+	assertNotNull( mem );
+	tmp = ooc_ptr_read_and_null( & mem );
+	assertTrue( old == tmp );
+	assertNull( mem );
+}
+
+/* Testing the demolition of circularly referenced objects.
+ */
+
+DeclareClass( CircularCheck, Base );
+
+ClassMembers( CircularCheck, Base )
+	CircularCheck	reference;
+EndOfClassMembers;
+
+Virtuals( CircularCheck, Base )
+EndOfVirtuals;
+
+AllocateClass( CircularCheck, Base );
+
+static	void	CircularCheck_initialize( Class this ) {}
+static	void	CircularCheck_finalize( Class this ) {}
+static	void	CircularCheck_constructor( CircularCheck self, const void * params ) {}
+static	void	CircularCheck_destructor( CircularCheck self, CircularCheckVtable vtab )
+{
+	assertNull( self->Base._vtab );
+	assertTrue( vtab == & CircularCheckVtableInstance );
+	ooc_release( (Object) self->reference );
+}
+static	int		CircularCheck_copy( CircularCheck self, const CircularCheck from ) { return OOC_NO_COPY; }
+static	void	circularcheck_set_reference( CircularCheck self, CircularCheck reference ) { self->reference = reference; }
+
+static
+void
+test_release_circular( void )
+{
+	#define CCO_OBJECTS 5
+
+	CircularCheck first, previous;
+	struct CircularCheckObject cco[ CCO_OBJECTS ];
+	int i;
+	
+	ooc_init_class( CircularCheck );
+	
+	ooc_use( &cco[0], CircularCheck, NULL );
+	first = previous = &cco[0];
+	
+	for( i = 1; i < CCO_OBJECTS; i++ ) 
+	{
+		ooc_use( &cco[i], CircularCheck, NULL );
+		circularcheck_set_reference( &cco[i], previous );
+		previous = &cco[i];
+	}
+	circularcheck_set_reference( first, previous );
+	
+	ooc_release( (Object) first );
+	
+	ooc_finalize_class( CircularCheck );
+}
+
+typedef struct BarObject * Bar;
+typedef struct BarObject * BarSon;
+typedef struct BarObject * BarDaughter;
+
+static
+void
+test_cast( void )
+{
+	static struct FooObject 			foo;
+	static struct BarObject 			bar;
+	static struct BarSonObject			barson;
+	static struct BarDaughterObject		bardaughter;
+	
+	ooc_init_class( Foo );
+	ooc_init_class( BarSon );
+	ooc_init_class( BarDaughter );
+	
+	assertTrue( ooc_isClassOf( BarSon, Bar ) );
+	assertTrue( ooc_isClassOf( BarDaughter, Bar ) );
+	assertFalse( ooc_isClassOf( Bar, BarDaughter ) );
+	assertFalse( ooc_isClassOf( Foo, Bar ) );
+
+	foo_use( &foo );
+	bar_use( &bar );
+	barson_use( &barson );
+	bardaughter_use( &bardaughter );
+
+	assertTrue( ooc_isInstanceOf( &bar, Bar ) );
+	assertTrue( ooc_isInstanceOf( &bardaughter, BarDaughter ) );
+	assertTrue( ooc_isInstanceOf( &barson, BarSon ) );
+	assertTrue( ooc_isInstanceOf( &bardaughter, Bar ) );
+	assertTrue( ooc_isInstanceOf( &barson, Bar ) );
+	assertFalse( ooc_isInstanceOf( &bar, BarSon ) );
+	assertFalse( ooc_isInstanceOf( &bar, BarDaughter ) );
+	assertFalse( ooc_isInstanceOf( &bar, Foo ) );
+	
+	assertTrue( ooc_get_type( (Object) &bar ) == &BarClass );
+	assertTrue( ooc_get_type( (Object) &barson ) == &BarSonClass );
+	assertTrue( ooc_get_type( (Object) &bardaughter ) == &BarDaughterClass );
+	
+	assertTrue( ooc_cast( &barson, Bar ) == (Bar) &barson );
+	assertTrue( ooc_cast( &bardaughter, Bar ) == (Bar) &bardaughter );
+	assertTrue( ooc_cast( &bar, Bar ) == (Bar) &bar );
+	
+	try {
+		ooc_cast( &bar, BarSon );
+		fail();
+	}
+	catch_any
+		assertTrue( exception_get_error_code( exception ) == err_bad_cast );
+	end_try;
+	
+	try {
+		ooc_cast( &bardaughter, BarSon );
+		fail();
+	}
+	catch_any
+		assertTrue( exception_get_error_code( exception ) == err_bad_cast );
+	end_try;
+	
+	try {
+		ooc_cast( &bar, Foo );
+		fail();
+	}
+	catch_any
+		assertTrue( exception_get_error_code( exception ) == err_bad_cast );
+	end_try;
+	
+	ooc_check_cast( &barson, &BarClass );
+	ooc_check_cast( &bardaughter, &BarClass );
+	ooc_check_cast( &bar, &BarClass );
+	
+	try {
+		ooc_check_cast( &bar, &BarSonClass );
+		fail();
+	}
+	catch_any
+		assertTrue( exception_get_error_code( exception ) == err_bad_cast );
+	end_try;
+	
+	try {
+		ooc_check_cast( &bardaughter, &BarSonClass );
+		fail();
+	}
+	catch_any
+		assertTrue( exception_get_error_code( exception ) == err_bad_cast );
+	end_try;
+	
+	try {
+		ooc_check_cast( &bar, &FooClass );
+		fail();
+	}
+	catch_any
+		assertTrue( exception_get_error_code( exception ) == err_bad_cast );
+	end_try;
+	
+	ooc_release( (Object) &foo );
+	ooc_release( (Object) &bar );
+	ooc_release( (Object) &barson );
+	ooc_release( (Object) &bardaughter );
+	
+	ooc_finalize_class( BarDaughter );
+	ooc_finalize_class( BarSon );
+	ooc_finalize_class( Bar );
+	ooc_finalize_class( Foo );
+}
+
 /** Test methods order table.
  * Put your test methods in this table in the order they should be executed
  * using the TEST(method) macro. 
  * 
  */
  
-struct TestCaseMethod methods[] =
+ROM struct TestCaseMethod methods[] =
 {
 	
 	TEST(test_class_table),
 	TEST(test_init),
 	TEST(test_finalize),
-	TEST(test_lifecycle),
 	TEST(test_lifecycle_static),
 	TEST(test_virtual_initialization),
-	TEST(test_new),
 	TEST(test_use),	
-	
+	TEST(test_ctor_use),
+	TEST(test_copy_static),
+	TEST(test_ptr_read_and_null),
+	TEST(test_release_circular),
+	TEST(test_cast),
+
 	{NULL, NULL} /* Do NOT delete this line! */
 };
 	
 /* Runs the test as an executable
  */
+
+typedef struct TestCaseObject * TestCase;
  
 void main( void )
 {
@@ -517,12 +796,10 @@ void main( void )
 	int result;
 	
 	ooc_init_class( OocTest );
-	ooc_use( &ooctest, OocTest, &methods );
-	result = testcase_run( &ooctest );
+	ooc_use( &ooctest, OocTest, (void *) &methods );
+	result = testcase_run( (TestCase) &ooctest );
 	ooc_release( (Object) &ooctest );
 	ooc_finalize_all();
-
-	printf( "%s test result = %d\n", __FILE__, result );
 
 	abort();
 }

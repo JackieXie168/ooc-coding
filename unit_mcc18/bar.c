@@ -80,7 +80,7 @@ static
 void
 Bar_destructor( Bar self, BarVtable vtab )
 {
-	ooc_free_and_null( (void**) & self->text );
+	self->text = NULL;
 }
 
 /* Copy constuctor
@@ -98,51 +98,35 @@ Bar_copy( Bar self, const Bar from )
 	Class member functions
  */
 
-
 Bar
-bar_new( void )
+bar_use( void * bar )
 {
 	ooc_init_class( Bar );
 		
-	return (Bar) ooc_new( Bar, NULL );
+	ooc_use( bar, Bar, NULL );
+
+	return (Bar) bar;
 }
 
 Bar
-bar_new_with_data( int data )
+bar_use_with_data( void * bar, int data )
 {
-	Bar bar = bar_new();
+	bar_use( bar );
+
+	bar_set_data( (Bar) bar, data );
 	
-	bar_set_data( bar, data );
-	
-	return bar;
+	return (Bar) bar;
 }
 
 Bar
-bar_new_with_text( char * text )
+bar_use_with_text( void * bar, const char * text )
 {
-	Bar bar;
+	bar_use( bar );
 	
-	ooc_manage( text, (ooc_destroyer) ooc_free );
+	bar_add_text( bar, text );
 	
-	bar = bar_new();
-	
-	bar_add_text( bar, ooc_pass( text ) );
-	
-	return bar;
+	return (Bar) bar;
 }
-
-Bar
-bar_new_with_const_text( const char * text )
-{
-	Bar bar = bar_new();
-	
-	{
-	ooc_manage_object( bar );
-	bar_add_text( bar, ooc_strdup( text ) );
-	return ooc_pass( bar );
-	}
-}
-
 
 void
 bar_set_data( Bar self, int data )
@@ -157,9 +141,8 @@ bar_get_data( Bar self )
 }
 
 void
-bar_add_text( Bar self, char * text )
+bar_add_text( Bar self, const char * text )
 {
-	ooc_free( self->text );
 	self->text = text;	
 }
 

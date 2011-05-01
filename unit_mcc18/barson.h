@@ -8,14 +8,9 @@
 
 DeclareClass( BarSon, Bar );
 
-#ifndef OOC_NO_DYNAMIC_MEM
-
-BarSon barson_new( void );
-BarSon barson_new_with_data( int );
-BarSon barson_new_with_text( char * text );
-BarSon barson_new_with_const_text( const char * text );
-
-#endif /* OOC_NO_DYNAMIC_MEM */
+BarSon barson_use( void * );
+BarSon barson_use_with_data( void *, int );
+BarSon barson_use_with_text( void *, const char * text );
 
 /* Virtual function definitions
  */

@@ -376,8 +376,8 @@ enum ooc_CopyMode { OOC_COPY_DEFAULT = 0, OOC_COPY_DONE, OOC_NO_COPY };
 struct ClassTable
 {
 	const size_t		size;				/* size of the object */
-	const char *		name;				/* the name of the class (for information only) */
-	const Class		 	parent;				/* parent of the class */
+	ROM   char *		name;				/* the name of the class (for information only) */
+	ROM   Class		 	parent;				/* parent of the class */
 	Vtable			    vtable;				/* the pointer to the virtual function's table */
 	const size_t		vtab_size;			/* the size of the vtable */
 	
@@ -393,9 +393,7 @@ struct BaseVtable_stru
 	Class			_class;
 	Class			_class_register_prev;
 	Class			_class_register_next; 
-#ifndef OOC_NO_DYNAMIC_MEM
-	void   			(* _delete )( Object );
-#endif
+	void   			(* _destroy )( Object );
 };
 
 struct BaseObject											
@@ -545,14 +543,14 @@ extern ROM struct ClassTable BaseClass;
 	static int	  pClass ## _copy ( pClass, const pClass );	\
 															\
 	/* Allocating the Vtable */								\
-	struct pClass ## Vtable_stru pClass ## VtableInstance;	\
+	struct pClass ## Vtable_stru pClass ## VtableInstance = { NULL };	\
 															\
 	_define_vtab_access( pClass, pParent )					\
 															\
 	/* Allocating the class description table */			\
 	ROM struct ClassTable pClass ## Class = {				\
 		sizeof( struct pClass ## Object ),					\
-		(const char *) #pClass,								\
+		(ROM char *) #pClass,								\
 		& pParent ## Class,	                                \
 		(Vtable) & pClass ## VtableInstance,				\
 		sizeof( struct pClass ## Vtable_stru ),				\

@@ -164,13 +164,13 @@ testcase_fail( ROM char * filename, int line, ROM char * message )
 	if( current_method_fail_count++ == 0 )
 		printf( "\n" );
 		
-	printf("\tFailed: %s [%s : %u]\n", message ? message : "", filename, line );
+	printf("\tFailed: %HS [%HS : %u]\n", message ? message : "", filename, line );
 
 	ooc_unlock( printing );
 }
 
-static ROM char * before_class = "before_class";
-static ROM char * after_class = "after_class";
+static ROM char before_class[] = "before_class";
+static ROM char after_class[] = "after_class";
 
 #ifdef OOC_NO_DYNAMIC_MEM
 char print_buffer[PRINT_BUFFER_SIZE];
@@ -200,18 +200,18 @@ print_func_name( TestCase self, ROM char * func, ROM char * suffix )
 			buffer_length = previous_display_length + 1;
 		
 		display_text = ooc_malloc( buffer_length );
-else
+#else
 		display_text = print_buffer;
 #endif
 		
 		if( func == NULL )
 			display_text[0] = '\0';
 		else if( func == before_class || func == after_class )
-			sprintf( display_text,  "%s.%s()", ooc_get_type((Object)self)->name, func );
-		else if( strlen( (char *) suffix ) == 0 )
-			sprintf( display_text,  "[%d] %s.%s()", self->run , ooc_get_type((Object)self)->name, func );
+			sprintf( display_text,  "%HS.%HS()", ooc_get_type((Object)self)->name, func );
+		else if( suffix == NULL )
+			sprintf( display_text,  "[%d] %HS.%HS()", self->run , ooc_get_type((Object)self)->name, func );
 		else 
-			sprintf( display_text,  "[%d] %s.%s.%s()", self->run , ooc_get_type((Object)self)->name, func, suffix );
+			sprintf( display_text,  "[%d] %HS.%HS.%HS()", self->run , ooc_get_type((Object)self)->name, func, suffix );
 		
 		display_length = strlen( display_text );
 		if( display_length < previous_display_length ) {
@@ -297,7 +297,7 @@ testcase_run_methods(TestCase self)
 			print_func_name( self, method->name, "before" );
 			testcase_run_before_recursive( self, ooc_get_type( (Object) self ) );
 		
-			print_func_name( self, method->name, "" );
+			print_func_name( self, method->name, NULL );
 			method->method(self);
 			
 			print_func_name( self, method->name, "after" );
@@ -308,7 +308,7 @@ testcase_run_methods(TestCase self)
 			
 			if( ! current_test_failed )
 				printf("\n");
-			printf("\tUnexpected exception: %s, code: %d, user code: %d\n",
+			printf("\tUnexpected exception: %HS, code: %d, user code: %d\n",
 							ooc_get_type((Object)exception)->name,
 							exception_get_error_code(exception),
 							exception_get_user_code(exception));
@@ -357,7 +357,7 @@ testcase_run( TestCase self)
 	}
 	catch_any {
 		ooc_lock( printing );
-		printf("\n\tUnexpected exception %s in %s, code: %d, user code: %d\n",
+		printf("\n\tUnexpected exception %HS in %HS, code: %d, user code: %d\n",
 						ooc_get_type((Object)exception)->name,
 						ooc_get_type((Object)self)->name,
 						exception_get_error_code(exception),
@@ -369,7 +369,7 @@ testcase_run( TestCase self)
 	
 	if( self->failed != 0 ) {
 		ooc_lock( printing );
-		printf("Test case %s failed: %d/%d (methods run/failed)\n", ooc_get_type((Object)self)->name, self->run, self->failed );
+		printf("Test case %HS failed: %d/%d (methods run/failed)\n", ooc_get_type((Object)self)->name, self->run, self->failed );
 		ooc_unlock( printing );
 	}
 	

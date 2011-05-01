@@ -97,50 +97,32 @@ BarSon_copy( BarSon self, const BarSon from )
 	Class member functions
  */
 
-#ifndef OOC_NO_DYNAMIC_MEM
-
 BarSon
-barson_new( void )
+barson_use( void * barson )
 {
 	ooc_init_class( BarSon );
 		
-	return (BarSon) ooc_new( BarSon, NULL );
+	ooc_use( barson, BarSon, NULL );
+
+	return (BarSon) barson;	
 }
 
 BarSon
-barson_new_with_data( int data )
+barson_use_with_data( void * barson, int data )
 {
-	BarSon barson = barson_new();
+	barson_use( barson );
 	
-	bar_set_data( (Bar) barson, data );
+	bar_set_data( barson, data );
 	
-	return barson;
+	return (BarSon) barson;
 }
 
 BarSon
-barson_new_with_text( char * text )
+barson_use_with_text( void * barson, const char * text )
 {
-	BarSon barson;
+	barson_use( barson );
 	
-	ooc_manage( text, (ooc_destroyer) ooc_free );
+	bar_add_text( barson, text );
 	
-	barson = barson_new();
-	
-	bar_add_text( (Bar) barson, ooc_pass( text ) );
-	
-	return barson;
+	return (BarSon) barson;
 }
-
-BarSon
-barson_new_with_const_text( const char * text )
-{
-	BarSon barson = barson_new();
-	
-	{
-	ooc_manage_object( barson );
-	bar_add_text( (Bar) barson, ooc_strdup( text ) );
-	return ooc_pass( barson );
-	}
-}
-
-#endif

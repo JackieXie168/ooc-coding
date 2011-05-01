@@ -80,11 +80,7 @@ static
 void
 Foo_destructor( Foo self, FooVtable vtab )
 {
-#ifndef OOC_NO_DYNAMIC_MEM
-	ooc_free_and_null( (void**) & self->text );
-#else
 	self->text = NULL;
-#endif
 }
 
 /* Copy constuctor
@@ -102,54 +98,6 @@ Foo_copy( Foo self, const Foo from )
 	Class member functions
  */
 
-
-#ifndef OOC_NO_DYNAMIC_MEM
-
-Foo
-foo_new( void )
-{
-	ooc_init_class( Foo );
-		
-	return (Foo) ooc_new( Foo, NULL );
-}
-
-Foo
-foo_new_with_data( int data )
-{
-	Foo foo = foo_new();
-	
-	foo_set_data( foo, data );
-	
-	return foo;
-}
-
-Foo
-foo_new_with_text( char * text )
-{
-	Foo foo;
-	
-	ooc_manage( text, (ooc_destroyer) ooc_free );
-	
-	foo = foo_new();
-	
-	foo_add_text( foo, ooc_pass( text ) );
-	
-	return foo;
-}
-
-Foo
-foo_new_with_const_text( const char * text )
-{
-	Foo foo = foo_new();
-	
-	{
-	ooc_manage_object( foo );
-	foo_add_text( foo, ooc_strdup( text ) );
-	return ooc_pass( foo );
-	}
-}
-
-#else
 
 Foo
 foo_use( void * mem )
@@ -178,8 +126,6 @@ foo_use_with_text( void * mem, char * text )
 	
 	foo_add_text( (Foo) mem, text );
 }
-
-#endif
 
 
 void
