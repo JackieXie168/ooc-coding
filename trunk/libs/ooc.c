@@ -302,6 +302,8 @@ ooc_copy( void * to, const Object from )
 
 	ooc_manage( to, (ooc_destroyer) ooc_release );
 
+	memset( to, 0, type->size );  /* the constructor expects everything to be zeroed */
+
 	ooc_make_a_copy( to, from, type );
 
 	return ooc_pass( to );

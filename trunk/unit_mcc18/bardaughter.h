@@ -8,10 +8,9 @@
 
 DeclareClass( BarDaughter, Bar );
 
-BarDaughter bardaughter_new( void );
-BarDaughter bardaughter_new_with_data( int );
-BarDaughter bardaughter_new_with_text( char * text );
-BarDaughter bardaughter_new_with_const_text( const char * text );
+BarDaughter bardaughter_use( void * );
+BarDaughter bardaughter_use_with_data( void *, int );
+BarDaughter bardaughter_use_with_text( void *, const char * text );
 
 /* Virtual function definitions
  */

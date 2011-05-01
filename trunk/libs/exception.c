@@ -129,7 +129,7 @@ void
 Exception_constructor( Exception self, const void * params )
 {
 	if( params )
-        self->code = * ( (int*) params );
+        self->code = * ( (const enum error_codes *) params );
     else
     	self->code = err_user_code;
 }
@@ -176,7 +176,7 @@ static TLS struct ExceptionObject static_exception;
 Exception
 exception_new( enum error_codes err_code )
 {
-	ooc_use( (void*)  &static_exception, Exception, (void*) &err_code );
+	ooc_use( (void*)  &static_exception, Exception, (void *) &err_code );
 	return &static_exception;
 }
 

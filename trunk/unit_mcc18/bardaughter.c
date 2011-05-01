@@ -2,6 +2,7 @@
 /* This is a BarDaughter class implementation file
  */
 
+#include "bardaughter.h"
 #include "implement/bardaughter.h"
 
 #include "../libs/exception.h"
@@ -98,17 +99,21 @@ BarDaughter_copy( BarDaughter self, const BarDaughter from )
 
 
 BarDaughter
-bardaughter_new( void )
+bardaughter_use( void * self )
 {
 	ooc_init_class( BarDaughter );
-		
-	return (BarDaughter) ooc_new( BarDaughter, NULL );
+	
+	ooc_use( self, BarDaughter, NULL );
+
+	return (BarDaughter) self;
 }
 
+typedef struct BarObject * Bar;
+
 BarDaughter
-bardaughter_new_with_data( int data )
+bardaughter_use_with_data( void * self, int data )
 {
-	BarDaughter bardaughter = bardaughter_new();
+	BarDaughter bardaughter = bardaughter_use( self );
 	
 	bar_set_data( (Bar) bardaughter, data );
 	
@@ -116,27 +121,13 @@ bardaughter_new_with_data( int data )
 }
 
 BarDaughter
-bardaughter_new_with_text( char * text )
+bardaughter_use_with_text( void * self, const char * text )
 {
 	BarDaughter bardaughter;
 	
-	ooc_manage( text, (ooc_destroyer) ooc_free );
+	bardaughter = bardaughter_use( self );
 	
-	bardaughter = bardaughter_new();
-	
-	bar_add_text( (Bar) bardaughter, ooc_pass( text ) );
+	bar_add_text( (Bar) bardaughter, text );
 	
 	return bardaughter;
-}
-
-BarDaughter
-bardaughter_new_with_const_text( const char * text )
-{
-	BarDaughter bardaughter = bardaughter_new();
-	
-	{
-	ooc_manage_object( bardaughter );
-	bar_add_text( (Bar) bardaughter, ooc_strdup( text ) );
-	return ooc_pass( bardaughter );
-	}
 }

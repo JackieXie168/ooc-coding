@@ -93,7 +93,7 @@ DeclareClass( ArithmeticFault, Exception );
 #endif
 
 #ifdef OOC_NO_DYNAMIC_MEM
-#define PRINT_BUFFER_SIZE 128
+#define PRINT_BUFFER_SIZE 64
 #endif
 
 #endif  /* TESTCASE_H */
