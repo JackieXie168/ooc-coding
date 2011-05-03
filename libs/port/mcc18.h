@@ -34,7 +34,7 @@
 #ifdef NDEBUG
 #define assert(e)
 #else
-#define assert(e) if(!(e)) printf( "*** Assertion failed in %s:%d ***\n", __FILE__,__LINE__ )
+#define assert(e) if(!(e)) printf( "*** Assertion failed in %HS:%d ***\n", __FILE__,__LINE__ )
 #endif
 
 #ifdef COMPILING_OOC_C
@@ -99,5 +99,17 @@
 	return tmp;
 
 #endif /* COMPILING_OOC_C */
+
+/* TestCase format strings
+ */
+
+#define _FMT_Failed_ssu		"\tFailed: %HS [%HS : %u]\n"
+#define _FMT_Func_ss		"%HS.%HS()"
+#define _FMT_Func_dss		"[%d] %HS.%HS()"
+#define _FMT_Func_dsss		"[%d] %HS.%HS.%HS()"
+#define _FMT_Exc_sdd		"\tUnexpected exception: %HS, code: %d, user code: %d\n"
+#define _FMT_Exc_ssdd		"\n\tUnexpected exception %HS in %HS, code: %d, user code: %d\n"
+#define _FMT_Failed_sdd		"Test case %HS failed: %d/%d (methods run/failed)\n"
+
 
 #endif /*MCC18_H_*/
