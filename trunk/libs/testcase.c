@@ -143,6 +143,21 @@ TestCase_copy( TestCase self, const TestCase from )
 static void signal_handler( int signum );
 #endif
 
+/*  =====================================================
+	Format strings - if not defined in the port headers already
+ */
+
+#ifndef _FMT_Failed_ssu
+
+#define _FMT_Failed_ssu		"\tFailed: %s [%s : %u]\n"
+#define _FMT_Func_ss		"%s.%s()"
+#define _FMT_Func_dss		"[%d] %s.%s()"
+#define _FMT_Func_dsss		"[%d] %s.%s.%s()"
+#define _FMT_Exc_sdd		"\tUnexpected exception: %s, code: %d, user code: %d\n"
+#define _FMT_Exc_ssdd		"\n\tUnexpected exception %s in %s, code: %d, user code: %d\n"
+#define _FMT_Failed_sdd		"Test case %s failed: %d/%d (methods run/failed)\n"
+
+#endif
 
 /*	=====================================================
 	Class member functions
@@ -164,7 +179,7 @@ testcase_fail( ROM char * filename, int line, ROM char * message )
 	if( current_method_fail_count++ == 0 )
 		printf( "\n" );
 		
-	printf("\tFailed: %HS [%HS : %u]\n", message ? message : "", filename, line );
+	printf( _FMT_Failed_ssu, message ? message : "", filename, line );
 
 	ooc_unlock( printing );
 }
@@ -191,11 +206,12 @@ print_func_name( TestCase self, ROM char * func, ROM char * suffix )
 		ooc_lock( printing );
 		
 #ifndef OOC_NO_DYNAMIC_MEM
+		buffer_length = 1;
 		if( func != NULL )
-			buffer_length = 32 + strlen( func ) + 1 + strlen( suffix ) + 1 + strlen( ooc_get_type((Object)self)->name ) + 3;
-		else
-			buffer_length = 1;
-			
+			buffer_length = 32 + strlen( func ) + 1 + strlen( ooc_get_type((Object)self)->name ) + 3;
+		if( suffix != NULL )
+			buffer_length += strlen( suffix ) + 1;
+
 		if( buffer_length < previous_display_length + 1 )
 			buffer_length = previous_display_length + 1;
 		
@@ -207,11 +223,11 @@ print_func_name( TestCase self, ROM char * func, ROM char * suffix )
 		if( func == NULL )
 			display_text[0] = '\0';
 		else if( func == before_class || func == after_class )
-			sprintf( display_text,  "%HS.%HS()", ooc_get_type((Object)self)->name, func );
+			sprintf( display_text,  _FMT_Func_ss, ooc_get_type((Object)self)->name, func );
 		else if( suffix == NULL )
-			sprintf( display_text,  "[%d] %HS.%HS()", self->run , ooc_get_type((Object)self)->name, func );
+			sprintf( display_text,  _FMT_Func_dss, self->run , ooc_get_type((Object)self)->name, func );
 		else 
-			sprintf( display_text,  "[%d] %HS.%HS.%HS()", self->run , ooc_get_type((Object)self)->name, func, suffix );
+			sprintf( display_text,  _FMT_Func_dsss, self->run , ooc_get_type((Object)self)->name, func, suffix );
 		
 		display_length = strlen( display_text );
 		if( display_length < previous_display_length ) {
@@ -308,7 +324,7 @@ testcase_run_methods(TestCase self)
 			
 			if( ! current_test_failed )
 				printf("\n");
-			printf("\tUnexpected exception: %HS, code: %d, user code: %d\n",
+			printf( _FMT_Exc_sdd,
 							ooc_get_type((Object)exception)->name,
 							exception_get_error_code(exception),
 							exception_get_user_code(exception));
@@ -357,7 +373,7 @@ testcase_run( TestCase self)
 	}
 	catch_any {
 		ooc_lock( printing );
-		printf("\n\tUnexpected exception %HS in %HS, code: %d, user code: %d\n",
+		printf( _FMT_Exc_ssdd,
 						ooc_get_type((Object)exception)->name,
 						ooc_get_type((Object)self)->name,
 						exception_get_error_code(exception),
@@ -369,7 +385,7 @@ testcase_run( TestCase self)
 	
 	if( self->failed != 0 ) {
 		ooc_lock( printing );
-		printf("Test case %HS failed: %d/%d (methods run/failed)\n", ooc_get_type((Object)self)->name, self->run, self->failed );
+		printf( _FMT_Failed_sdd, ooc_get_type((Object)self)->name, self->run, self->failed );
 		ooc_unlock( printing );
 	}
 	

@@ -40,9 +40,7 @@ ROM struct ClassTable BaseClass;
 /*  Prototypes
  */
  
-#ifndef OOC_NO_DYNAMIC_MEM
-static void Base_delete( Object );
-#endif
+static void Base_destroyer( Object );
 
 /* Class initialization
  */
@@ -92,9 +90,8 @@ inherit_vtable_from_parent( const Class self )
 		assert( self->vtab_size >= self->parent->vtab_size );
 		
 		/* Inherit the overridden operators */
-#ifndef OOC_NO_DYNAMIC_MEM
-		self->vtable->_delete = self->parent->vtable->_delete;
-#endif		
+		self->vtable->_destroy = self->parent->vtable->_destroy;
+
 		/* Inherit the virtual functions */
 		if( self->parent->vtab_size > virtual_function_alignment )
 		    memcpy( ((GEN_PTR) self->vtable)+ virtual_function_alignment,			/* destination */
@@ -118,9 +115,8 @@ _ooc_init_class( const Class self )
 			_ooc_init_class( self->parent );
 
 		self->vtable->_class = self;
-#ifndef OOC_NO_DYNAMIC_MEM
-		self->vtable->_delete= Base_delete;
-#endif
+		self->vtable->_destroy = Base_destroyer;
+
 		invalidate_vtable( self );
 
 		inherit_vtable_from_parent( self );
@@ -352,7 +348,7 @@ void
 ooc_delete( Object self )
 {
 	if( self && self->_vtab )
-	   self->_vtab->_delete( self );
+	   self->_vtab->_destroy( self );
 }
 
 void
@@ -364,16 +360,19 @@ ooc_delete_and_null( Object * obj_ptr )
 	ooc_delete( (Object) ooc_ptr_read_and_null( (void**) obj_ptr ) );
 }
 
+#endif /* OOC_NO_DYNAMIC_MEM */
+
 static
 void
-Base_delete( Object self )
+Base_destroyer( Object self )
 {
 	ooc_destroy_object( self );
 	
+#ifndef OOC_NO_DYNAMIC_MEM
 	free( self );
+#endif
 }
 
-#endif /* OOC_NO_DYNAMIC_MEM */
 
 /* Type checking helpers
  *

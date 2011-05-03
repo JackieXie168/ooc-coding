@@ -46,25 +46,25 @@
 
 AllocateClass( RefCounted, Base );
 
-/* The overridden delete operator
+/* The overridden destroy operator
  */
  
-static void (* original_delete)( Object );			/* Pointer to the original delete operator */
+static void (* original_destroy)( Object );			/* Pointer to the original destroy operator */
  
 static
 void
-RefCounted_delete( RefCounted self )
+RefCounted_destroy( RefCounted self )
 {
-	int to_be_deleted = FALSE;
+	int to_be_destroyed = FALSE;
 	
 	ooc_lock( self->access );
 	if( self->counter != 0 )
 		--self->counter;
-	to_be_deleted = ( self->counter == 0 );
+	to_be_destroyed = ( self->counter == 0 );
 	ooc_unlock( self->access );
 	
-	if( to_be_deleted )
-	   original_delete( (Object) self );
+	if( to_be_destroyed )
+	   original_destroy( (Object) self );
 }
 
 
@@ -77,8 +77,8 @@ RefCounted_initialize( Class this )
 {
 	/* Overriding the delete operator */
 	
-	original_delete       = this->vtable->_delete;
-	this->vtable->_delete = (void (*)(Object)) RefCounted_delete;
+	original_destroy       = this->vtable->_destroy;
+	this->vtable->_destroy = (void (*)(Object)) RefCounted_destroy;
 }
 
 /* Class finalizing
