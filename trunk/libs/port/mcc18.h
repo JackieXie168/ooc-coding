@@ -111,5 +111,7 @@
 #define _FMT_Exc_ssdd		"\n\tUnexpected exception %HS in %HS, code: %d, user code: %d\n"
 #define _FMT_Failed_sdd		"Test case %HS failed: %d/%d (methods run/failed)\n"
 
+#define TESTCASE_MAIN		void main( void )
+
 
 #endif /*MCC18_H_*/

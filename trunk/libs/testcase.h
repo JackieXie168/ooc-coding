@@ -96,4 +96,8 @@ DeclareClass( ArithmeticFault, Exception );
 #define PRINT_BUFFER_SIZE 64
 #endif
 
+#ifndef TESTCASE_MAIN
+#define TESTCASE_MAIN 	int main( int argc, char argv[] )
+#endif
+
 #endif  /* TESTCASE_H */

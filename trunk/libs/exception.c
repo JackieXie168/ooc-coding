@@ -234,7 +234,7 @@ ooc_throw( Exception exc_obj_ptr )
 	if( try_pt ) {
 		
 		/* if we are in an exception handling, then its a rethrow with the new Exception */
-		if( try_pt->exc_obj != NULL ) {
+		if( try_pt->exc_obj != NULL && try_pt->exc_obj != exc_obj_ptr ) {
 #ifndef OOC_NO_DYNAMIC_MEM
 			ooc_delete( (Object) try_pt->exc_obj );
 #else
