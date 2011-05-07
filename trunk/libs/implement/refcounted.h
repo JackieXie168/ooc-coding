@@ -22,7 +22,9 @@
 #ifndef IMPL_REFCOUNTED_H_
 #define IMPL_REFCOUNTED_H_
 
-#include "../refcounted.h"
+#ifndef REFCOUNTED_H_
+#error Do #include "refcounted.h" right before #include "implement/refcounted.h"
+#endif
 
 ClassMembers( RefCounted, Base )
 

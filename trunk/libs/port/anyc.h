@@ -50,7 +50,7 @@
 
 /* Threadless implementation */
 
-#define TLS
+#define TLS static
 
 #define	ooc_Mutex				void
 #define ooc_mutex_init( x )

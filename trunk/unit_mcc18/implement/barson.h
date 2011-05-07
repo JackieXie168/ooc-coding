@@ -2,7 +2,7 @@
 #ifndef IMPL_BARSON_H
 #define IMPL_BARSON_H
 
-#ifndef __18CXX
+#ifndef NO_RELATIVE_INCLUDE
 #include "bar.h"
 #else
 #include "implement/bar.h"

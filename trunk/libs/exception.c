@@ -154,7 +154,22 @@ Exception_copy( Exception self, const Exception from )
 	return OOC_COPY_DEFAULT;
 }
 
+/*	=====================================================
+	Global variables
+ */
 
+#ifdef __18CXX
+
+#pragma idata access ooc_exception_globals
+TLS struct ooc_try_block * 		near try_pt 	= NULL;
+TLS struct ooc_Manageable * 	near managed 	= NULL;
+
+#else
+
+TLS struct ooc_try_block * 		try_pt 			= NULL;
+TLS struct ooc_Manageable * 	managed 		= NULL;
+
+#endif
 
 /*	=====================================================
 	Class member functions
@@ -171,7 +186,7 @@ exception_new( enum error_codes err_code )
 
 #else
 
-static TLS struct ExceptionObject static_exception;
+TLS struct ExceptionObject static_exception;
 
 Exception
 exception_new( enum error_codes err_code )
@@ -201,8 +216,6 @@ exception_get_user_code( const Exception self )
 /* Implementation of exception handling
  *
  ***********************************************************/
-
-TLS struct ooc_try_block * try_pt = NULL;
 
 /* status values */
 #define	CAUGHT		001
@@ -329,8 +342,6 @@ ooc_end_try( void )
 
 /* Managing objects
  */
- 
-TLS struct ooc_Manageable * managed = NULL;
  
 void
 ooc_chain_manageable( struct ooc_Manageable * manageable )
