@@ -233,12 +233,10 @@ test_init( void )
 	assertTrue( ((BaseVtable)( BarClass.vtable ))->_class == & BarClass );
 	assertTrue( ((BaseVtable)( BarSonClass.vtable ))->_class == & BarSonClass );
 
-#ifndef OOC_NO_DYNAMIC_MEM
-	/* Check if vtable has delete operator */
-	assertNotNull( ((BaseVtable)( FooClass.vtable ))->_delete );
-	assertNotNull( ((BaseVtable)( BarClass.vtable ))->_delete );
-	assertNotNull( ((BaseVtable)( BarSonClass.vtable ))->_delete );
-#endif
+	/* Check if vtable has no destroy_check operator */
+	assertNull( ((BaseVtable)( FooClass.vtable ))->_destroy_check );
+	assertNull( ((BaseVtable)( BarClass.vtable ))->_destroy_check );
+	assertNull( ((BaseVtable)( BarSonClass.vtable ))->_destroy_check );
 	
 	/* Ckeck if the vtable is inherited */
 	assertTrue( ((BarVtable)( BarClass.vtable ))->bar_virtual ==
