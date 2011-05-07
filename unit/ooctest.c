@@ -221,10 +221,10 @@ test_init( void )
 	assertTrue( ((BaseVtable)( BarClass.vtable ))->_class == & BarClass );
 	assertTrue( ((BaseVtable)( BarSonClass.vtable ))->_class == & BarSonClass );
 
-	/* Check if vtable has delete operator */
-	assertNotNull( ((BaseVtable)( FooClass.vtable ))->_destroy );
-	assertNotNull( ((BaseVtable)( BarClass.vtable ))->_destroy );
-	assertNotNull( ((BaseVtable)( BarSonClass.vtable ))->_destroy );
+	/* Check if vtable has no destroy_check operator */
+	assertNull( ((BaseVtable)( FooClass.vtable ))->_destroy_check );
+	assertNull( ((BaseVtable)( BarClass.vtable ))->_destroy_check );
+	assertNull( ((BaseVtable)( BarSonClass.vtable ))->_destroy_check );
 	
 	/* Ckeck if the vtable is inherited */
 	assertTrue( ((BarVtable)( BarClass.vtable ))->bar_virtual ==
