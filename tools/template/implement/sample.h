@@ -2,9 +2,17 @@
 #ifndef IMPL_SAMPLE_H
 #define IMPL_SAMPLE_H
 
-#include "../sample.h"
+#ifndef SAMPLE_H
+#error Do #include "sample.h" right before doing #include "implement/sample.h"
+#endif
 
-#include "base.h" !!! TODO !!! Remove if the class has Base parent!
+
+!!! TODO !!! Remove this group if the class has Base parent!
+#ifndef NO_RELATIVE_INCLUDE
+#include "base.h"
+#else
+#include "implement/base.h"
+#endif
 
 
 ClassMembers( Sample, Base )

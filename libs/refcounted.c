@@ -25,6 +25,7 @@
 /* This is a class implementation file for the RefCounted class
  */
 
+#include "refcounted.h"
 #include "implement/refcounted.h"
 
 /** @class RefCounted
@@ -49,11 +50,9 @@ AllocateClass( RefCounted, Base );
 /* The overridden destroy operator
  */
  
-static void (* original_destroy)( Object );			/* Pointer to the original destroy operator */
- 
 static
-void
-RefCounted_destroy( RefCounted self )
+int
+RefCounted_destroy_check( RefCounted self )
 {
 	int to_be_destroyed = FALSE;
 	
@@ -63,8 +62,7 @@ RefCounted_destroy( RefCounted self )
 	to_be_destroyed = ( self->counter == 0 );
 	ooc_unlock( self->access );
 	
-	if( to_be_destroyed )
-	   original_destroy( (Object) self );
+	return to_be_destroyed;
 }
 
 
@@ -75,10 +73,10 @@ static
 void
 RefCounted_initialize( Class this )
 {
-	/* Overriding the delete operator */
-	
-	original_destroy       = this->vtable->_destroy;
-	this->vtable->_destroy = (void (*)(Object)) RefCounted_destroy;
+	/* Overriding the destroy_check operator */
+	assert( this->vtable->_destroy_check == NULL );
+
+	this->vtable->_destroy_check = (int (*)(Object)) RefCounted_destroy_check;
 }
 
 /* Class finalizing

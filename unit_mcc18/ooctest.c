@@ -15,6 +15,7 @@
 #include "bardaughter.h"
 #include "implement/bardaughter.h"
 
+
 /** @class OocTest
  *  @brief OocTest class - brief description.
  * 	@see ooctest.h
@@ -47,12 +48,13 @@ ClassMembers( OocTest, TestCase )
 
 EndOfClassMembers;
 
+typedef struct TestCaseObject * TestCase; /* This is not necessary here! MPLAB C18 bug requires this. */
+
+
 /* Allocating the class description table and the vtable
  */
 
-
 AllocateClass( OocTest, TestCase );
-
 
 /* Class initializing
  */
@@ -788,7 +790,8 @@ ROM struct TestCaseMethod methods[] =
 /* Runs the test as an executable
  */
 
-typedef struct TestCaseObject * TestCase;
+/*typedef struct TestCaseObject * TestCase;
+*/
  
 TESTCASE_MAIN
 {

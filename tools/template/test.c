@@ -156,7 +156,7 @@ sample_method1( Sample self )
  * 
  */
  
-struct TestCaseMethod methods[] =
+ROM struct TestCaseMethod methods[] =
 {
 	
 	TEST(sample_method1),
@@ -167,7 +167,7 @@ struct TestCaseMethod methods[] =
 /* Runs the test as an executable
  */
  
-int main(int argc, char * argv[])
+TESTCASE_MAIN
 {
 	Sample sample;
 	int result;

@@ -22,26 +22,32 @@
 #ifndef MCC18_H_
 #define MCC18_H_
 
+/* Compilation control
+ */
+
 #ifndef __DEBUG
 #define NDEBUG
 #endif
+
+#define NO_RELATIVE_INCLUDE 1
 
 /* Inlcude standard headers */
 
 #include <stdlib.h>
 #include <stdio.h>
 
-#ifdef NDEBUG
-#define assert(e)
-#else
-#define assert(e) if(!(e)) printf( "*** Assertion failed in %HS:%d ***\n", __FILE__,__LINE__ )
-#endif
-
 #ifdef COMPILING_OOC_C
 #include <stddef.h>
 #include <string.h>
 #endif /* COMPILING_OOC_C */
 
+/* Memory model */
+
+#define OOC_NO_DYNAMIC_MEM 1
+
+#define ROM const rom
+
+#define GEN_PTR	void *
 
 /* Longjump functions */
  
@@ -50,6 +56,16 @@
 #define JMP_BUF		jmp_buf
 #define SETJMP		setjmp
 #define LONGJMP		longjmp
+
+/* Implementing missing assert */
+
+#ifdef NDEBUG
+#define assert(e)
+#else
+extern ROM char ooc_assert_msg[];
+#define OOC_ASSERT_MSG "*** Assertion failed in %HS:%d ***\n"
+#define assert(e) if(!(e)) { printf( ooc_assert_msg, __FILE__, __LINE__ ); for(;;); }
+#endif
 
 
 /* implementing static inline */
@@ -60,7 +76,7 @@
 
 /* Threadless implementation */
 
-#define TLS
+#define TLS static
 
 #define	ooc_Mutex				void
 #define ooc_mutex_init( x )
@@ -69,24 +85,14 @@
 #define ooc_unlock( x )
 #define ooc_try_lock( x )		TRUE 
 
-/* Memory model */
-
-#define OOC_NO_DYNAMIC_MEM 1
-
-#define ROM const rom
-
-#define GEN_PTR	void *
-
-
-/* What to do in case of an uncaught exception?
- * Let's give abort() a meaning! Hang up ...
- */
-#define abort() for(;;)
 
 /* Definition of missing library functions
  */
 
+#define abort() for(;;)
 #define setbuf(stream, param)
+
+
 
 #ifdef COMPILING_OOC_C
 

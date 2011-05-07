@@ -37,11 +37,6 @@
 
 ROM struct ClassTable BaseClass;
 
-/*  Prototypes
- */
- 
-static void Base_destroyer( Object );
-
 /* Class initialization
  */
 
@@ -90,7 +85,7 @@ inherit_vtable_from_parent( const Class self )
 		assert( self->vtab_size >= self->parent->vtab_size );
 		
 		/* Inherit the overridden operators */
-		self->vtable->_destroy = self->parent->vtable->_destroy;
+		self->vtable->_destroy_check = self->parent->vtable->_destroy_check;
 
 		/* Inherit the virtual functions */
 		if( self->parent->vtab_size > virtual_function_alignment )
@@ -115,7 +110,7 @@ _ooc_init_class( const Class self )
 			_ooc_init_class( self->parent );
 
 		self->vtable->_class = self;
-		self->vtable->_destroy = Base_destroyer;
+		self->vtable->_destroy_check = NULL;
 
 		invalidate_vtable( self );
 
@@ -339,7 +334,11 @@ ooc_destroy_object( Object self )
 void
 ooc_release( Object self )
 {
-	ooc_destroy_object( self );
+	if( self && self->_vtab )
+		if( self->_vtab->_destroy_check == NULL || (self->_vtab->_destroy_check)(self) == TRUE )
+		{
+			ooc_destroy_object( self );
+		}
 }
 
 #ifndef OOC_NO_DYNAMIC_MEM
@@ -348,7 +347,11 @@ void
 ooc_delete( Object self )
 {
 	if( self && self->_vtab )
-	   self->_vtab->_destroy( self );
+		if( self->_vtab->_destroy_check == NULL || (self->_vtab->_destroy_check)(self) == TRUE )
+		{
+			ooc_destroy_object( self );
+			ooc_free( self );
+		}
 }
 
 void
@@ -361,18 +364,6 @@ ooc_delete_and_null( Object * obj_ptr )
 }
 
 #endif /* OOC_NO_DYNAMIC_MEM */
-
-static
-void
-Base_destroyer( Object self )
-{
-	ooc_destroy_object( self );
-	
-#ifndef OOC_NO_DYNAMIC_MEM
-	free( self );
-#endif
-}
-
 
 /* Type checking helpers
  *
@@ -551,7 +542,8 @@ ooc_ptr_read_and_null( void ** ptr_ptr )
 	OOC_IMPLEMENT_PTR_READ_AND_NULL
 }
 
-
-
-
+/* Assert message */
+#ifdef OOC_ASSERT_MSG
+ROM char ooc_assert_msg[] = OOC_ASSERT_MSG;
+#endif
 

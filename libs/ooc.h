@@ -393,7 +393,7 @@ struct BaseVtable_stru
 	Class			_class;
 	Class			_class_register_prev;
 	Class			_class_register_next; 
-	void   			(* _destroy )( Object );
+	int   			(* _destroy_check )( Object );
 };
 
 struct BaseObject											
