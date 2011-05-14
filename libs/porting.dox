@@ -36,6 +36,11 @@ Currently the following porting headers are available:
 	<TD>Microsoft Windows 32 bit x86 port with MS Visual C++ compilation. \n
 	Windows threads and OpenMP multithreading is supported as well as single threading.</TD>
 </TR>
+<TR>
+	<TD>mcc18.h</TD>
+	<TD>MPLAB C18 compiler support for 8 bit Microchip controllers. \n
+	There is no dynamic memory allocation and multithreading support in this port.</TD>
+</TR>
 </TABLE>
 
 @section new_port How to create a new port?

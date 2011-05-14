@@ -24,7 +24,6 @@
  */
 
 #include "testcase.h"
-#include "exception.h"
 #include "implement/exception.h"
 
 #ifdef OOC_HAS_UNIX_SIGNALS
@@ -42,7 +41,7 @@
  *  @brief TestCase class - base class for unit testing.
  * TestCase is a base class for unit testing. All of your Unit tests inherits TestCase.
  * The process to create a new unit test in your project:
- * -# Create a new test class with: ooc --new MyTest --source test
+ * -# Create a new test class with: ode $ooc --new MyTest --source test @endcode
  * -# Override the necessary virtual methods
  * -# implement your test methods
  * -# create the test methods table
@@ -166,7 +165,7 @@ static void signal_handler( int signum );
 static int current_test_failed;
 static int current_method_fail_count;
 
-/** Marks the current test method as failed.
+/* Marks the current test method as failed.
  */
  
 void
@@ -372,13 +371,13 @@ testcase_run( TestCase self)
 		print_func_name( self, NULL, NULL ); /* following a succesfull run cleans the last function name */
 	}
 	catch_any {
+		self->failed++;
 		ooc_lock( printing );
 		printf( _FMT_Exc_ssdd,
 						ooc_get_type((Object)exception)->name,
 						ooc_get_type((Object)self)->name,
 						exception_get_error_code(exception),
 						exception_get_user_code(exception));
-		self->failed++;
 		ooc_unlock( printing );
 	}
 	end_try;
@@ -394,7 +393,7 @@ testcase_run( TestCase self)
 
 #ifdef OOC_HAS_UNIX_SIGNALS
 
-/** Segmentation fault exception.
+/* Segmentation fault exception.
 */
 
 ClassMembers( SegmentationFault, Exception )
@@ -418,7 +417,7 @@ static	void	SegmentationFault_constructor( SegmentationFault self, const void * 
 static	void	SegmentationFault_destructor( SegmentationFault self, SegmentationFaultVtable vtab ) {}
 static	int		SegmentationFault_copy( SegmentationFault self, const SegmentationFault from ) { return OOC_COPY_DEFAULT; }
 
-/** Arithmetic fault exception.
+/* Arithmetic fault exception.
 */
 
 ClassMembers( ArithmeticFault, Exception )
@@ -460,3 +459,76 @@ signal_handler( int signum )
 }
 
 #endif /* OOC_HAS_UNIX_SIGNALS */
+
+
+/** TestCase virtual functions.
+ * These virtual functions run before and after your test methods. You can override them as needed. \n
+ * The execution order of the virtual functions are: \n
+	@verbatim
+	For each instantiation of your test case:
+	{
+		Your testcase's parents' constructors
+		Your testcase's constructor
+		For each testcase_run( TestCase ):
+		{
+			Your test's parents' before_class() methods
+			Your test's before_class() method
+			For each test method in the test method table:
+			{
+				Your test's parents' before() methods
+				Your test's  before() method
+				Yor test method
+				Your test's  after() method
+				Your test's parents' after() methods
+			}
+			Your test's after_class() method
+			Your test's parents' after_class() methods
+		}
+		Your testcase's destructor
+		Your testcase's parents' destructors
+	}
+	@endverbatim
+ */
+
+/*@{*/
+
+/** \struct TestCaseVtable_stru
+ * \brief Virtual functions.
+ */
+
+/** \fn void (*TestCaseVtable_stru::before_class) ( TestCase testcase )
+ * Prepares the testcase.
+ * In this virtual function should the testcase be prepared for execution. \n
+ * Implement this function according to your needs. \n
+ * It runs only ones for each testcase_run() function call.
+ * @param	The testcase.
+ */
+ 
+/** \fn void (*TestCaseVtable_stru::before) ( TestCase testcase )
+ * Prepares the test method.
+ * In this virtual function should the test method be prepared for execution. \n
+ * Implement this function according to your needs. \n
+ * Runs before each test methods.
+ * @param	The testcase.
+ */
+ 
+/** \fn void (*TestCaseVtable_stru::after) ( TestCase testcase )
+ * Finishes the test method.
+ * In this virtual function should the test method be finished. \n
+ * Implement this function according to your needs: free, delete or release all resources
+ * that were aquired in before(). \n
+ * Runs after each test methods.
+ * @param	The testcase.
+ */
+ 
+/** \fn void (*TestCaseVtable_stru::after_class) ( TestCase testcase )
+ * Finishes the testcase.
+ * In this virtual function should the testcase be finished. \n
+ * Implement this function according to your needs: free, delete or release all resources
+ * that were aquired in before_class().\n
+ * It runs only ones for each testcase_run() function call.
+ * @param	The testcase.
+ */
+ 
+/*@}*/
+
