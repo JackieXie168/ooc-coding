@@ -6,6 +6,7 @@
 
 #include "../libs/testcase.h"
 
+#include "../libs/refcounted.h"
 #include "../libs/implement/refcounted.h"
 
 /** @class RefCountedTest

@@ -487,6 +487,10 @@ extern ROM struct ClassTable BaseClass;
 	/* defining virtual function members */										\
 	struct pClass ## Vtable_stru {												\
 		struct pParent ## Vtable_stru	pParent;
+		
+#ifndef _OOC_VTAB_INITIALIZER
+#define _OOC_VTAB_INITIALIZER
+#endif		
 
 /** End of virtual functions.
  * This macro terminates the @c Virtuals block.
@@ -543,7 +547,7 @@ extern ROM struct ClassTable BaseClass;
 	static int	  pClass ## _copy ( pClass, const pClass );	\
 															\
 	/* Allocating the Vtable */								\
-	struct pClass ## Vtable_stru pClass ## VtableInstance = { NULL };	\
+	struct pClass ## Vtable_stru pClass ## VtableInstance _OOC_VTAB_INITIALIZER; \
 															\
 	_define_vtab_access( pClass, pParent )					\
 															\

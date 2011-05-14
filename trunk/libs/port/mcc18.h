@@ -49,6 +49,8 @@
 
 #define GEN_PTR	void *
 
+#define _OOC_VTAB_INITIALIZER = { NULL }
+
 /* Longjump functions */
  
 #include <setjmp.h>
@@ -71,7 +73,6 @@ extern ROM char ooc_assert_msg[];
 /* implementing static inline */
 #define STIN static
 #define NO_INLINE
-
 #define NO_THREADS
 
 /* Threadless implementation */

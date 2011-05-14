@@ -600,7 +600,7 @@ signal_emit_sync( Signal signal, void * parameter, ooc_destroyer param_destroy_f
 
 /** @file signal.h 
 @details
-The use of the Signal class is optimized for the user's convenience, therefore it is a bit different then other ooc classes.
+The use of the Signal class is optimized for the user's convenience, therefore it is a bit different from other ooc classes.
 There are some rules that must be considered using Signals.
 The signaling system must be initilaized at the start and released at the end of your application.
 @code
