@@ -52,13 +52,14 @@ BarSon_initialize( Class this )
 /* Class finalizing
  */
 
+#ifndef OOC_NO_FINALIZE
 static
 void
 BarSon_finalize( Class this )
 {
 	/* Release global resources! */
 }
-
+#endif
 
 /* Constructor
  */

@@ -114,11 +114,13 @@ Exception_initialize( Class this )
 /* Class finalizing
  */
 
+#ifndef OOC_NO_FINALIZE
 static
 void
 Exception_finalize( Class this )
 {
 }
+#endif
 
 
 /* Constructor

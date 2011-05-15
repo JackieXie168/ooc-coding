@@ -4,6 +4,11 @@
 
 #include "../libs/testcase.h"
 
+#ifdef OOC_NO_FINALIZE
+#define ooc_finalize_class( x )
+#define ooc_finalize_all( )
+#endif
+
 /** @class SignalTest
  *  @brief SignalTest class - brief description.
  * 	@see probatest.h
@@ -67,14 +72,14 @@ TestCaseTest_initialize( Class this )
 
 /* Class finalizing
  */
-
+#ifndef OOC_NO_FINALIZE
 static
 void
 TestCaseTest_finalize( Class this )
 {
 	/* Release global resources! */
 }
-
+#endif
 
 /* Constructor
  */
@@ -285,12 +290,13 @@ TestCaseTestChild_initialize( Class this )
 
 /* Class finalizing
  */
-
+#ifndef OOC_NO_FINALIZE
 static
 void
 TestCaseTestChild_finalize( Class this )
 {
 }
+#endif
 
 /* Constructor
  */

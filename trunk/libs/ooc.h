@@ -545,6 +545,8 @@ extern ROM struct ClassTable BaseClass;
  * @hideinitializer
  */
 
+#ifndef OOC_NO_FINALIZE
+
 #define AllocateClass( pClass, pParent )					\
 															\
 	/* Prototyping */										\
@@ -572,6 +574,36 @@ extern ROM struct ClassTable BaseClass;
 		(void (*)( Object, Vtable ))        pClass ## _destructor,	\
 		(int  (*)( Object, const Object)) 	pClass ## _copy	        \
 		}
+#else
+
+#define AllocateClass( pClass, pParent )					\
+															\
+	/* Prototyping */										\
+	static void   pClass ## _initialize ( Class );	        \
+	static void   pClass ## _constructor( pClass, const void * ); \
+	static void   pClass ## _destructor ( pClass, pClass ## Vtable ); \
+	static int	  pClass ## _copy ( pClass, const pClass );	\
+															\
+	/* Allocating the Vtable */								\
+	struct pClass ## Vtable_stru pClass ## VtableInstance _OOC_VTAB_INITIALIZER; \
+															\
+	_define_vtab_access( pClass, pParent )					\
+															\
+	/* Allocating the class description table */			\
+	ROM struct ClassTable pClass ## Class = {				\
+		sizeof( struct pClass ## Object ),					\
+		(ROM char *) #pClass,								\
+		& pParent ## Class,	                                \
+		(Vtable) & pClass ## VtableInstance,				\
+		sizeof( struct pClass ## Vtable_stru ),				\
+											pClass ## _initialize,	\
+		(void (*)( Object, const void *)) 	pClass ## _constructor,	\
+		(void (*)( Object, Vtable ))        pClass ## _destructor,	\
+		(int  (*)( Object, const Object)) 	pClass ## _copy	        \
+		}
+
+#endif /* OOC_NO_FINALIZE */
+
 		
 /** Chain the parent constructor.
  * This macro calls the constructor of the parent class.

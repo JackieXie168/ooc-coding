@@ -65,13 +65,14 @@ ExceptionTest_initialize( Class this )
 
 /* Class finalizing
  */
-
+#ifndef OOC_NO_FINALIZE
 static
 void
 ExceptionTest_finalize( Class this )
 {
 	/* Release global resources! */
 }
+#endif
 
 
 /* Constructor
@@ -352,7 +353,9 @@ TESTCASE_MAIN
 	ooc_use( &exceptiontesto, ExceptionTest, (void*) &methods );
 	result = testcase_run((TestCase) &exceptiontesto);
 	ooc_release( (Object) &exceptiontesto );
+#ifndef OOC_NO_FINALIZE
 	ooc_finalize_all();
+#endif
 	
 	abort();
 }

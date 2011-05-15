@@ -52,13 +52,14 @@ BarDaughter_initialize( Class this )
 /* Class finalizing
  */
 
+#ifndef OOC_NO_FINALIZE
 static
 void
 BarDaughter_finalize( Class this )
 {
 	/* Release global resources! */
 }
-
+#endif
 
 /* Constructor
  */
