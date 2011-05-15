@@ -82,11 +82,13 @@ RefCounted_initialize( Class this )
 /* Class finalizing
  */
 
+#ifndef OOC_NO_FINALIZE
 static
 void
 RefCounted_finalize( Class this )
 {
 }
+#endif
 
 /* Constructor
  */

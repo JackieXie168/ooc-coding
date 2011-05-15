@@ -16,6 +16,11 @@
 #include "implement/bardaughter.h"
 
 
+#ifdef OOC_NO_FINALIZE
+#define ooc_finalize_class( x )
+#define ooc_finalize_all( )
+#endif
+
 /** @class OocTest
  *  @brief OocTest class - brief description.
  * 	@see ooctest.h
@@ -82,14 +87,14 @@ OocTest_initialize( Class this )
 
 /* Class finalizing
  */
-
+#ifndef OOC_NO_FINALIZE
 static
 void
 OocTest_finalize( Class this )
 {
 	/* Release global resources! */
 }
-
+#endif
 
 /* Constructor
  */
@@ -175,7 +180,9 @@ EndOfVirtuals;
 AllocateClass( BarBadGrandSon, BarSon );
 
 static	void	BarBadGrandSon_initialize( Class this ) {}
+#ifndef OOC_NO_FINALIZE
 static	void	BarBadGrandSon_finalize( Class this ) {}
+#endif
 static	void	BarBadGrandSon_constructor( BarBadGrandSon self, const void * params ) {}
 static	void	BarBadGrandSon_destructor( BarBadGrandSon self, BarBadGrandSonVtable vtab ) {}
 static	int		BarBadGrandSon_copy( BarBadGrandSon self, const BarBadGrandSon from ) { return OOC_COPY_DEFAULT; }
@@ -209,7 +216,9 @@ test_class_table( void )
 	assertTrue( BarBadGrandSonClass.vtable == (Vtable) & BarBadGrandSonVtableInstance);
 	assertTrue( BarBadGrandSonClass.vtab_size == sizeof(struct BarBadGrandSonVtable_stru)/sizeof(char) );
 	assertTrue( BarBadGrandSonClass.init == BarBadGrandSon_initialize );
+#ifndef OOC_NO_FINALIZE
 	assertTrue( BarBadGrandSonClass.finz == BarBadGrandSon_finalize );
+#endif
 	assertTrue( BarBadGrandSonClass.ctor == (void (*)( Object, const void *))	BarBadGrandSon_constructor );
 	assertTrue( BarBadGrandSonClass.dtor == (void (*)( Object, Vtable))			BarBadGrandSon_destructor );
 	assertTrue( BarBadGrandSonClass.copy == (int  (*)( Object, const Object))	BarBadGrandSon_copy );
@@ -242,6 +251,7 @@ test_init( void )
 	assertTrue( ((BarVtable)( BarClass.vtable ))->bar_virtual ==
 				((BarSonVtable)( BarSonClass.vtable ))->Bar.bar_virtual	);
 				
+#ifndef OOC_NO_FINALIZE
 	/* Ckeck if class initialization chain is correct */
 	assertNotNull( ((BaseVtable)( FooClass.vtable ))->_class_register_prev );
 	assertTrue( ((BaseVtable)( FooClass.vtable ))->_class_register_next == & BarClass );
@@ -253,16 +263,19 @@ test_init( void )
 	ooc_finalize_class( BarSon );
 	ooc_finalize_class( Bar );
 	ooc_finalize_class( Foo );
-	
+
 	assertFalse( ooc_isInitialized( Foo ) );
 	assertFalse( ooc_isInitialized( Bar ) );
 	assertFalse( ooc_isInitialized( BarSon ) );
+#endif
+
 }
 
 void
 static
 test_finalize( void )
 {
+#ifndef OOC_NO_FINALIZE
 	assertTrue( ooc_isInitialized( OocTest ) );
 	
 	ooc_init_class( Foo );
@@ -304,6 +317,7 @@ test_finalize( void )
 	assertFalse( ooc_isInitialized( Foo ) );
 	assertFalse( ooc_isInitialized( Bar ) );
 	assertFalse( ooc_isInitialized( BarSon ) );
+#endif
 }
 
 static
@@ -363,7 +377,9 @@ foolife_status
 static enum foolife_status foolife_last_called;
 
 static	void	FooLife_initialize( Class this ) 	{ foolife_last_called++; }
+#ifndef OOC_NO_FINALIZE
 static	void	FooLife_finalize( Class this ) 		{ foolife_last_called++; }
+#endif
 
 static	void	FooLife_constructor( FooLife self, const void * params )
 													{  foolife_last_called++; }
@@ -388,8 +404,10 @@ test_lifecycle_static( void )
 		assertTrue( foolife_last_called == foolife_copy );
 	ooc_release( (Object) &foolife1 );
 		assertTrue( foolife_last_called == foolife_dtor );
+#ifndef OOC_NO_FINALIZE
 	ooc_finalize_class( FooLife );
 		assertTrue( foolife_last_called == foolife_finz );
+#endif
 	
 	/* prevent leaking foolife2 */
 	ooc_init_class( FooLife );
@@ -450,7 +468,9 @@ AllocateClass( CtorCheck, Base );
 
 
 static	void	CtorCheck_initialize( Class this ) {}
+#ifndef OOC_NO_FINALIZE
 static	void	CtorCheck_finalize( Class this ) {}
+#endif
 
 static	void	CtorCheck_constructor( CtorCheck self, const void * params )
 {
@@ -490,7 +510,9 @@ EndOfClassMembers;
 AllocateClass( CtorCheckSon, CtorCheck );
 
 static	void	CtorCheckSon_initialize( Class this ) {}
+#ifndef OOC_NO_FINALIZE
 static	void	CtorCheckSon_finalize( Class this ) {}
+#endif
 
 static	void	CtorCheckSon_constructor( CtorCheckSon self, const void * params )
 {
@@ -615,7 +637,9 @@ EndOfVirtuals;
 AllocateClass( CircularCheck, Base );
 
 static	void	CircularCheck_initialize( Class this ) {}
+#ifndef OOC_NO_FINALIZE
 static	void	CircularCheck_finalize( Class this ) {}
+#endif
 static	void	CircularCheck_constructor( CircularCheck self, const void * params ) {}
 static	void	CircularCheck_destructor( CircularCheck self, CircularCheckVtable vtab )
 {

@@ -91,13 +91,15 @@ TestCase_initialize( Class this )
 /* Class finalizing
  */
 
+#ifndef OOC_NO_FINALIZE
+
 static
 void
 TestCase_finalize( Class this )
 {
 	ooc_mutex_release( printing );
 }
-
+#endif
 
 /* Constructor
  */

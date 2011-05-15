@@ -12,6 +12,12 @@
 #include "refcounted.h"
 #include "implement/refcounted.h"
 
+#ifdef OOC_NO_FINALIZE
+#define ooc_finalize_class( x )
+#define ooc_finalize_all( )
+#endif
+
+
 /** @class RefCountedTest
  *  @brief RefCountedTest class - brief description.
  * 	@see refcountedtest.h
@@ -71,14 +77,14 @@ RefCountedTest_initialize( Class this )
 
 /* Class finalizing
  */
-
+#ifndef OOC_NO_FINALIZE
 static
 void
 RefCountedTest_finalize( Class this )
 {
 	/* Release global resources! */
 }
-
+#endif
 
 /* Constructor
  */
@@ -162,7 +168,9 @@ AllocateClass( FooRefCnt, RefCounted );
 typedef struct RefCountedObject * RefCounted;
 
 static	void	FooRefCnt_initialize( Class this ) {}
+#ifndef OOC_NO_FINALIZE
 static	void	FooRefCnt_finalize( Class this ) {}
+#endif
 
 static	void	FooRefCnt_constructor( FooRefCnt self, const void * params )
 {

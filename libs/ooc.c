@@ -95,11 +95,15 @@ inherit_vtable_from_parent( const Class self )
 		}
 }
 
+#ifndef OOC_NO_FINALIZE
+
 static Class 		class_register = NULL;		/* Points to the most recently initialized Class */
 
 #ifndef NO_THREADS
 static ooc_Mutex	class_register_change;
 #endif
+
+#endif /* OOC_NO_FINALIZE */
 
 void
 _ooc_init_class( const Class self )
@@ -118,6 +122,7 @@ _ooc_init_class( const Class self )
 
 		self->init( self );
 
+#ifndef OOC_NO_FINALIZE
 		if( class_register == NULL )					/* Race condition, but however we declared _ooc_init_class() as non-thread-safe */
 			ooc_mutex_init( class_register_change );
 			
@@ -128,6 +133,7 @@ _ooc_init_class( const Class self )
 		self->vtable->_class_register_next = NULL;
 		class_register = self;
 		ooc_unlock( class_register_change );
+#endif /* OOC_NO_FINALIZE */
 	}
 }
 
