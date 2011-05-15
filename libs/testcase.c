@@ -41,7 +41,7 @@
  *  @brief TestCase class - base class for unit testing.
  * TestCase is a base class for unit testing. All of your Unit tests inherits TestCase.
  * The process to create a new unit test in your project:
- * -# Create a new test class with: ode $ooc --new MyTest --source test @endcode
+ * -# Create a new test class with: @code $ooc --new MyTest --source test @endcode
  * -# Override the necessary virtual methods
  * -# implement your test methods
  * -# create the test methods table
@@ -488,7 +488,7 @@ signal_handler( int signum )
 		Your testcase's parents' destructors
 	}
 	@endverbatim
- */
+  */
 
 /*@{*/
 
@@ -502,6 +502,7 @@ signal_handler( int signum )
  * Implement this function according to your needs. \n
  * It runs only ones for each testcase_run() function call.
  * @param	The testcase.
+  * \nosubgrouping
  */
  
 /** \fn void (*TestCaseVtable_stru::before) ( TestCase testcase )

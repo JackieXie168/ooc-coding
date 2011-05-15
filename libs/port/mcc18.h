@@ -31,6 +31,8 @@
 
 #define NO_RELATIVE_INCLUDE 1
 
+#define OOC_NO_FINALIZE	1
+
 /* Inlcude standard headers */
 
 #include <stdlib.h>

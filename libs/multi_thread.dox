@@ -1,11 +1,13 @@
 
 /**
 @file
-Multithreading primitives.
+Multithreading support.
 Multithreading primitives that can be used writing ooc core and ooc extensions (e.g. new containers, etc.)
 Don't use these in your own code!
 Use the platform native threading or some generalized one (e.g. OpenMP) instead.
+*/
 
+/**
 @page page_MT Multithreading support.
 
 The ooc library has multithreaded and a single threaded versions. \n
@@ -116,11 +118,11 @@ it in your own code with the native threading libraries or with a generalized so
 
 The following threading primitives are available:
 
-@ref multi_thread.dox
+@see @ref thread_prims_defs
 
 */
 
-#define TLS
+#define TLS static
 
 #define	ooc_Mutex				void
 #define ooc_mutex_init( x )
@@ -129,10 +131,11 @@ The following threading primitives are available:
 #define ooc_unlock( x )
 #define ooc_try_lock( x )		TRUE 
 
-/**
+
+/** @section thread_prims_defs Threading primitive definitions.
 
 @def	ooc_Mutex
-Mutex.
+@brief Mutex.
 Allocates a mutex.
 @hideinitializer
 
@@ -174,5 +177,7 @@ TLS int MyVariable;
 @endcode
 @hideinitializer
 
- */
- 
+*/
+
+
+

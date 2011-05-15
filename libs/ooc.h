@@ -91,6 +91,8 @@ typedef		  struct BaseObject * Object;
 
 void		_ooc_init_class( const Class class_ptr );
 
+#ifndef OOC_NO_FINALIZE	
+
 /** Finalizes a class.
  * Finalizes a class using the class name. This is a convenient macro.
  * @param pClass	Tha name of the class.
@@ -111,6 +113,8 @@ void		_ooc_finalize_class( const Class class_ptr );
  */
  
 void		ooc_finalize_all( void );
+
+#endif /* OOC_NO_FINALIZE */	
 
 /** Checks if Class is initialized.
  * This is a convenient macro.
@@ -382,7 +386,9 @@ struct ClassTable
 	const size_t		vtab_size;			/* the size of the vtable */
 	
 	void				(* init) ( Class this );        				/* class initializer */
+#ifndef OOC_NO_FINALIZE	
 	void				(* finz) ( Class this );						/* class finalizer */
+#endif
 	void				(* ctor) (Object self, const void * params );	/* constructor */
 	void				(* dtor) (Object self, Vtable vtab);			/* destructor */
 	int				  	(* copy) (Object self, const Object from); 		/* copy constructor */
@@ -391,8 +397,10 @@ struct ClassTable
 struct BaseVtable_stru
 {
 	Class			_class;
+#ifndef OOC_NO_FINALIZE	
 	Class			_class_register_prev;
 	Class			_class_register_next; 
+#endif
 	int   			(* _destroy_check )( Object );
 };
 

@@ -39,7 +39,8 @@ Currently the following porting headers are available:
 <TR>
 	<TD>mcc18.h</TD>
 	<TD>MPLAB C18 compiler support for 8 bit Microchip controllers. \n
-	There is no dynamic memory allocation and multithreading support in this port.</TD>
+	There is no dynamic memory allocation and multithreading support in this port.\n
+	Supports the large data + large code configuration only.</TD>
 </TR>
 </TABLE>
 
@@ -98,7 +99,7 @@ this looks like:
 @skip	ooc_Mutex
 @until	ooc_try_lock
 
-@see multi_thread.dox
+@see @ref page_MT
 
 @subsection port_xchg Atomic pointer exchange.
 Define an atomic pointer exchange (read while nulling) operation as a macro called @c OOC_IMPLEMENT_PTR_READ_AND_NULL. 
@@ -111,6 +112,90 @@ the following:
 @until endif
 
 @note The @c COMPILING_OOC_C macro ensures, that this definition is available in the ooc core implementation only.
+
+@section compiler_control What compiler controls do I have?
+You can use several macros that alter the behavior of the code according to the actual needs of your port.
+
+<TABLE>
+<TR>
+	<TD>Macro name</TD>
+	<TD>Behavior</TD>
+</TR>
+<TR>
+	<TD>ROM</TD>
+	<TD>In case of a microcontroller, the @c const data could be located in Read Only Memory.\n
+	For those targets define ROM macro as the appropriate storage specifier.\n
+	If not specified it is defined automatically as: @code #define ROM const @endcode
+	</TD>
+</TR>
+<TR>
+	<TD>GEN_PTR</TD>
+	<TD>General pointer type for memory and string manipulation libraries (<mem.h>, <string.h>).\n
+	In ANSI-C the general pointer type in theese standard libraries is @c char*. \n
+	However e.g MPLAB C18 uses @c void* in these libraries, causing compiler warnings.\n
+	Define GEN_PTR according to your actual target's needs.\n
+	If not specified it is defined automatically as: @code #define GEN_PTR char * @endcode
+	</TD>
+</TR>
+<TR>
+	<TD>NO_RELATIVE_INCLUDE</TD>
+	<TD>Most compiler treats the @c include path relative to the actual file invoking the @c include
+	command for local includes, regardless if it is a source or a header file.\n
+	Some others always use the source file location as the base path for all local includes (e.g. MPLAB C18).\n
+	This macro is not defined normally, define it if your compiler requires.
+	</TD>
+</TR>
+<TR>
+	<TD>NDEBUG</TD>
+	<TD>The usual way to distinguish between debug and release versions is defining the @c NDEBUG macro for the release version.
+	Ooc uses this approach internally. However some compilers or IDEs use other macros for this purpose.\n
+	Define @c NDEBUG macro according to your compiler / IDE, letting ooc be consistent.
+	</TD>
+</TR>
+<TR>
+	<TD>NO_THREADS</TD>
+	<TD>If defined then a single threaded version is built.\n
+	You must define dummy threading primitives in case of a single threaded version, as well! See @ref port_locks
+	</TD>
+</TR>
+<TR>
+	<TD>NO_INLINE</TD>
+	<TD>If defined then it indicates that the comlpiler does not support function inlining.\n
+	See @ref port_inline
+	</TD>
+</TR>
+<TR>
+	<TD>OOC_NO_DYNAMIC_MEM</TD>
+	<TD>On some microcontroller targets the dynamic memory allocation is not available. On those targets every @c Object must be
+	statically allocated, and thus the ooc_new() and ooc_delete() is nonsence. \n
+	Defining @c OOC_NO_DYNAMIC_MEM ooc is compiled without the need for dynamic memory handling, and thus has some limitations as well:
+	any function related to dynamic memories is unavailable.
+	</TD>
+</TR>
+<TR>
+	<TD>OOC_NO_FINALIZE</TD>
+	<TD>On microcontroller targets there is usually no normal shutdown or program exit: those programs are running continuously and never exit.
+	In such environments the class finalization is more than meaningless: defining this macro will save three pointers per class definitions and 
+	remove the ooc_finalize_class() and ooc_finalize_all() functions from the build.
+	(A good optimizing compiler should remove your class finalizing routines as well, since they are never reached.)
+	</TD>
+</TR>
+<TR>
+	<TD>_OOC_VTAB_INITIALIZER</TD>
+	<TD>On some microcontroller targets it is important to place the virtual table into the initialized data section.
+	We van force this behaviour by defining this macro. (Se mcc18.h port file!)\n
+	Although ANSI-C says that all uninitialized data is set to 0 at program start, this macro could be necessary on small microcomputers,
+	since they do not clean their uninitialized data section at start up or restrat.
+	</TD>
+</TR>
+<TR>
+	<TD>OOC_HAS_UNIX_SIGNALS</TD>
+	<TD>The TestCase class converts some Unix signals (SIGSEGV, SIGFPE) into ooc Exceptions letting us to do unit test checks way much easier.
+	This macro indicates that there are unix signals implemented in the operation system.
+	</TD>
+</TR>
+
+</TABLE>
 
 @section port_stdc Requirements against the standard C library.
 The standard C library on the host must support the following minimal set compatible with 
