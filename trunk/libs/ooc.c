@@ -30,7 +30,7 @@
 /** @file ooc.h
  * @brief Object Oriented C - macros and definitions.
  */
- 
+
 /**	Base Class.
  * Used for root Class in ooc. It must be a superclass for all classes.
  */
@@ -131,6 +131,8 @@ _ooc_init_class( const Class self )
 	}
 }
 
+#ifndef OOC_NO_FINALIZE
+
 void
 _ooc_finalize_class( const Class self )
 {
@@ -167,6 +169,9 @@ ooc_finalize_all( void )
 	while( class_register )
 		_ooc_finalize_class( class_register );
 }
+
+#endif /* OOC_NO_FINALIZE */
+
 
 /*	Creating a new Object
  */
@@ -542,7 +547,7 @@ ooc_ptr_read_and_null( void ** ptr_ptr )
 	OOC_IMPLEMENT_PTR_READ_AND_NULL
 }
 
-/* Assert message */
+/* Assert message store */
 #ifdef OOC_ASSERT_MSG
 ROM char ooc_assert_msg[] = OOC_ASSERT_MSG;
 #endif

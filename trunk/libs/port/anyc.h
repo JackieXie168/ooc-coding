@@ -19,6 +19,7 @@
  * MA 02110-1301  USA
  */
 
+
 #ifndef ANYC_H_
 #define ANYC_H_
 
@@ -36,7 +37,7 @@
 /* Longjump functions */
  
 #include <setjmp.h>
-
+ 
 #define JMP_BUF		jmp_buf
 #define SETJMP		setjmp
 #define LONGJMP		longjmp

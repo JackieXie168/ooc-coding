@@ -52,6 +52,7 @@
 #ifndef NO_THREADS
 
 /* implementing Thread Local Storage */
+
 #define TLS static __thread
 
 #ifdef _OPENMP
