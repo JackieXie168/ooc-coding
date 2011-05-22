@@ -50,10 +50,11 @@ supports it in developing GNU and promoting software freedom.''
 * Using Classes::
 * Implementing Classes::
 * Memory handling::
-* Type less, produce more: Class manipulation tool
-* Copying This Manual: GNU Free Documentation License
+* Testing your classes : Unit testing support
+* Type less, produce more : Class manipulation tool
+* Copying This Manual : GNU Free Documentation License
 * Table of Figures::
-* Index: Indices
+* Index : Indices
 @end menu
 
 
@@ -68,7 +69,11 @@ The ooc also incorporates @emph{single inheritance}.
 @sp 1
 There are many similar kits out there, but I found most of them either too complicated for writing a fully controllable, really @emph{portable} code, or inconvenient to use it for writing readable programs. So I have started from scratch.
 @sp 1
+The @strong{ooc} toolkit comes with some container classes, a unit testing helper class and a tool that let's you generate classes from several templates easily.
+@sp 1
 In this manual I will cover only issues related to the implementation and use of @strong{ooc}, I assume that the reader is familiar with the Object Oriented Programming and has a good knowledge about C and C++ and their most common internal implementation.
+@sp 1
+More detailed information on the use of @strong{ooc} can be found in the ooc API documentation.
 
 @node Objects and Classes
 @chapter Objects and Classes
@@ -499,7 +504,7 @@ Although using the @code{ooc_new} macro for object creation is easy, it is advis
 
 String str_new( char * initial )
 @{
-    return (String) ooc_new( String, initial );
+    return ooc_new( String, initial );
 @}
 
 @end example
@@ -902,7 +907,7 @@ Foo_copy( Foo self, const Foo from )
 
 @subsection Destructor definition
 
-The destructor destroys the object of your class before releasing the allocated memory. The @code{ooc_delete} uses this constructor when deleting an object.
+The destructor destroys the object of your class before releasing the allocated memory. The @code{ooc_delete} uses this destructor when deleting an object.
 @sp 1
 The destructor has a fix name: the class name concatenated with @code{_destructor}. @*
 The destructor has two parameters: a pointer to the object to be detroyed, and a pointer to its virtual table.
@@ -1009,7 +1014,7 @@ Foo_destructor( Foo self, FooVtable vtab )
 Less malloc(), better performance!@*
 Of course, in this case you can access the member of the included Bar objects a bit different: instead of @code{self->bar->data} you must reference as @code{self->bar.data}.@*
 
-Never use either the object inclusion, nor @code{ooc_release()} for reference counted objects! The reference counting will not work for included objects!
+Never use the object inclusion for reference counted objects! The reference counting will not work for included objects!
 
 @node Memory handling
 @chapter Memory handling
@@ -1060,6 +1065,204 @@ Always use this, if your class has a memory pointer as a class member, for examp
 The thread safety of @strong{ooc} does not mean that your code will be thread safe automatically! You must take care about the proper thread-safe implementation of your classes!
 @sp 1
 The @code{ooc_init_class()}, @code{ooc_finalize_class()} and @code{ooc_finalize_all()} functions are @emph{not} thread safe! It is advisable calling @code{ooc_init_class()} from the main thread before the fork and @code{ooc_finalize_all()} after the join.
+
+@node Unit testing support
+@chapter Unit testing support
+
+It is very important testing your classes before you integrate them into a larger part of code. The Unit testing support in @strong{ooc} is inspired by the Unit 3 testing framework used mainly in Java. If you are not familiar with the topic I recommend some reading about the "test-driven development" approach to catch the basis and importance of unit testing.
+
+@section How to create a unit test?
+Unit test classes are subclasses of @code{TestCase} class, these are called test cases. A test case in @strong{ooc} is represented by an executable that can be invoked from the operating system or can be run in a simulator in case of microcontrollers.@*
+The test cases have several test methods, that do different tests. These test methods are executed in the order as they are defined in the test method order table.@*
+The test cases could be organized into test suites. The latter means a batch file in @strong{ooc} that executes the test cases in a sequence.@*
+Its recommended collecting your testable classes in a static directory (*.o in Linux, *.lib in Windows, etc.) to make things simplier. Although this is not necessary, this makes the linking of your testcase more simply, and enables you creating fake classes as needed.
+@sp 1
+Creating a unit test is easy!
+@enumerate
+@item
+Make a directory in wich you would like to collect your test cases. This directory will be your test suite directory, since it will hold your test case, your makefiles and test siute batch files. Select this directory as your working folder. (For very small projects this practice may not be necessary, you may use the source directory too for your tests.)
+@item
+Create your test environment with the following command:@*
+@example
+~$ ooc --testsuite
+@end example
+This creates the necessary makefiles and test suite batch files into this directory. Edit those files according to the comments in them as necessary. If you are working with an IDE, you can configure it to use these makefiles for convenience. It can be used with the automake tools as well under Linux.
+@item
+Create your test case with the following command:@*
+@example
+~$ ooc --new MyClassTest --source test
+@end example
+As a naming convention I recommend using "Test" as a tail for your test classes. This helps identify them, but also lets you use the automatic makefile rules in Linux! In Windows you must add this file to the Makefile: edit it according to the comments in it.
+@item
+Implement the @code{before_class(), before(), after(), after_class()} methods in your test file if they are necessary for your test methods. The skeletons can be found in the created file already.
+@item
+Implement your test methods. Add them to the test method order table. For details see the next sections.
+@item
+Build your test case with the supplied Makefile.
+@item
+Run your test case as an executable.
+@item
+Run your testsuite. Edit your test suite file (suite.sh or suite.bat) as required by the help of the comments in it, and start that script/batch file.
+@end enumerate
+
+@section Writing a unit test
+@subsection Writing test methods
+Implement your test method as a function of the following prototype:@*
+@example
+static void myclasstest_method1( MyTest self );
+@end example
+You can expect that the @code{before()} method has been completed succefully before invoking your test method, and the @code{after()} method will be invoked after completing your test method.@*
+The test method can throw an @code{Exception} or a subclass of it. If the exception is uncaught within the method, the test case repots the test as failed. If the @code{Exception} is not caught within your test method, the @code{after()} method will not be invoked!
+@sp 1
+You must put your test method into the test method order table, to let your test case know what methods to invoke! You can do this using the @code{TEST} macro:@*
+@example
+static ROM struct TestCaseMethod methods[] =
+@{
+    TEST(myclasstest_method1),
+	
+    @{NULL, NULL@} /* Do NOT delete this line! */
+@};
+@end example
+
+
+@sp 1
+@strong{Important!} In ooc your test methods are not independent! This means that if one of your test methods makes changes into any global or test case member variables, or into the environment, the succeeding test methods will inherit those changes. This is a very important difference from Unit 3, where it is garanteed that all test methods starts in a fresh environment.
+
+@subsection Assertions
+This is why we do the whole staff! :-) Within our test methods we would like to make assertions on the status of our testable classes. For this purpose we can use a group of @code{assertCondition} macros. (Don't be confused: these macros do nothing with those ones in the <assert.h> headers!) The @code{assertCondition} macros check the given condition, and if the assertion is not met, print an error message identifying the line of code. The execution of code continues in both cases.@*
+A group of @code{assertCondition} macros can print messages defined by the user as well. These macros look like @code{assertConditionMsg}.@*
+An example for using the  @code{assertCondition} macros from the @code{ListTest} unit test case, testing the list iterator:
+@example
+static
+void
+iterator( ListTest self )
+@{
+    list_append( self->foolist, foo_new() );
+	
+    assertTrue( self->foolist->first == list_first( self->foolist ) );
+    assertTrue( self->foolist->last == list_last( self->foolist ) );
+    assertTrue( list_first( self->foolist ) == list_last( self->foolist ) );
+	
+    list_append( self->foolist, foo_new() );
+	
+    assertTrue( self->foolist->first == list_first( self->foolist ) );
+    assertTrue( self->foolist->last == list_last( self->foolist ) );
+    assertFalse( list_first( self->foolist ) == list_last( self->foolist ) );
+    assertTrue( list_last( self->foolist ) == list_next( list_first( self->foolist ) ) );
+    assertTrue( list_first( self->foolist ) == list_previous( list_last( self->foolist ) ) );
+@}
+@end example
+For the complete list of @code{assertCondition} macros see the @strong{ooc} API documentation, or the @code{testcase.h} header file.
+@sp 1
+There is a macro that reports a failure unconditionally, this is the @code{fail} (or the @code{failMsg}) macro. It prints the error message unconditionally, and continues. It can be used if the condition to be tested is not a simple assertion, and the code runs on a bad path.
+@subsection Messages
+Normally the test cases do not print any message on the screen: they inform you about the actual method by printing its name, but this info will be deleted if the method was executed succesfully. On a Linux or Windows system there won't be any messages left on the display in case of expected results!@*
+@example
+~$ ./listtest
+~$
+@end example
+If some assertions fails, you will see a message similar to this one:
+@example
+~$ ./listtest
+[4] ListTest.iterator()          
+        Failed:  [listtest.c : 325]
+Test case ListTest failed: 30/1 (methods run/failed)
+~$
+@end example
+This could be an example, if our @code{ListTest::iterator()} method detected an error in the list iterator implementation. Let's see the meaning of the message!@*
+@enumerate
+@item
+The number in angle brackets shows the sequence number of the method: the failed method was the fourth executed method in the test case.
+@item
+@code{ListTest.iterator()} informs about the name of the method. The part before the period shows the name of the class, the part after the period identifies the name of the failed test method.
+@item
+The next line says that an assertion in this method failed. If we used an @code{assertConditionMsg} assertion, the message would be displayed here.
+@item
+In the angle brackets the exact location of the failed assertion is displayed: the name of the source code and the line number in the source code. This information helps you find the failed one fast and easily.
+@item
+The last line is a summary for the test case. It shows how many test methods was run in the test case, and how many of them was failed.
+@end enumerate
+
+In some cases your test method may throw an exception that is not caught by your method. These exceptions are caught by the TestCase class, displayed as follows, and the code execution continues with the next test method.
+
+@example
+~$ ./listtest
+[4] ListTest.iterator()          
+        Unexpected exception: Exception, code: 1, user code: 0
+~$
+@end example
+The caught exception was an @code{Exception} class with code 1. Since this is a core ooc exception, evaluating the @code{"exception.h"} header it can be seen, this is @code{err_out_of_memory}, probably our test method run out of memory.
+
+@subsection Overriding virtuals
+Use the @code{before_class(), before(), after(), after_class()} methods to prepare your test case for test methods. Similar to Unit 3: @code{before_class()} and @code{after_class()} will run only once: when instantiating your test case class, that is a subclass of @code{TestCase}.@*
+The @code{before()} and @code{after()} methods will run for each test method execution. Generally in @code{before()} you can prepare the necessary classes for your test methods, while in @code{after()} you should destroy them.@*
+You can use @code{assertConditionMsg} assertions freely in these virtuals. It might be usefull especially in the @code{after()} method to check that the test method did not corrupt the integrity of your test class.@*
+You can throw ecxeptions in @code{before()} and @code{before_class()} methods, but never throw in @code{after()}!@*
+For complicated test cases you can override these methods, since those are virtual methods (but do not do this, if you do not understand exactly how and when they are called. Check the source code if you have any doubt!)@*
+The exexcution order of the virtual methods is:
+@verbatim
+For each instantiation of your test case:
+{
+	Your testcase's parents' constructors
+	Your testcase's constructor
+	For each testcase_run( TestCase ):
+	{
+		Your test's parents' before_class() methods
+		Your test's before_class() method
+		For each test method in the test method table:
+		{
+			Your test's parents' before() methods
+			Your test's  before() method
+			Yor test method
+			Your test's  after() method
+			Your test's parents' after() methods
+		}
+		Your test's after_class() method
+		Your test's parents' after_class() methods
+	}
+	Your testcase's destructor
+	Your testcase's parents' destructors
+}
+@end verbatim
+
+@subsection Testing exceptions
+Test the expected exceptions as follows! Let's check the index overrun behavior of the Vector class:
+@example
+try @{
+    vector_get_item( self->vector, -1 );   /* Should throw an Exception! */
+    fail();                                /* Should never be executed! */
+@}
+catch_any
+    assertTrue( exception_get_error_code( exception ) == err_wrong_position );
+end_try;
+@end example
+@subsection Memory leak test
+Tests for possible memory leaks is an essential issue in C! Always run your test cases to discover memory leaks, because this helps you make your code robust and reliable!@*
+In @strong{ooc} the recommended way is using @strong{Valgrind} (@uref{http://valgrind.org}), a memory checker (and much more!) tool available under Linux. (For Windows I do not know such a tool, please infrom me if there is a similar possibility.)@*
+To perform a memory check, run your testcase in @strong{Valgrind}:
+@example
+~$ valgrind --leak-check=yes --quiet ./myclasstest
+@end example
+To minimize your headache, I recommend running only error free test cases under Valgrind! :-) Hunting for assertion failures together with memory problems could be a nightmare!
+@sp 1
+@strong{Note I.:} In the Linux standard C library there may be some optimizations that are reported by @strong{Valgrind} as a possible memory leak, but in fact they are not an error, especially not yours. If you face with this problem, you can suppress them. To supress them, create an empty test case, run it in @strong{Valgrind} and create a suppress file. For details see the @strong{Valgrind} documentation: "2.5. Suppressing errors" (@uref{http://valgrind.org/docs/manual/manual-core.html#manual-core.suppress}).
+@sp 1
+@strong{Note II.:} @strong{ooc} converts the Unix signals (SIGSEGV, SIGFPE) into ooc exceptions. This let us handle and display those problems the same way as other exceptions in ooc. Unfortunately @strong{Valgrind} overrides these signal handlers, and as a consequence, your test case can not be run under @strong{Valgrind} if you force emmitting these Unix signals (e.g. intentionally dereferencing a NULL pointer and checking for @code{SegmentationFault} exception.)
+
+@subsection Unit testing techniques:
+There are several best practices in Unit testing. Some of them could be used in @strong{ooc} as well.
+@subsubsection Inherited test cases
+If you must write many test cases that requires identical preparation or a special environment, then you may consider creating a test case to make this preparation and which could be the parent for your test cases.@*
+@strong{ooc} @code{TestCase} can be inherited!
+@subsubsection Using fake objects
+In this technique you can mimic the behaviour of an object that is not available during the execution of your test case: you simply replace a class with a fake class that behaves identical (or at least as expected), but does not do its job.@*
+Write your fake class in your test suite directory: all the method names must be identical to the original ones! Link your test case as usual, except that you define your fake object file earlier in the parameter line than the library containing your testable classes. The linker will use the symbols in the order they appear in the parameter list: replacing you class with the fake.
+@sp 1
+In Linux and Windows this is very simple! Just create your fake class with the @kbd{ooc} tool in the suite directory (you may copy it from your source directory). Do not copy the header file, since it should be the original one! As a naming convention the source file name must NOT end with @code{Test}, tail it with @code{Fake} instead.@*
+Modifiy your code in the fake class. The rest is done by the supplied Makefiles! (In Windows, you must add your file to the Makefile first!)
+@subsubsection Using mock objects
+I have no clue in this moment, how to elaborate this technique. :-(
+
 
 @node Class manipulation tool
 @chapter Class manipulation tool
@@ -1127,14 +1330,17 @@ You will have @code{foo.c}, @code{foo.h} and @code{implement/foo.h} files with c
 The following templates are available:
 @table @kbd
 @item sample
-The default template. This generates a class with 'protected' data members and implementation header. This class can be sublessed.
+The default template. This generates a class with 'protected' data members and implementation header. This class can be subclassed.
 (This is the default if you do not specify a @kbd{--source}.)
 
 @item private
-Class definition with private members only. This type of class can not be subclassed! (no implementation header)
+Class definition with private members only. This type of class can not be subclassed! (there is no implementation header)
 
 @item minimal
 A minimal class definition, only with a class implementation file (no headers). Use this for internal classes within a class.
+
+@item test
+Unit testing base class template.
 
 @end table
 
