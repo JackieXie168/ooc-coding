@@ -321,7 +321,7 @@ void
 iterator( ListTest self )
 {
 	list_append( self->foolist, foo_new() );
-	
+
 	assertTrue( self->foolist->first == list_first( self->foolist ) );
 	assertTrue( self->foolist->last == list_last( self->foolist ) );
 	assertTrue( list_first( self->foolist ) == list_last( self->foolist ) );

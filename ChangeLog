@@ -1,3 +1,8 @@
+1.1
+Manual for unit testing and API doc for TestCase.
+MPLAB C18 port, and unit tests for it.
+chain_constructor() depreceated, use ooc_super() instead!
+
 1.0
 Unit testing support
 More precise tests for the ooc libraries

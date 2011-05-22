@@ -316,9 +316,6 @@ testcase_run_methods(TestCase self)
 		
 			print_func_name( self, method->name, NULL );
 			method->method(self);
-			
-			print_func_name( self, method->name, "after" );
-			testcase_run_after_recursive( self, ooc_get_type( (Object) self ) );
 		}
 		catch_any {
 			ooc_lock( printing );
@@ -331,6 +328,10 @@ testcase_run_methods(TestCase self)
 							exception_get_user_code(exception));
 			current_test_failed = TRUE;
 			ooc_unlock( printing );
+		}
+		finally {
+			print_func_name( self, method->name, "after" );
+			testcase_run_after_recursive( self, ooc_get_type( (Object) self ) );
 		}
 		end_try;
 		
