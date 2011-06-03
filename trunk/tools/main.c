@@ -21,6 +21,7 @@
 
 
 #include <iso646.h>
+#include <stdlib.h>
 #include <string.h>
 #include <glib.h>
 
@@ -65,7 +66,8 @@ enum
 OperationCode
 {
 	OPERATION_NONE	=	0,
-	OPERATION_NEW
+	OPERATION_NEW,
+	OPERATION_TESTSUITE
 };
 
 struct
@@ -275,6 +277,14 @@ get_args( int argc, char * argv[] )
 			if( g_path_is_absolute ( argv[ i ] ) )
 				settings.input_dir  = g_path_get_dirname( argv[ i ] );
 			settings.input_file = g_path_get_basename( argv[ i ] );
+			}
+			
+		else if( g_strcmp0( argv[i], "--testsuite" ) == 0 ) {
+			if( argc != 2 ) {
+				g_printerr( "--testsuite command has no other parameters!\n" );
+				return OOC_TOOL_ERROR_FEW_PARAMETERS;
+				}
+			operation = OPERATION_TESTSUITE;
 			}
 			
 		else {
@@ -548,6 +558,23 @@ replace_templates( Settings set )
 		return OOC_TOOL_ERROR_CANT_OPEN_FILE;
 }
 
+static
+void
+create_testsuite( Settings set )
+{
+	char * command;
+	
+#ifndef WIN32
+	command = g_strdup_printf( "cp -u %s/unit/* .",  set->input_dir );
+#else
+	command = g_strdup_printf( "copy %s\\unit\\*.*",  set->input_dir );
+#endif
+	
+	if( command ) {
+		system( command );
+		g_free( command );
+		}
+}
 
 int
 main( int argc, char * argv[] )
@@ -563,6 +590,11 @@ main( int argc, char * argv[] )
 	if( operation == OPERATION_NEW ) {
 		
 		replace_templates( & settings );
+		
+		}
+	else if( operation == OPERATION_TESTSUITE ) {
+		
+		create_testsuite( & settings );
 		
 		};
 		
