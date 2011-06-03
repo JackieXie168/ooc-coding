@@ -1254,6 +1254,7 @@ There are several best practices in Unit testing. Some of them could be used in 
 @subsubsection Inherited test cases
 If you must write many test cases that requires identical preparation or a special environment, then you may consider creating a test case to make this preparation and which could be the parent for your test cases.@*
 @strong{ooc} @code{TestCase} can be inherited!
+@anchor{Using fake objects}
 @subsubsection Using fake objects
 In this technique you can mimic the behaviour of an object that is not available during the execution of your test case: you simply replace a class with a fake class that behaves identical (or at least as expected), but does not do its job.@*
 Write your fake class in your test suite directory: all the method names must be identical to the original ones! Link your test case as usual, except that you define your fake object file earlier in the parameter line than the library containing your testable classes. The linker will use the symbols in the order they appear in the parameter list: replacing you class with the fake.
@@ -1261,7 +1262,54 @@ Write your fake class in your test suite directory: all the method names must be
 In Linux and Windows this is very simple! Just create your fake class with the @kbd{ooc} tool in the suite directory (you may copy it from your source directory). Do not copy the header file, since it should be the original one! As a naming convention the source file name must NOT end with @code{Test}, tail it with @code{Fake} instead.@*
 Modifiy your code in the fake class. The rest is done by the supplied Makefiles! (In Windows, you must add your file to the Makefile first!)
 @subsubsection Using mock objects
-I have no clue in this moment, how to elaborate this technique. :-(
+I have no clue in this moment, how to elaborate this technique in C. :-(
+@subsection Dependency lookup
+For effective unit testing you need a design in wich your classes do not rely on their dependencies. Establishing your classes uncoupled helps you reuse them much easier and lets you implement unit testing. (For more infromation on this topic I recommend some googling on dependency injection, dependency lookup and such topics in Java.)
+Theoretically it is possible writing a cotainer class in @strong{ooc} that could handle the object/class dependencies based on an external descriptor file (e.g. XML), like in some Java implementations. Although it would be possible, it will not be feasible: small microcontollers do not have the power to execute effectively.
+So I recommend using the "dependency lookup" idiom in @strong{ooc} with a very simple implementation:
+@enumerate
+@item
+In your class's implementation source file define an external function prototype, like this:@*
+@example
+void injectMyClass( MyClass self );
+@end example
+This is your injector method for your class.
+@item
+In your class's constructor call your injector. It is the injector's responsibility to fill the members with the dependencies of your class. Do not set those members in your constructor. It is a good idea to put some check in your code that validates the injected dependencies, at least in the debug version.
+@example
+Static
+Void
+MyClass_constructor( MyClass self, void * param )
+@{
+   chain_constructor( MyClass, self, NULL );
+   injectMyClass( self );
+   assert( ooc_isInstanceOf( self->settings, Settings ) );
+@}
+@end example
+@item
+Create your injector method in a separate file, let's call it @code{injector.c}.
+@example
+#include "myclass.h"
+#include "implement/myclass.h"
+#include "settings.h"
+
+void injectMyClass( MyClass self )
+@{
+   self->settings = settings_new();
+@}
+@end example
+You can inject singleton objects too, if you create them before any call to injectors, or you can use reference counted objects for your dependencies alternatively.@*
+Implement your other injectors in this file too.
+@item
+Compile and link together your object files.
+@item
+Copy your injector file into your unit testing directory, and rewrite it as it is required by your unit tests. Compile and link your test: pay atention to link your test injector, instead of the original one! (The supplied Makefiles will take care.)@*
+@xref{Using fake objects}.
+
+@end enumerate
+
+However in Java there is only a idiom called "inject while constructing", in @strong{ooc} it makes sense "inject while initializing". Implement injectors for your initialization methods separately, when it makes sense. (e.g. Injecting virtual functions into the virtual table.)@*
+@strong{Important!} Take care of your design in your classes, that if there is a circular dependency (typically a reference-back) between your classes, this approach will result in an endless loop! Break up the circular dependency, and pass the back reference as a constructor parameter!
 
 
 @node Class manipulation tool
