@@ -60,6 +60,8 @@ typedef int		(* vector_item_checker ) ( void * item, void * param );
 /* Vector member functions
  */
  
+#ifndef OOC_NO_DYNAMIC_MEM
+
 /** Vector constructor.
  * Creates a new non-typed vector.
  * @param	chunk_size	The chunk size of the Vector. This is used as the initial size of the 
@@ -82,6 +84,7 @@ Vector			vector_new( VectorIndex chunk_size, vector_item_destroyer destroyer );
  * 						the Vector), @c FALSE if you manage those other way.
  * @return	The newly created Vector.
  * @note	This is a convenient macro for _vector_new_type().
+ * @hideinitializer
  */
  
 #define			vector_new_type( chunk_size, pClass, manage ) _vector_new_type( chunk_size, & pClass ## Class, manage )
@@ -109,6 +112,70 @@ Vector			_vector_new_type( VectorIndex chunk_size, Class type, int manage );
  */ 
 
 Vector			vector_new_from_table( void * table, size_t record_size, VectorIndex table_size );
+
+#else /* OOC_NO_DYNAMIC_MEM defined */
+
+/** Vector constructor.
+ * Builds a new non-typed vector from a preallocated block of memory and assigns a static store to it.
+ * @param	vector		The location of the VectorObject to be constructed.
+ * @param	size		The size of the Vector. This is used as the maximal size of the vector.
+ * @param	destroyer	The destructor for the items stored in the Vector (usually ooc_release()).
+ *						You can pass @c NULL if you store static items in the Vector,
+ * 						or you take care of releasing the item's other way.
+ * @param	store		The memory block assigned to the Vector that will hold the pointers to
+ *						the VectorItems. The strore must be statically allocated, and must be
+ *						large enough to store @c size pieces of VectorItem pointers.
+ * @note	Usable in static memory models only (OOC_NO_DYNAMIC_MEM)!
+ * @code
+#define MY_VECTOR_SIZE	13
+
+void * 			myVectorStore[ MY_VECTOR_SIZE ];
+VectorObject	myVector;
+
+vector_use_with_store( & myVector, MY_VECTOR_SIZE, NULL, myVectorStore );
+ * @endcode
+ * @see 	vector_use_type_with_store()
+ */
+
+void			vector_use_with_store( Vector vector, VectorIndex size, vector_item_destroyer destroyer, void* store[] );
+
+/** @def vector_use_type_with_store( vector, size, pClass, manage, store )
+ * @brief Vector constructor.
+ * Builds a new typed vector from a preallocated block of memory and assigns a static store to it.
+ * @param	vector		The location of the VectorObject to be constructed.
+ * @param	size		The size of the Vector. This is used as the maximal size of the vector.
+ * @param	pClass		The type of the items in the Vector. (Name of the class.)
+ * @param	manage		@c TRUE is the Vector must manage the stored items (release when destroying
+ * 						the Vector), @c FALSE if you manage those other way.
+ * @param	store		The memory block assigned to the Vector that will hold the pointers to
+ *						the VectorItems. The strore must be statically allocated, and must be
+ *						large enough to store @c size pieces of VectorItem pointers.
+ * @note	This is a convenient macro for _vector_use_type_with_store().
+ * @note	Usable in static memory models only (OOC_NO_DYNAMIC_MEM)!
+ * @see 	vector_use_with_store()
+ * @hideinitializer
+ */
+ 
+#define			vector_use_type_with_store( vector, size, pClass, manage, store ) \
+					_vector_use_type_with_store( vector, size, & pClass ## Class, manage, store )
+
+/** Vector constructor.
+ * Builds a new typed vector from a preallocated block of memory and assigns a static store to it.
+ * @param	vector		The location of the VectorObject to be constructed.
+ * @param	size		The size of the Vector. This is used as the maximal size of the vector.
+ * @param	type		The type of the items in the Vector. (Class Table pointer.)
+ * @param	manage		@c TRUE is the Vector must manage the stored items (release when destroying
+ * 						the Vector), @c FALSE if you manage those other way.
+ * @param	store		The memory block assigned to the Vector that will hold the pointers to
+ *						the VectorItems. The strore must be statically allocated, and must be
+ *						large enough to store @c size pieces of VectorItem pointers.
+ * @note	Usable in static memory models only (OOC_NO_DYNAMIC_MEM)!
+ * @see 	vector_use_with_store()
+ */
+
+void			_vector_use_type_with_store( Vector vector, VectorIndex size, Class type, int manage, void* store[] );
+
+#endif /* OOC_NO_DYNAMIC_MEM */
 
 /** Put an item at the end of the Vector.
  * @param	vector	The vector.
