@@ -270,7 +270,7 @@ get_args( int argc, char * argv[] )
 			settings.output_file = g_path_get_basename( argv[ i ] );
 			}
 			
-		else if( not g_strcmp0( argv[i], "-s" ) or not g_strcmp0( argv[i], "--source" ) ) {
+		else if( not g_strcmp0( argv[i], "-s" ) or not g_strcmp0( argv[i], "--source" ) or not g_strcmp0( argv[i], "--template" ) ) {
 			if( ( i+1 == argc ) or ( argv[i+1][0] == '-' ) ) {
 				g_printerr( "Missing source file name\n" );
 				return OOC_TOOL_ERROR_FEW_PARAMETERS;
