@@ -41,7 +41,7 @@
  *  @brief TestCase class - base class for unit testing.
  * TestCase is a base class for unit testing. All of your Unit tests inherits TestCase.
  * The process to create a new unit test in your project:
- * -# Create a new test class with: @code $ooc --new MyTest --source test @endcode
+ * -# Create a new test class with: @code $ ooc --new MyTest --template test @endcode
  * -# Override the necessary virtual methods
  * -# implement your test methods
  * -# create the test methods table

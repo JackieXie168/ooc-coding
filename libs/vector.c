@@ -27,6 +27,7 @@
  */
 
 #include "vector.h"
+#include "implement/vector.h"
 
 /** @class Vector
  *  @brief Vector class - a standard ooc container.
@@ -60,27 +61,6 @@ Virtuals( Vector, Base )
 
 EndOfVirtuals;
 
-/*   Private class members
- */
- 
-typedef void * VectorItem;
- 
-ClassMembers( Vector, Base )
-
-	VectorIndex		allocated;
-	VectorIndex		allocation_chunks;
-	VectorItem *	items;
-	VectorIndex		number_of_items;
-	
-	Class					type;
-	vector_item_destroyer	destroy;
-	
-#ifndef NO_THREADS
-	ooc_Mutex		modify;
-#endif
-
-EndOfClassMembers;
-
 /* Class virtual function prototypes
  */
 
@@ -103,28 +83,24 @@ Vector_initialize( Class this )
 /* Class finalizing
  */
 
+#ifndef OOC_NO_FINALIZE
+
 static
 void
 Vector_finalize( Class this )
 {
 }
 
+#endif
 
 /* Constructor
  */
-
-struct vector_const_params
-{
-	VectorIndex				size;
-	vector_item_destroyer	destroy;
-	Class					type;
-};
 
 static
 void
 Vector_constructor( Vector self, const void * params )
 {
-	struct vector_const_params const * p = params;
+	struct VectorConstructorParams const * p = params;
 	
 	assert( ooc_isInitialized( Vector ) );
 	
@@ -132,13 +108,21 @@ Vector_constructor( Vector self, const void * params )
 	
 	ooc_mutex_init( self->modify );
 	
-	self->allocation_chunks	= p->size;
+	self->allocated = p->size;
 	self->destroy = p->destroy;
 	self->type = p->type;
 	
-	self->allocated = self->allocation_chunks;
+	#ifndef OOC_NO_DYNAMIC_MEM
+
+	self->allocation_chunks	= p->size;
 	
 	self->items = ooc_malloc( self->allocated * sizeof(VectorItem) );
+
+	#else
+
+	self->items = p->store;
+
+	#endif
 }
 
 /* Destructor
@@ -156,7 +140,15 @@ Vector_destructor( Vector self, VectorVtable vtab )
 		for( i = 0; i < self->number_of_items; i++ )
 			self->destroy( self->items[ i ] );
 		
+	#ifndef OOC_NO_DYNAMIC_MEM
+
 	ooc_free_and_null( (void **) & self->items );
+
+	#else
+
+	self->items = NULL;
+
+	#endif
 	
 	ooc_mutex_release( self->modify );
 }
@@ -175,11 +167,12 @@ Vector_copy( Vector self, const Vector from )
 	Class member functions
  */
 
+#ifndef OOC_NO_DYNAMIC_MEM
 
 Vector
 vector_new( VectorIndex size, vector_item_destroyer destroy )
 {
-	struct vector_const_params p;
+	struct VectorConstructorParams p;
 	
 	p.size = size;
 	p.destroy = destroy;
@@ -191,7 +184,7 @@ vector_new( VectorIndex size, vector_item_destroyer destroy )
 Vector
 _vector_new_type( VectorIndex size, Class type, int manage )
 {
-	struct vector_const_params p;
+	struct VectorConstructorParams p;
 	
 	if( ! _ooc_isClassOf( type, & BaseClass ) )
 		ooc_throw( exception_new( err_bad_cast ) );
@@ -212,7 +205,7 @@ vector_new_from_table( void * table, size_t record_size, VectorIndex num_of_reco
 	Vector vector;
 	char * tp;
 	VectorIndex counter;
-	struct vector_const_params p;
+	struct VectorConstructorParams p;
 	
 	p.size = num_of_records;
 	p.destroy = NULL;
@@ -228,15 +221,59 @@ vector_new_from_table( void * table, size_t record_size, VectorIndex num_of_reco
 	return vector;
 }
 
+#else /* OOC_NO_DYNAMIC_MEM defined */
+
+void
+vector_use_with_store( Vector vector, VectorIndex size, vector_item_destroyer destroy, VectorItem store[] )
+{
+	struct VectorConstructorParams p;
+	
+	p.size = size;
+	p.destroy = destroy;
+	p.type = NULL;
+	p.store = store;
+	
+	ooc_use( vector, Vector, (void*) & p );
+}
+
+void
+_vector_use_type_with_store( Vector vector, VectorIndex size, Class type, int manage, VectorItem store[] )
+{
+	struct VectorConstructorParams p;
+	
+	if( ! _ooc_isClassOf( type, & BaseClass ) )
+		ooc_throw( exception_new( err_bad_cast ) );
+	
+	p.size = size;
+	p.type = type;
+	if( manage )
+		p.destroy = (vector_item_destroyer) ooc_release;
+	else
+		p.destroy = NULL;
+	
+	p.store = store;
+	
+	ooc_use( vector, Vector, (void*) & p );
+}
+
+#endif /* OOC_NO_DYNAMIC_MEM */
+
 static
 void
 vector_realloc_if_needed( Vector self )
 {
 	if( self->number_of_items == self->allocated ) {
 		
+		#ifndef OOC_NO_DYNAMIC_MEM
+
 		self->allocated += self->allocation_chunks;
-		
 		self->items = ooc_realloc( self->items, self->allocated * sizeof(VectorItem) );
+
+		#else
+
+		ooc_throw( exception_new( err_out_of_memory ) );
+
+		#endif
 		}
 }
 
@@ -279,8 +316,8 @@ vector_insert( Vector self, VectorIndex position, void * data )
 	vector_realloc_if_needed( self );
 	
 	if( position != self->number_of_items )
-		memmove(& ( self->items[ position + 1 ] ), 								/* destination */
-				& ( self->items[ position ] ),									/* source */
+		memmove((GEN_PTR) & ( self->items[ position + 1 ] ), 					/* destination */
+				(GEN_PTR) & ( self->items[ position ] ),						/* source */
 				( self->number_of_items - position ) * sizeof( VectorItem ) );	/* len */
 	
 	self->items[ position ] = ooc_pass( data );
@@ -307,8 +344,8 @@ vector_delete_item( Vector self, VectorIndex position )
 	tmp = self->items[ position ];
 	
 	if( position != self->number_of_items-1 )
-		memmove(& ( self->items[ position ] ), 											/* destination */
-				& ( self->items[ position + 1 ] ),										/* source */
+		memmove((GEN_PTR) & ( self->items[ position ] ), 								/* destination */
+				(GEN_PTR) & ( self->items[ position + 1 ] ),							/* source */
 				( self->number_of_items - (position + 1) ) * sizeof( VectorItem ) );	/* len */
 	
 	self->number_of_items --;
