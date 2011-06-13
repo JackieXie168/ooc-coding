@@ -46,6 +46,7 @@ error_codes
 	err_can_not_be_duplicated,			/**< duplication of an object is invalid */
 	err_wrong_position,					/**< insertion at wrong position into a container */
 	err_bad_connect,					/**< signal connection failure */
+	err_already_in_use,					/**< resource (Object) is already in use */
 
 	err_user_code		= ~0			/**< Non ooc core exception == user defined exception */
 };

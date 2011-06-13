@@ -54,7 +54,7 @@ typedef void	(* vector_item_executor ) ( void * item, void * param );
  * @see vector_foreach_until_true(), vector_find_item(), vector_find_item_reverse().
  */
  
-typedef int		(* vector_item_checker ) ( void * item, void * param );
+typedef int	(* vector_item_checker ) ( void * item, void * param );
 
 
 /* Vector member functions
@@ -113,7 +113,7 @@ Vector			_vector_new_type( VectorIndex chunk_size, Class type, int manage );
 
 Vector			vector_new_from_table( void * table, size_t record_size, VectorIndex table_size );
 
-#else /* OOC_NO_DYNAMIC_MEM defined */
+#endif /* OOC_NO_DYNAMIC_MEM defined */
 
 /** Vector constructor.
  * Builds a new non-typed vector from a preallocated block of memory and assigns a static store to it.
@@ -124,23 +124,22 @@ Vector			vector_new_from_table( void * table, size_t record_size, VectorIndex ta
  * 						or you take care of releasing the item's other way.
  * @param	store		The memory block assigned to the Vector that will hold the pointers to
  *						the VectorItems. The strore must be statically allocated, and must be
- *						large enough to store @c size pieces of VectorItem pointers.
- * @note	Usable in static memory models only (OOC_NO_DYNAMIC_MEM)!
+ *						large enough to store @c size pieces of @c void* .
  * @code
 #define MY_VECTOR_SIZE	13
 
-void * 			myVectorStore[ MY_VECTOR_SIZE ];
-VectorObject	myVector;
+void *          myVectorStore[ MY_VECTOR_SIZE ];
+VectorObject    myVector;
 
 vector_use_with_store( & myVector, MY_VECTOR_SIZE, NULL, myVectorStore );
  * @endcode
+ * @note	Recommended in static memory models only (OOC_NO_DYNAMIC_MEM).
  * @see 	vector_use_type_with_store()
  */
 
 void			vector_use_with_store( Vector vector, VectorIndex size, vector_item_destroyer destroyer, void* store[] );
 
-/** @def vector_use_type_with_store( vector, size, pClass, manage, store )
- * @brief Vector constructor.
+/** Vector constructor.
  * Builds a new typed vector from a preallocated block of memory and assigns a static store to it.
  * @param	vector		The location of the VectorObject to be constructed.
  * @param	size		The size of the Vector. This is used as the maximal size of the vector.
@@ -151,7 +150,7 @@ void			vector_use_with_store( Vector vector, VectorIndex size, vector_item_destr
  *						the VectorItems. The strore must be statically allocated, and must be
  *						large enough to store @c size pieces of VectorItem pointers.
  * @note	This is a convenient macro for _vector_use_type_with_store().
- * @note	Usable in static memory models only (OOC_NO_DYNAMIC_MEM)!
+ * @note	Recommended in static memory models only (OOC_NO_DYNAMIC_MEM).
  * @see 	vector_use_with_store()
  * @hideinitializer
  */
@@ -169,13 +168,11 @@ void			vector_use_with_store( Vector vector, VectorIndex size, vector_item_destr
  * @param	store		The memory block assigned to the Vector that will hold the pointers to
  *						the VectorItems. The strore must be statically allocated, and must be
  *						large enough to store @c size pieces of VectorItem pointers.
- * @note	Usable in static memory models only (OOC_NO_DYNAMIC_MEM)!
- * @see 	vector_use_with_store()
+ * @note	Recommended in static memory models only (OOC_NO_DYNAMIC_MEM).
+ * @see 	vector_use_type_with_store(), vector_use_with_store()
  */
 
 void			_vector_use_type_with_store( Vector vector, VectorIndex size, Class type, int manage, void* store[] );
-
-#endif /* OOC_NO_DYNAMIC_MEM */
 
 /** Put an item at the end of the Vector.
  * @param	vector	The vector.
@@ -308,7 +305,7 @@ VectorIndex		vector_find_item        ( Vector vector, VectorIndex index,  vector
  * @param	index	The starting position of the search.
  * @param	checker	The checker to be executed.
  * 					The @c checker is a C function, and must have two parameters:
- * 					the first will point to the item, the second holpd the parameter. This is a 
+ * 					the first will point to the item, the second holds the parameter. This is a 
  * 					normal way of calling a class method too.
  * 					The @c checker must return @c TRUE if we found the item or @c FALSE otherwise.
  * @param	param	The second parameter to be passed to the @c checker.
