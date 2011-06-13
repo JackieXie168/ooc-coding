@@ -1,18 +1,23 @@
-#!/bin/bash
-# Running test cases as a test suite with memory leak check
+#! /bin/bash
+# Running all test cases as a test suite with memory leak check
 
+MYNAME=`basename $0`
+RETURN=0
+ARGS="$@"
 
-valgrind --leak-check=yes --quiet ./ooctest
+for i in *; do
+ [[ $i == $MYNAME ]] && continue
+ [[ -x ./$i ]] || continue
+ [[ -d ./$i ]] && continue
 
-valgrind --leak-check=yes --quiet ./exceptiontest
+ # Filter out those executables that should not run in Valgrind
+ [[ $i == "my...test" ]] && continue
 
-# This test should not be run in Valgrind because it uses unix signals
-./testcasetest
+ # Run the testcase in valgrind
+ valgrind --leak-check=yes --quiet ./$i $ARGS ; R=$?
 
-valgrind --leak-check=yes --quiet ./refcountedtest
+ [[ $R != 0 ]] && RETURN=1
+done
 
-valgrind --leak-check=yes --quiet ./vectortest
+exit $RETURN
 
-valgrind --leak-check=yes --quiet ./listtest
-
-valgrind --leak-check=yes --quiet ./signaltest
