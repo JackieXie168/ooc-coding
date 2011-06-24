@@ -16,6 +16,9 @@
 <tool id="cdt.managedbuild.tool.gnu.assembler.lib.debug.237532505" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.lib.debug"/>
 <macros/>
 </toolChain>
+<resourceConfiguration exclude="true" id="cdt.managedbuild.config.gnu.lib.debug.2104771532./libs/list_mod.c" name="list_mod.c" rcbsApplicability="disable" resourcePath="/libs/list_mod.c" toolsToInvoke="cdt.managedbuild.tool.gnu.c.compiler.lib.debug.938189461./libs/list_mod.c">
+<tool id="cdt.managedbuild.tool.gnu.c.compiler.lib.debug.938189461./libs/list_mod.c" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.lib.debug.938189461"/>
+</resourceConfiguration>
 </configuration>
 <configuration artifactExtension="a" artifactName="ooc" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.config.gnu.lib.release.1290241984" name="Release_gomp" parent="cdt.managedbuild.config.gnu.lib.release">
 <toolChain id="cdt.managedbuild.toolchain.gnu.lib.release.960022714" name="GCC Tool Chain" superClass="cdt.managedbuild.toolchain.gnu.lib.release">
