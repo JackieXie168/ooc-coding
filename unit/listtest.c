@@ -536,7 +536,6 @@ static
 void
 remove_first_item( ListTest self )
 {
-	ListIterator 	iterator;
 	Foo				foo;
 	
 	list_append( self->foolist, foo_new_with_data( 34 ) );
@@ -554,7 +553,6 @@ static
 void
 remove_last_item( ListTest self )
 {
-	ListIterator 	iterator;
 	Foo				foo;
 	
 	list_append( self->foolist, foo_new_with_data( 0 ) );
