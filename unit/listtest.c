@@ -331,8 +331,8 @@ iterator( ListTest self )
 	assertTrue( self->foolist->first == list_first( self->foolist ) );
 	assertTrue( self->foolist->last == list_last( self->foolist ) );
 	assertFalse( list_first( self->foolist ) == list_last( self->foolist ) );
-	assertTrue( list_last( self->foolist ) == list_next( list_first( self->foolist ) ) );
-	assertTrue( list_first( self->foolist ) == list_previous( list_last( self->foolist ) ) );
+	assertTrue( list_last( self->foolist ) == list_next( self->foolist, list_first( self->foolist ) ) );
+	assertTrue( list_first( self->foolist ) == list_previous( self->foolist, list_last( self->foolist ) ) );
 	
 }
 
@@ -343,7 +343,7 @@ check_sequential( List list )
 	int i;
 	ListIterator  iterator = list_first( list );
 		
-	for( i=0, iterator = list_first( list ); iterator != NULL; i++, iterator = list_next( iterator ) )
+	for( i=0, iterator = list_first( list ); iterator != NULL; i++, iterator = list_next( list, iterator ) )
 	{
 		Object item = (Object) list_get_item( iterator );
 		
@@ -367,7 +367,7 @@ append( ListTest self )
 	for( i=0; i<list_size; i++ )
 		list_append( self->foolist, foo_new_with_data( i ) );
 		
-	for( i=0, iterator = list_first( self->foolist ); i<list_size; i++, iterator = list_next( iterator ) )
+	for( i=0, iterator = list_first( self->foolist ); i<list_size; i++, iterator = list_next( self->foolist, iterator ) )
 		assertTrue( foo_get_data( ooc_cast( list_get_item( iterator ), Foo ) ) == i );
 }
 
@@ -389,7 +389,7 @@ paralell_append( ListTest self )
 	for( i=0; i<check_size; i++ )
 		list_append( self->foolist, foo_new_with_data( i ) );
 
-	for( i=0, iterator = list_first( self->foolist ); i<check_size; i++, iterator = list_next( iterator ) )
+	for( i=0, iterator = list_first( self->foolist ); i<check_size; i++, iterator = list_next( self->foolist, iterator ) )
 	{
 		int index;
 		index = foo_get_data( ooc_cast( list_get_item( iterator ), Foo ) );
@@ -413,7 +413,7 @@ prepend( ListTest self )
 	for( i=0; i<list_size; i++ )
 		list_prepend( self->foolist, foo_new_with_data( i ) );
 		
-	for( i=0, iterator = list_first( self->foolist ); i<list_size; i++, iterator = list_next( iterator ) )
+	for( i=0, iterator = list_first( self->foolist ); i<list_size; i++, iterator = list_next( self->foolist, iterator ) )
 		assertTrue( foo_get_data( ooc_cast( list_get_item( iterator ), Foo ) ) == list_size - i - 1 );
 }
 
@@ -435,7 +435,7 @@ paralell_prepend( ListTest self )
 	for( i=0; i<check_size; i++ )
 		list_prepend( self->foolist, foo_new_with_data( i ) );
 
-	for( i=0, iterator = list_first( self->foolist ); i<check_size; i++, iterator = list_next( iterator ) )
+	for( i=0, iterator = list_first( self->foolist ); i<check_size; i++, iterator = list_next( self->foolist, iterator ) )
 	{
 		int index;
 		index = foo_get_data( ooc_cast( list_get_item( iterator ), Foo ) );
@@ -458,7 +458,7 @@ insert_before( ListTest self )
 	list_append( self->foolist, foo_new_with_data( 3 ) );
 	
 	iterator = list_first( self->foolist );
-	iterator = list_next( iterator );
+	iterator = list_next( self->foolist, iterator );
 
 	list_insert_before( self->foolist, iterator, foo_new_with_data( 2 ) );
 
@@ -522,8 +522,8 @@ remove_item( ListTest self )
 	list_append( self->foolist, foo_new_with_data( 2 ) );
 	
 	iterator = list_first( self->foolist );
-	iterator = list_next( iterator );
-	iterator = list_next( iterator );
+	iterator = list_next( self->foolist, iterator );
+	iterator = list_next( self->foolist, iterator );
 	
 
 	foo = list_remove_item( self->foolist, iterator );
@@ -608,8 +608,8 @@ delete_item( ListTest self )
 	list_append( self->foolist, foo_new_with_data( 2 ) );
 	
 	iterator = list_first( self->foolist );
-	iterator = list_next( iterator );
-	iterator = list_next( iterator );
+	iterator = list_next( self->foolist, iterator );
+	iterator = list_next( self->foolist, iterator );
 
 	list_delete_item( self->foolist, iterator );
 		
@@ -937,7 +937,7 @@ find_item( ListTest self )
 		{
 			found_counter++;
 			assertTrue( foo_get_data( ooc_cast( list_get_item( found ), Foo ) ) == expected_value );
-			found = list_next( found );
+			found = list_next( self->foolist, found );
 		}
 	} while( found );
 	assertTrue( found_counter == to_be_found );
@@ -970,10 +970,61 @@ find_item_reverse( ListTest self )
 		{
 			found_counter++;
 			assertTrue( foo_get_data( ooc_cast( list_get_item( found ), Foo ) ) == expected_value );
-			found = list_previous( found );
+			found = list_previous( self->foolist, found );
 		}
 	} while( found );
 	assertTrue( found_counter == to_be_found );
+}
+
+static
+void
+bad_reuse( ListTest self )
+{
+	FooNode	node;
+	ListIterator position;
+	
+	list_append( self->foonodelist, foonode_new_with_data( 0 ) );
+	list_append( self->foonodelist, foonode_new_with_data( 1 ) );
+	
+	node = foonode_new_with_data( 2 );
+	list_append( self->foonodelist, node );
+
+	position = list_append( self->foonodelist, foonode_new_with_data( 3 ) );
+	
+	list_append( self->foonodelist, foonode_new_with_data( 4 ) );
+	list_append( self->foonodelist, foonode_new_with_data( 5 ) );
+	
+	try {
+		list_append( self->foonodelist, node );
+		fail();
+		}
+	catch_any
+		assertTrue( exception_get_error_code( exception ) == err_already_in_use );
+	end_try;
+	
+	try {
+		list_prepend( self->foonodelist, node );
+		fail();
+		}
+	catch_any
+		assertTrue( exception_get_error_code( exception ) == err_already_in_use );
+	end_try;
+	
+	try {
+		list_insert_after( self->foonodelist, position, node );
+		fail();
+		}
+	catch_any
+		assertTrue( exception_get_error_code( exception ) == err_already_in_use );
+	end_try;
+	
+	try {
+		list_insert_before( self->foonodelist, position, node );
+		fail();
+		}
+	catch_any
+		assertTrue( exception_get_error_code( exception ) == err_already_in_use );
+	end_try;
 }
 
 /** Test methods order table.
@@ -1014,6 +1065,7 @@ struct TestCaseMethod methods[] =
 	TEST(foreach_delete_if),
 	TEST(find_item),
 	TEST(find_item_reverse),
+	TEST(bad_reuse),
 	
 	{NULL, NULL} /* Do NOT delete this line! */
 };

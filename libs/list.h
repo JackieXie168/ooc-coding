@@ -240,6 +240,7 @@ ListIterator    list_last( List list );
 void *          list_get_item( ListIterator listiterator );
 
 /** Gets the iterator of the next item in the list.
+ * @param	list			The list
  * @param	listiterator	The position of the current item in the list. It must be a valid list iterator,
  * 							passing @c NULL will throw @c err_wrong_position exception.
  * @return	The ListIterator of the next item in the list, or @c NULL if there are no more items.
@@ -247,15 +248,16 @@ void *          list_get_item( ListIterator listiterator );
  * 			the listiterator itself. Noded Lists consider the ListNodes as items.
  */
 
-ListIterator    list_next( ListIterator listiterator );
+ListIterator    list_next( List list, ListIterator listiterator );
 
 /** Gets the iterator of the previous item in the list.
+ * @param	list			The list
  * @param	listiterator	The position of the current item in the list. It must be a valid list iterator,
  * 							passing @c NULL will throw @c err_wrong_position exception.
  * @return	The ListIterator of the previous item in the list, or @c NULL if there are no more items.
  */
 
-ListIterator    list_previous( ListIterator listiterator );
+ListIterator    list_previous( List list, ListIterator listiterator );
 
 /** Changes two items' position in the list.
  * @param	list			The list.
