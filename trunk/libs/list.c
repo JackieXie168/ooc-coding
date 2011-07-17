@@ -26,6 +26,7 @@
 /* This is a class implementation file
  */
 
+#include "list.h"
 #include "implement/list.h"
 
 /** @class List
@@ -38,7 +39,7 @@
  * List is a container class, that can hold pointers to any kind of data.
  * Every item stored in the list must work perfectly with the supplied list item destroyer!
  * In practice this means, that you can only store items in the list that has the same deletion method.
- * @note	List implementation is thread safe, in the manner, that adding to or deleting items from the List
+ * @note	List implementation is thread safe, in the manner, that adding items to, or deleting from the List
  * 			will not mesh up the List. But the ListIterators may become invalid if multiple threads modify the
  * 			same List object. As a consecvence the @c _foreach_ and @c _find_ methods may behave unexpectedly
  * 			if an other thread is modifying the List! Make your own locking if needed! 
@@ -100,6 +101,8 @@ ListNode_copy( ListNode self, const ListNode from )
 /* ListNode for general list items
  */
  
+#ifndef OOC_NO_DYNAMIC_MEM
+
 DeclareClass( _ListNodeVoidp, ListNode );
 
 Virtuals( _ListNodeVoidp, ListNode )
@@ -155,6 +158,8 @@ _ListNodeVoidp_copy( _ListNodeVoidp self, const _ListNodeVoidp from )
 	return OOC_COPY_DONE;
 }
 
+#endif /* OOC_NO_DYNAMIC_MEM */
+
 /************************************************
  * List class preparation
  */
@@ -163,7 +168,9 @@ static
 void
 List_initialize( Class this )
 {
+#ifndef OOC_NO_DYNAMIC_MEM
 	ooc_init_class( _ListNodeVoidp );
+#endif
 }
 
 /* Class finalizing
@@ -245,12 +252,16 @@ List_copy( List self, const List from )
 	List chain / unchain helpers
  */
 
+typedef struct ListNodeObject * ListNode;
+
 static
 ListNode
 create_new_node( List self, void * new_item )
 {
 	ListNode tmp;
 	
+#ifndef OOC_NO_DYNAMIC_MEM
+
 	if( self->list_of_nodes ) {
 		tmp = (ListNode) new_item;
 		if( tmp->next != NULL || tmp->previous != NULL )
@@ -261,6 +272,12 @@ create_new_node( List self, void * new_item )
 		tmp = (ListNode) ooc_new( _ListNodeVoidp, NULL );
 		get_item_ptr(tmp) = (void * ) ooc_pass( new_item );
 		}
+#else
+	assert( self->list_of_nodes );
+	tmp = ooc_cast( new_item, ListNode);
+	if( tmp->next != NULL || tmp->previous != NULL )
+		ooc_throw( exception_new( err_already_in_use ) );
+#endif
 
 	return tmp;	
 }
@@ -335,6 +352,8 @@ unchain( List self, ListIterator location ) /* List must be locked */
 	Class member functions
  */
 
+#ifndef OOC_NO_DYNAMIC_MEM
+
 List
 list_new( list_item_destroyer destroyer )
 {
@@ -376,6 +395,8 @@ _list_new_of_nodes( Class node, int manage )
 	
 	return (List) ooc_new( List, & p );
 }
+
+#endif /* OOC_NO_DYNAMIC_MEM */
 
 ListIterator
 list_append( List self, void * new_item )
@@ -656,8 +677,10 @@ list_swap( List self, ListIterator node1, ListIterator node2 )
 		return;
 		
 	ooc_lock( self->modify );
-	
+
+#ifndef OOC_NO_DYNAMIC_MEM	
 	if( self->list_of_nodes )
+#endif
 	{ /* http://ptspts.blogspot.com/2010/01/how-to-swap-two-nodes-in-doubly-linked.html */
 		ListIterator tmp;
 	
@@ -685,7 +708,9 @@ list_swap( List self, ListIterator node1, ListIterator node2 )
 			self->last = node2;
 		else if ( self->last == node2 )
 			self->last = node1;
+
 	}
+#ifndef OOC_NO_DYNAMIC_MEM	
 	else
 	{
 		void * tmp;
@@ -693,6 +718,7 @@ list_swap( List self, ListIterator node1, ListIterator node2 )
 		((_ListNodeVoidp) node1 )->item = ((_ListNodeVoidp) node2 )->item;
 		((_ListNodeVoidp) node2 )->item = tmp;
 	}
+#endif
 
 	ooc_unlock( self->modify );
 }
