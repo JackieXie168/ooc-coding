@@ -22,7 +22,9 @@
 #ifndef IMPL_LIST_H_
 #define IMPL_LIST_H_
 
-#include "../list.h"
+#ifndef LIST_H_
+#error Do #include "list.h" right before #include "implement/list.h"
+#endif
 
 /*   Private class members
  */

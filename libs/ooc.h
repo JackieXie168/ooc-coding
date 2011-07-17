@@ -467,7 +467,7 @@ extern ROM struct ClassTable BaseClass;
  */
 
 #define	DeclareClass( pClass, pParent )  							\
-	typedef struct pClass ## Object * pClass;				\
+	typedef struct pClass ## Object * pClass;						\
 	extern ROM struct ClassTable pClass ## Class
 
 
