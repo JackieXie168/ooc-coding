@@ -6,6 +6,7 @@
 
 #include "../libs/exception.h"
 #include "../libs/testcase.h"
+#include "../libs/list.h"
 #include "../libs/implement/list.h"
 
 #include "foo.h"

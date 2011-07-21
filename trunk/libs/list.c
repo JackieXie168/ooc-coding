@@ -252,7 +252,7 @@ List_copy( List self, const List from )
 	List chain / unchain helpers
  */
 
-typedef struct ListNodeObject * ListNode;
+/* typedef struct ListNodeObject * ListNode; */
 
 static
 ListNode
