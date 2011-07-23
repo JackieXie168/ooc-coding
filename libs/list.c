@@ -252,14 +252,14 @@ List_copy( List self, const List from )
 {
 	struct ListConstructorParams params;
 
-	if( from->type == NULL)		/* Untyped List can not be copied, since we do not know the */
-		return OOC_NO_COPY;		/* copy constructor of the items */
-
 	params.destroyer	= from->destroy;
 	params.type			= from->type;
 	params.list_of_nodes= from->list_of_nodes;
 
 	List_constructor( self, & params );
+
+	if( from->type == NULL)		/* Untyped List can not be copied, since we do not know the */
+		return OOC_NO_COPY;		/* copy constructor of the items */
 
 	list_foreach( from, (list_item_executor) list_copy_Object_to, self );
 

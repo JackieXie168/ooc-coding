@@ -170,10 +170,10 @@ Vector_copy( Vector self, const Vector from )
 
 	VectorIndex i;
 
-	if( from->type == NULL)		/* Untyped Vector can not be copied, since we do not know the */
-		return OOC_NO_COPY;		/* copy constructor of the items */
-
 	ooc_mutex_init( self->modify );
+
+	if( from->type == NULL )		/* Untyped Vector can not be copied, since we do not know the */
+		return OOC_NO_COPY;			/* copy constructor of the items */
 
 	self->type				= from->type;
 	self->destroy			= from->destroy;

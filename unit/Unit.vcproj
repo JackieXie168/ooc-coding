@@ -18,7 +18,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="0"
 			>
@@ -49,6 +49,46 @@
 				CleanCommandLine="nmake /F Makefile.Windows clean"
 				Output=""
 				PreprocessorDefinitions="WIN32;NDEBUG"
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release_st|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="0"
+			>
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="nmake /F Makefile.Windows CONFIG=$(ConfigurationName)"
+				ReBuildCommandLine="nmake /F Makefile.Windows CONFIG=$(ConfigurationName)"
+				CleanCommandLine="nmake /F Makefile.Windows clean"
+				Output=""
+				PreprocessorDefinitions="WIN32;NDEBUG"
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
+		</Configuration>
+		<Configuration
+			Name="Debug_st|Win32"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="0"
+			>
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="nmake /F Makefile.Windows CONFIG=$(ConfigurationName)"
+				ReBuildCommandLine="nmake /F Makefile.Windows CONFIG=$(ConfigurationName)"
+				CleanCommandLine="nmake /F Makefile.Windows clean"
+				Output=""
+				PreprocessorDefinitions="WIN32;_DEBUG"
 				IncludeSearchPath=""
 				ForcedIncludes=""
 				AssemblySearchPath=""
@@ -120,19 +160,19 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\implement\bar.h"
-				>
-			</File>
-			<File
 				RelativePath=".\bar.h"
 				>
 			</File>
 			<File
-				RelativePath=".\bardaughter.h"
+				RelativePath=".\implement\bar.h"
 				>
 			</File>
 			<File
 				RelativePath=".\implement\bardaughter.h"
+				>
+			</File>
+			<File
+				RelativePath=".\bardaughter.h"
 				>
 			</File>
 			<File
@@ -144,11 +184,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\foo.h"
+				RelativePath=".\implement\foo.h"
 				>
 			</File>
 			<File
-				RelativePath=".\implement\foo.h"
+				RelativePath=".\foo.h"
 				>
 			</File>
 			<File
