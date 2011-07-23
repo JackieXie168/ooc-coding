@@ -800,8 +800,6 @@ duplicate_untyped( VectorTest self )
 	Vector volatile duplicate = NULL;
 	Vector vector = vector_new( 10, (vector_item_destroyer) ooc_free );
 
-	ooc_manage_object( vector );
-
 	try {
 		duplicate = (Vector) ooc_duplicate( (Object) vector );
 		fail();
@@ -812,7 +810,7 @@ duplicate_untyped( VectorTest self )
 		}
 	end_try;
 
-	ooc_delete( (Object) ooc_pass( vector ) );
+	ooc_delete( (Object) vector );
 }
 
 static
