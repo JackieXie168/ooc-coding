@@ -793,12 +793,76 @@ test_wrong_position_find_item_reverse( void )
 	ooc_delete( (Object) vector );	
 }
 
+static
+void
+duplicate_untyped( VectorTest self )
+{
+	Vector volatile duplicate = NULL;
+	Vector vector = vector_new( 10, (vector_item_destroyer) ooc_free );
+
+	ooc_manage_object( vector );
+
+	try {
+		duplicate = (Vector) ooc_duplicate( (Object) vector );
+		fail();
+		}
+	catch_any {
+		assertTrue( exception_get_error_code( exception ) == err_can_not_be_duplicated );
+		assertNull( duplicate );
+		}
+	end_try;
+
+	ooc_delete( (Object) ooc_pass( vector ) );
+}
+
+static
+void
+vector_check_sequential( Vector self )
+{
+	VectorIndex i;
+
+	for( i=0; i<vector_items( self ); i++ )
+	{
+		Foo item = ooc_cast( vector_get_item( self, i ), Foo );
+		assertTrue( foo_get_data( item ) == i );
+	}
+}
+static
+void
+duplicate_typed( VectorTest self )
+{
+	Vector volatile duplicate = NULL;
+	Vector vector = vector_new_type( 10, Foo, OOC_MANAGE );
+	VectorIndex i;
+
+	ooc_manage_object( vector );
+
+	vector_push_back( vector, foo_new_with_data( 0 ) );
+	vector_push_back( vector, foo_new_with_data( 1 ) );
+	vector_push_back( vector, foo_new_with_data( 2 ) );
+	vector_push_back( vector, foo_new_with_data( 3 ) );
+	vector_push_back( vector, foo_new_with_data( 4 ) );
+
+	duplicate = (Vector) ooc_duplicate( (Object) vector );
+
+	assertTrue( vector_items(vector) == vector_items(duplicate) );
+	for( i=0; i<vector_items(vector); i++ )
+		assertTrue( vector_get_item( vector, i ) != vector_get_item( duplicate, i ) );
+
+	ooc_delete( (Object) ooc_pass( vector ) );
+
+	vector_check_sequential( duplicate );
+
+	ooc_delete( (Object) duplicate );
+}
+
 /** Test methods order table.
  * Put your test methods in this table in the order they should be executed
  * using the TEST(method) macro. 
  * 
  */
- 
+
+ROM
 struct TestCaseMethod methods[] =
 {
 	
@@ -824,6 +888,8 @@ struct TestCaseMethod methods[] =
 	TEST(test_wrong_position_delete_item),
 	TEST(test_wrong_position_find_item),
 	TEST(test_wrong_position_find_item_reverse),
+	TEST(duplicate_untyped),
+	TEST(duplicate_typed),
 
 	{NULL, NULL} /* Do NOT delete this line! */
 };

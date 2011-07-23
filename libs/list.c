@@ -153,9 +153,7 @@ static
 int
 _ListNodeVoidp_copy( _ListNodeVoidp self, const _ListNodeVoidp from )
 {
-	self->item = from->item;
-	
-	return OOC_COPY_DONE;
+	return OOC_NO_COPY;
 }
 
 #endif /* OOC_NO_DYNAMIC_MEM */
@@ -242,10 +240,30 @@ List_destructor( List self, ListVtable vtab )
  */
 
 static
+void
+list_copy_Object_to( Object item, List target )
+{
+	list_append( target, ooc_duplicate( item ) );
+}
+
+static
 int
 List_copy( List self, const List from )
 {
-	return OOC_NO_COPY;
+	struct ListConstructorParams params;
+
+	if( from->type == NULL)		/* Untyped List can not be copied, since we do not know the */
+		return OOC_NO_COPY;		/* copy constructor of the items */
+
+	params.destroyer	= from->destroy;
+	params.type			= from->type;
+	params.list_of_nodes= from->list_of_nodes;
+
+	List_constructor( self, & params );
+
+	list_foreach( from, (list_item_executor) list_copy_Object_to, self );
+
+	return OOC_COPY_DONE;
 }
 
 /*	=====================================================
@@ -274,7 +292,7 @@ create_new_node( List self, void * new_item )
 		}
 #else
 	assert( self->list_of_nodes );
-	tmp = ooc_cast( new_item, ListNode);
+	tmp = ooc_cast( new_item, ListNode );
 	if( tmp->next != NULL || tmp->previous != NULL )
 		ooc_throw( exception_new( err_already_in_use ) );
 #endif
@@ -687,17 +705,14 @@ list_swap( List self, ListIterator node1, ListIterator node2 )
 		tmp = node1->next;
 		node1->next = node2->next;
 		node2->next = tmp;
-		if ( node1->next )
-			node1->next->previous = node1;
-		if ( node2->next )
-			node2->next->previous = node2;
+		node1->next->previous = node1;
+		node2->next->previous = node2;
+
 		tmp = node1->previous;
 		node1->previous = node2->previous;
 		node2->previous = tmp;
-		if (node1->previous != NULL)
-			node1->previous->next = node1;
-		if (node2->previous != NULL)
-			node2->previous->next = node2;
+		node1->previous->next = node1;
+		node2->previous->next = node2;
 		
 		if( self->first == node1 )
 			self->first = node2;
@@ -708,7 +723,6 @@ list_swap( List self, ListIterator node1, ListIterator node2 )
 			self->last = node2;
 		else if ( self->last == node2 )
 			self->last = node1;
-
 	}
 #ifndef OOC_NO_DYNAMIC_MEM	
 	else
