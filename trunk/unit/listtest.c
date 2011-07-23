@@ -733,6 +733,20 @@ swap_4( ListTest self )
 	check_sequential( self->foonodelist );
 }
 
+static
+void
+swap_5( ListTest self )
+{
+	ListIterator i1, i2;
+
+	i1 = list_append( self->foonodelist, foonode_new_with_data( 1 ) );
+	i2 = list_append( self->foonodelist, foonode_new_with_data( 0 ) );
+
+	list_swap( self->foonodelist, i1, i2 );
+
+	check_sequential( self->foonodelist );
+}
+
 static char * const foreach_param 		= "foreach parameter";
 static int 			foreach_counter;
 Class				foreach_expected_item_type;
@@ -1026,12 +1040,82 @@ bad_reuse( ListTest self )
 	end_try;
 }
 
+static
+void
+duplicate_untyped( ListTest self )
+{
+	List volatile duplicate = NULL;
+
+	try {
+		duplicate = (List) ooc_duplicate( (Object) self->list );
+		fail();
+		}
+	catch_any {
+		assertTrue( exception_get_error_code( exception ) == err_can_not_be_duplicated );
+		assertNull( duplicate );
+		}
+	end_try;
+}
+
+static
+void
+duplicate_none_nodes( ListTest self )
+{
+	List volatile duplicate = NULL;
+
+	list_append( self->foolist, foo_new_with_data( 0 ) );
+	list_append( self->foolist, foo_new_with_data( 1 ) );
+	list_append( self->foolist, foo_new_with_data( 2 ) );
+	list_append( self->foolist, foo_new_with_data( 3 ) );
+
+	duplicate = (List) ooc_duplicate( (Object) self->foolist );
+
+	ooc_delete_and_null( (Object *) & self->foolist );
+
+	assertTrue( duplicate->destroy == (list_item_destroyer) ooc_delete );
+	assertTrue( duplicate->type == &FooClass );
+	assertFalse( duplicate->list_of_nodes );
+	assertNotNull( duplicate->first );
+	assertNotNull( duplicate->last );
+
+	check_sequential( duplicate );
+
+	ooc_delete( (Object) duplicate );
+}
+
+static
+void
+duplicate_nodes( ListTest self )
+{
+	List volatile duplicate = NULL;
+
+	list_append( self->foonodelist, foonode_new_with_data( 0 ) );
+	list_append( self->foonodelist, foonode_new_with_data( 1 ) );
+	list_append( self->foonodelist, foonode_new_with_data( 2 ) );
+	list_append( self->foonodelist, foonode_new_with_data( 3 ) );
+
+	duplicate = (List) ooc_duplicate( (Object) self->foonodelist );
+
+	ooc_delete_and_null( (Object *) & self->foonodelist );
+
+	assertTrue( duplicate->destroy == (list_item_destroyer) ooc_delete );
+	assertTrue( duplicate->type == &FooNodeClass );
+	assertTrue( duplicate->list_of_nodes );
+	assertNotNull( duplicate->first );
+	assertNotNull( duplicate->last );
+
+	check_sequential( duplicate );
+
+	ooc_delete( (Object) duplicate );
+}
+
 /** Test methods order table.
  * Put your test methods in this table in the order they should be executed
  * using the TEST(method) macro. 
  * 
  */
  
+ROM
 struct TestCaseMethod methods[] =
 {
 	TEST(constructor),
@@ -1059,12 +1143,16 @@ struct TestCaseMethod methods[] =
 	TEST(swap_2),
 	TEST(swap_3),
 	TEST(swap_4),
+	TEST(swap_5),
 	TEST(foreach),
 	TEST(foreach_until_true),
 	TEST(foreach_delete_if),
 	TEST(find_item),
 	TEST(find_item_reverse),
 	TEST(bad_reuse),
+	TEST(duplicate_untyped),
+	TEST(duplicate_none_nodes),
+	TEST(duplicate_nodes),
 	
 	{NULL, NULL} /* Do NOT delete this line! */
 };

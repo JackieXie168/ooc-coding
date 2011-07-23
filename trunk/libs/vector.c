@@ -155,12 +155,43 @@ Vector_destructor( Vector self, VectorVtable vtab )
 
 /* Copy constuctor
  */
+static
+void
+vector_copy_Object_to( Object item, Vector target )
+{
+	vector_push_back( target, ooc_duplicate( item ) );
+}
 
 static
 int
 Vector_copy( Vector self, const Vector from )
 {
+#ifndef OOC_NO_DYNAMIC_MEM
+
+	VectorIndex i;
+
+	if( from->type == NULL)		/* Untyped Vector can not be copied, since we do not know the */
+		return OOC_NO_COPY;		/* copy constructor of the items */
+
+	ooc_mutex_init( self->modify );
+
+	self->type				= from->type;
+	self->destroy			= from->destroy;
+	self->allocation_chunks	= from->allocation_chunks;
+
+	self->allocated			= from->allocated;
+	self->items 			= ooc_malloc( self->allocated * sizeof(VectorItem) );
+
+	for( i=0; i < from->number_of_items; i++ ) {
+		self->items[i] = ooc_duplicate( (Object) from->items[i] );
+		++self->number_of_items;
+		}
+
+	return OOC_COPY_DONE;
+
+#else
 	return OOC_NO_COPY;
+#endif
 }
 
 /*	=====================================================
