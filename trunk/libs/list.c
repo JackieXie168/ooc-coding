@@ -35,14 +35,15 @@
  */
 
 /** @file list.h
- * @brief List class - a standard ooc container.
+ * @brief List class - doubly linked list, a standard ooc container.
  * List is a container class, that can hold pointers to any kind of data.
  * Every item stored in the list must work perfectly with the supplied list item destroyer!
  * In practice this means, that you can only store items in the list that has the same deletion method.
  * @note	List implementation is thread safe, in the manner, that adding items to, or deleting from the List
  * 			will not mesh up the List. But the ListIterators may become invalid if multiple threads modify the
  * 			same List object. As a consecvence the @c _foreach_ and @c _find_ methods may behave unexpectedly
- * 			if an other thread is modifying the List! Make your own locking if needed! 
+ * 			if an other thread is modifying the List! Make your own locking if needed!
+ *          The same applies to the ooc_duplicate() method for List (uses list_foreach() internally)!
  */ 
 
 /* Allocating the class description table and the vtable
@@ -71,11 +72,13 @@ ListNode_initialize( Class this )
 {
 }
 
+#ifndef OOC_NO_FINALIZE
 static
 void
 ListNode_finalize( Class this )
 {
 }
+#endif
 
 static
 void
@@ -174,12 +177,13 @@ List_initialize( Class this )
 /* Class finalizing
  */
 
+#ifndef OOC_NO_FINALIZE
 static
 void
 List_finalize( Class this )
 {
 }
-
+#endif
 
 /* Constructor
  */
@@ -221,17 +225,22 @@ List_destructor( List self, ListVtable vtab )
 		p = next;
 		next = next->next != nomore ? next->next : NULL ;
 		
-		if( self->list_of_nodes )
-		{
+		#ifndef OOC_NO_DYNAMIC_MEM
+			if( self->list_of_nodes )
+			{
+				if( self->destroy )
+					self->destroy( p );
+			}
+			else
+			{
+				if( self->destroy )
+					self->destroy( get_item_ptr(p) );
+				ooc_delete( (Object) p );
+			}
+		#else
 			if( self->destroy )
 				self->destroy( p );
-		}
-		else
-		{
-			if( self->destroy )
-				self->destroy( get_item_ptr(p) );
-			ooc_delete( (Object) p );
-		}
+		#endif
 	}
 	ooc_mutex_release( self->modify );
 }
@@ -239,12 +248,14 @@ List_destructor( List self, ListVtable vtab )
 /* Copy constuctor
  */
 
+#ifndef OOC_NO_DYNAMIC_MEM
 static
 void
 list_copy_Object_to( Object item, List target )
 {
 	list_append( target, ooc_duplicate( item ) );
 }
+#endif
 
 static
 int
@@ -256,14 +267,18 @@ List_copy( List self, const List from )
 	params.type			= from->type;
 	params.list_of_nodes= from->list_of_nodes;
 
-	List_constructor( self, & params );
+	List_constructor( self, (void*) & params );
 
+#ifndef OOC_NO_DYNAMIC_MEM
 	if( from->type == NULL)		/* Untyped List can not be copied, since we do not know the */
 		return OOC_NO_COPY;		/* copy constructor of the items */
 
 	list_foreach( from, (list_item_executor) list_copy_Object_to, self );
 
 	return OOC_COPY_DONE;
+#else
+	return OOC_NO_COPY;
+#endif
 }
 
 /*	=====================================================
@@ -538,11 +553,30 @@ list_insert_after( List self, ListIterator location, void * new_item )
 	return iterator;
 }
 
+STIN
+void *
+list_unbind_item( List self, ListNode removed_node )
+{
+	void *			item;
+
+	#ifndef OOC_NO_DYNAMIC_MEM
+		if( self->list_of_nodes && removed_node == NULL )
+			item = removed_node;
+		else {
+			item = get_item_ptr( removed_node );
+			ooc_delete( (Object) removed_node );
+			}
+	#else
+		item = removed_node;
+	#endif
+
+	return item;
+}
+
 void *
 list_remove_item( List self, ListIterator location )
 {
-	ListNode		removed_node;
-	void *			item;
+	ListNode	removed_node;
 
 	assert( ooc_isInstanceOf( self, List ) );
 	
@@ -555,21 +589,13 @@ list_remove_item( List self, ListIterator location )
 	
 	ooc_unlock( self->modify );
 
-	if( self->list_of_nodes )
-		item = removed_node;
-	else {
-		item = get_item_ptr( removed_node );
-		ooc_delete( (Object) removed_node );
-		}
-
-	return item;
+	return list_unbind_item( self, removed_node );
 }
 
 void *
 list_remove_first_item( List self )
 {
-	ListNode		removed_node = NULL;
-	void *			item = NULL;
+	ListNode	removed_node = NULL;
 
 	assert( ooc_isInstanceOf( self, List ) );
 	
@@ -580,23 +606,13 @@ list_remove_first_item( List self )
 	
 	ooc_unlock( self->modify );
 
-	if( removed_node ) {
-		if( self->list_of_nodes )
-			item = removed_node;
-		else {
-			item = get_item_ptr( removed_node );
-			ooc_delete( (Object) removed_node );
-			}
-		}
-		
-	return item;
+	return list_unbind_item( self, removed_node );
 }
 
 void *
 list_remove_last_item( List self )
 {
 	ListNode		removed_node = NULL;
-	void *			item = NULL;
 
 	assert( ooc_isInstanceOf( self, List ) );
 	
@@ -607,16 +623,7 @@ list_remove_last_item( List self )
 	
 	ooc_unlock( self->modify );
 
-	if( removed_node ) {
-		if( self->list_of_nodes )
-			item = removed_node;
-		else {
-			item = get_item_ptr( removed_node );
-			ooc_delete( (Object) removed_node );
-			}
-		}
-		
-	return item;
+	return list_unbind_item( self, removed_node );
 }
 
 void
@@ -655,9 +662,11 @@ list_get_item( ListIterator node )
 	if( ! ooc_isInstanceOf( node, ListNode ) )
 		ooc_throw( exception_new( err_wrong_position ) );
 	
+#ifndef OOC_NO_DYNAMIC_MEM
 	if( node->Base._vtab->_class == & _ListNodeVoidpClass )
 		return get_item_ptr(node);
 	else
+#endif
 		return node;
 }
 
@@ -669,7 +678,7 @@ list_next( List self, ListIterator node )
 	if( ! ooc_isInstanceOf( node, ListNode ) )
 		ooc_throw( exception_new( err_wrong_position ) );
 		
-	return node->next != self->first ? node->next : NULL ;
+	return node != self->last ? node->next : NULL ;
 }
 
 ListIterator
@@ -680,7 +689,7 @@ list_previous( List self, ListIterator node )
 	if( ! ooc_isInstanceOf( node, ListNode ) )
 		ooc_throw( exception_new( err_wrong_position ) );
 		
-	return node->previous != self->last ? node->previous : NULL ;
+	return node != self->first ? node->previous : NULL ;
 }
 
 void
@@ -744,7 +753,7 @@ list_foreach( List self, list_item_executor func, void * param )
 	
 	assert( ooc_isInstanceOf( self, List ) );
 
-	for( p = self->first; p; p = p->next != self->first ? p->next : NULL ) 
+	for( p = self->first; p; p = ( p != self->last ) ? p->next : NULL ) 
 		func( list_get_item( p ), param ); 
 }
 
@@ -755,7 +764,7 @@ list_foreach_until_true( List self, ListIterator from, list_item_checker func, v
 	
 	assert( ooc_isInstanceOf( self, List ) );
 	
-	for( p = from ? from : self->first; p; p = p->next != self->first ? p->next : NULL )
+	for( p = from ? from : self->first; p; p = ( p != self->last ) ? p->next : NULL )
 		if( func( list_get_item( p ), param ) )
 			break;
 			 
@@ -788,7 +797,7 @@ list_find_item( List self, ListIterator from, list_item_checker fn_match, void *
 	
 	assert( ooc_isInstanceOf( self, List ) );
 
-	for( p = from ? from : self->first; p; p = p->next != self->first ? p->next : NULL )
+	for( p = from ? from : self->first; p; p = ( p != self->last ) ? p->next : NULL )
 		if( fn_match( list_get_item( p ), param ) )
 			break;
 			
@@ -802,7 +811,7 @@ list_find_item_reverse(  List self, ListIterator from, list_item_checker fn_matc
 	
 	assert( ooc_isInstanceOf( self, List ) );
 
-	for( p = from ? from : self->last; p; p = p->previous != self->last ? p->previous : NULL )
+	for( p = from ? from : self->last; p; p = ( p != self->first ) ? p->previous : NULL )
 		if( fn_match( list_get_item( p ), param ) )
 			break;
 			
