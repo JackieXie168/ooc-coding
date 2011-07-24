@@ -50,6 +50,7 @@
  * 			will not mesh up the Vector. But the VectorIndices may become invalid if multiple threads modify the
  * 			same Vector object. As a consecvence the @c _foreach_ and @c _find_ methods may behave unexpectedly
  * 			if an other thread is modifying the Vector! Make your own locking if needed! 
+ *          The same applies to the ooc_duplicate() method for Vector (uses vector_foreach() internally)!
  */
 
 #include <string.h>
@@ -155,12 +156,14 @@ Vector_destructor( Vector self, VectorVtable vtab )
 
 /* Copy constuctor
  */
+#ifndef OOC_NO_DYNAMIC_MEM
 static
 void
 vector_copy_Object_to( Object item, Vector target )
 {
 	vector_push_back( target, ooc_duplicate( item ) );
 }
+#endif
 
 static
 int

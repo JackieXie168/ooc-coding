@@ -174,14 +174,25 @@ void		ooc_chain_manageable( struct ooc_Manageable * );
  * @endcode
  * @param	p_target	Pointer to the @c Objcet to be managed.
  * @see ooc_pass()
+ * @note In non-dynamic memory models (OOC_NO_DYNAMIC_MEM) this macro uses
+ *       ooc_release() instead of ooc_delete(),
+ *       ensuring proper object destruction but without freeing the allocated memory.
  * @hideinitializer
  */
 
+#ifndef OOC_NO_DYNAMIC_MEM
 #define ooc_manage_object( p_target ) \
  	struct ooc_Manageable _managed_; \
 		_managed_.target = p_target; \
 		_managed_.destroyer =  (ooc_destroyer) ooc_delete; \
 		ooc_chain_manageable( & _managed_ );
+#else
+#define ooc_manage_object( p_target ) \
+ 	struct ooc_Manageable _managed_; \
+		_managed_.target = p_target; \
+		_managed_.destroyer =  (ooc_destroyer) ooc_release; \
+		ooc_chain_manageable( & _managed_ );
+#endif
 
 /** @def ooc_pass( target )
  * Removes the most recently pushed pointer from the managed pointers' stack.
