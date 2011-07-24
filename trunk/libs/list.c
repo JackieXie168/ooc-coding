@@ -560,7 +560,7 @@ list_unbind_item( List self, ListNode removed_node )
 	void *			item;
 
 	#ifndef OOC_NO_DYNAMIC_MEM
-		if( self->list_of_nodes && removed_node == NULL )
+		if( self->list_of_nodes || removed_node == NULL )
 			item = removed_node;
 		else {
 			item = get_item_ptr( removed_node );
