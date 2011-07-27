@@ -79,6 +79,8 @@ typedef int (*	list_item_checker) ( void * item, void * param );
 /* List member functions
  */
  
+#ifndef OOC_NO_DYNAMIC_MEM
+
 /** Creates a new List.
  * Creates an empty List.
  * @param	destroyer	The destroy function for the list items. It is usually ooc_free(), ooc_delete()
@@ -141,6 +143,38 @@ List            _list_new_type( Class type, int manage );
  */
 
 List            _list_new_of_nodes( Class node, int manage );
+
+#endif /* OOC_NO_DYNAMIC_MEM */
+
+/** @def list_use_of_nodes( location, pNode, manage )
+ *  @brief	Convenient macro for creating a List of a given type of ListNodes at a preallocated location.
+ *  @param	 location	The location where the preallocated List must be created.
+ *						The location must be large enough to hold a ListObject.
+ *  @param	 pNode		The type of the ListNodes. It is guaranteed, that the list holds this type of Objects only.
+ * 						Trying to put different Object into the List will cause throwing an @c Exception with 
+ * 						@c err_bad_cast error code.
+ * 						pNode must be a sublass of ListNode.
+ * @param	manage		OOC_MANAGE if the List must manage the Objects put in the List, !OOC_MANAGE if not.
+ * @see 	_list_use_of_nodes()
+ * @note	The List created with this method is more powerful, than a normal typed list, because the chaining information
+ * is held by the stored object itself.
+ */
+ 
+#define			list_use_of_nodes( location, pNode, manage ) _list_use_of_nodes( location, & pNode ## Class, manage )
+
+/** Creates a new List of a given type of ListNodes at location.
+ * Creates an empty List of listNodes at a preallocated location.
+ * @param	location	The location where the preallocated List must be created.
+ *						The location must be large enough to hold a ListObject.
+ * @param	node		The type of the ListNodes. It is guaranteed, that the list holds this type of Objects only.
+ * 						Trying to put different Object into the List will cause throwing an @c Exception with 
+ * 						@c err_bad_cast error code.
+ * 						node must be a sublass of ListNode.
+ * @param	manage		OOC_MANAGE if the List must manage the Objects put in the List, !OOC_MANAGE if not.
+ * @see 	list_use_of_nodes()
+ */
+
+void            _list_use_of_nodes( void * location, Class node, int manage );
 
 /** Appends an item to the end of the list.
  * @param	list	The list

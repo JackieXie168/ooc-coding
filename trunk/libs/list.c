@@ -431,6 +431,22 @@ _list_new_of_nodes( Class node, int manage )
 
 #endif /* OOC_NO_DYNAMIC_MEM */
 
+void
+_list_use_of_nodes( void * location, Class node, int manage )
+{
+	struct ListConstructorParams p;
+	
+	if( ! _ooc_isClassOf( node, & ListNodeClass ) )
+		ooc_throw( exception_new( err_bad_cast ) );
+		
+	p.destroyer = manage ? (list_item_destroyer) ooc_release : NULL ;
+	p.type		= node;
+	p.list_of_nodes = TRUE;
+
+	ooc_use( location, List, (void *) & p );
+}
+
+
 ListIterator
 list_append( List self, void * new_item )
 {
