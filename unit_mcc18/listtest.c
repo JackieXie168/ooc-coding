@@ -42,8 +42,8 @@ EndOfVirtuals;
 
 ClassMembers( ListTest, TestCase )
 
-	struct ListObject	foonodelisto;
-	struct ListObject 	foonodelisto_um;
+	List	foonodelist;
+	List 	foonodelist_um;
 	
 EndOfClassMembers;
 
@@ -206,16 +206,22 @@ static
 void
 listtest_before( ListTest self )
 {
-	 list_use_of_nodes( & self->foonodelisto, FooNode, OOC_MANAGE );
-	 list_use_of_nodes( & self->foonodelisto_um, FooNode, !OOC_MANAGE );
+	static struct ListObject foonodelisto;
+	static struct ListObject foonodelisto_um;
+
+	self->foonodelist 		= & foonodelisto;
+	self->foonodelist_um	= & foonodelisto_um;
+
+	list_use_of_nodes( self->foonodelist, FooNode, OOC_MANAGE );
+	list_use_of_nodes( self->foonodelist_um, FooNode, !OOC_MANAGE );
 }
 
 static
 void
 listtest_after( ListTest self )
 {
-	ooc_release( (Object) & self->foonodelisto );
-	ooc_release( (Object) & self->foonodelisto_um );
+	ooc_release( (Object) self->foonodelist );
+	ooc_release( (Object) self->foonodelist_um );
 }
 
 static
@@ -234,26 +240,24 @@ void
 static
 constructor( ListTest self )
 {
-	assertTrue( self->foonodelisto.destroy == (list_item_destroyer) ooc_release );
-	assertTrue( self->foonodelisto.type == &FooNodeClass );
-	assertTrue( self->foonodelisto.list_of_nodes );
-	assertNull( self->foonodelisto.first );
-	assertNull( self->foonodelisto.last );
+	assertTrue( self->foonodelist->destroy == (list_item_destroyer) ooc_release );
+	assertTrue( self->foonodelist->type == &FooNodeClass );
+	assertTrue( self->foonodelist->list_of_nodes );
+	assertNull( self->foonodelist->first );
+	assertNull( self->foonodelist->last );
 
-	assertNull( self->foonodelisto_um.destroy );
-	assertTrue( self->foonodelisto_um.type == &FooNodeClass );
-	assertTrue( self->foonodelisto_um.list_of_nodes );
-	assertNull( self->foonodelisto.first );
-	assertNull( self->foonodelisto.last );
+	assertNull( self->foonodelist_um->destroy );
+	assertTrue( self->foonodelist_um->type == &FooNodeClass );
+	assertTrue( self->foonodelist_um->list_of_nodes );
 }
 
 static
 void
 types( ListTest self )
 {
-	list_append( & self->foonodelisto, foonode_new() );
-	assertTrue( ooc_isInstanceOf( self->foonodelisto.first, FooNode ) );
-	assertTrue( ooc_isInstanceOf( list_get_item( list_first( & self->foonodelisto )), FooNode ) );
+	list_append( self->foonodelist, foonode_new() );
+	assertTrue( ooc_isInstanceOf( self->foonodelist->first, FooNode ) );
+	assertTrue( ooc_isInstanceOf( list_get_item( list_first( self->foonodelist )), FooNode ) );
 }
 
 static
@@ -265,7 +269,7 @@ type_safety( ListTest self )
 	ooc_use( & baro, Bar, NULL );
 
 	try {
-		list_append( &self->foonodelisto, &baro );
+		list_append( self->foonodelist, &baro );
 		fail();
 	}
 	catch_any
@@ -273,7 +277,7 @@ type_safety( ListTest self )
 	end_try;
 
 	try {
-		list_prepend( &self->foonodelisto, &baro );
+		list_prepend( self->foonodelist, &baro );
 		fail();
 	}
 	catch_any
@@ -281,7 +285,7 @@ type_safety( ListTest self )
 	end_try;
 
 	try {
-		list_insert_after( &self->foonodelisto, list_first(&self->foonodelisto), &baro );
+		list_insert_after( self->foonodelist, list_first(self->foonodelist), &baro );
 		fail();
 	}
 	catch_any
@@ -289,7 +293,7 @@ type_safety( ListTest self )
 	end_try;
 
 	try {
-		list_insert_before( &self->foonodelisto, list_last(&self->foonodelisto), &baro );
+		list_insert_before( self->foonodelist, list_last(self->foonodelist), &baro );
 		fail();
 	}
 	catch_any
@@ -313,22 +317,21 @@ static
 void
 iterator( ListTest self )
 {
-	list_append( &self->foonodelisto, foonode_new() );
+	list_append( self->foonodelist, foonode_new() );
 
-	assertTrue( self->foonodelisto.first == list_first( &self->foonodelisto ) );
-	assertTrue( self->foonodelisto.last == list_last( &self->foonodelisto ) );
-	assertTrue( list_first( &self->foonodelisto ) == list_last( &self->foonodelisto ) );
+	assertTrue( self->foonodelist->first == list_first( self->foonodelist ) );
+	assertTrue( self->foonodelist->last == list_last( self->foonodelist ) );
+	assertTrue( list_first( self->foonodelist ) == list_last( self->foonodelist ) );
 	
-	list_append( &self->foonodelisto, foonode_new() );
+	list_append( self->foonodelist, foonode_new() );
 	
-	assertTrue( self->foonodelisto.first == list_first( &self->foonodelisto ) );
-	assertTrue( self->foonodelisto.last == list_last( &self->foonodelisto ) );
-	assertFalse( list_first( &self->foonodelisto ) == list_last( &self->foonodelisto ) );
-	assertTrue( list_last( &self->foonodelisto ) == list_next( &self->foonodelisto, list_first( &self->foonodelisto ) ) );
-	assertTrue( list_first( &self->foonodelisto ) == list_previous( &self->foonodelisto, list_last( &self->foonodelisto ) ) );
+	assertTrue( self->foonodelist->first == list_first( self->foonodelist ) );
+	assertTrue( self->foonodelist->last == list_last( self->foonodelist ) );
+	assertFalse( list_first( self->foonodelist ) == list_last( self->foonodelist ) );
+	assertTrue( list_last( self->foonodelist ) == list_next( self->foonodelist, list_first( self->foonodelist ) ) );
+	assertTrue( list_first( self->foonodelist ) == list_previous( self->foonodelist, list_last( self->foonodelist ) ) );
 }
 
-/*
 static
 void
 check_sequential( List list )
@@ -340,12 +343,8 @@ check_sequential( List list )
 	{
 		Object item = (Object) list_get_item( iterator );
 		
-		if( ooc_isInstanceOf( item, Foo ) )
-			assertTrue( foo_get_data( ooc_cast( item, Foo ) ) == i );
-		else if( ooc_isInstanceOf( item, FooNode ) )
-			assertTrue( foonode_get_data( ooc_cast( item, FooNode ) ) == i );
-		else
-			failMsg("Unknown item type in list");
+		assertTrue( ooc_isInstanceOf( item, FooNode ) );
+		assertTrue( foonode_get_data( ooc_cast( item, FooNode ) ) == i );
 	}
 }
 
@@ -353,96 +352,84 @@ static
 void
 append( ListTest self )
 {
-	static const int list_size = 100;
 	int i;
 	ListIterator    iterator;
 	
-	for( i=0; i<list_size; i++ )
-		list_append( self->foolist, foo_new_with_data( i ) );
+	for( i=0; i<MAX_FOONODES; i++ )
+		list_append( self->foonodelist, foonode_new_with_data( i ) );
 		
-	for( i=0, iterator = list_first( self->foolist ); i<list_size; i++, iterator = list_next( self->foolist, iterator ) )
-		assertTrue( foo_get_data( ooc_cast( list_get_item( iterator ), Foo ) ) == i );
+	check_sequential( self->foonodelist );
 }
 
 static
 void
 paralell_append( ListTest self )
 {
-	static const int check_size = 1000;
 	ListIterator    iterator;
 	int i;
-	int * check = ooc_calloc( check_size, sizeof( int ) );
+	int check[ MAX_FOONODES ];
 	
-	ooc_manage( check, ooc_free );
-	
-	for( i=0; i<check_size; i++ )
+	for( i=0; i<MAX_FOONODES; i++ )
 		check[ i ] = 0;
 
 	#ifdef _OPENMP
 	#pragma omp parallel for private(i)
 	#endif
-	for( i=0; i<check_size; i++ )
-		list_append( self->foolist, foo_new_with_data( i ) );
+	for( i=0; i<MAX_FOONODES; i++ )
+		list_append( self->foonodelist, foonode_new_with_data( i ) );
 
-	for( i=0, iterator = list_first( self->foolist ); i<check_size; i++, iterator = list_next( self->foolist, iterator ) )
+	for( i=0, iterator = list_first( self->foonodelist ); i<MAX_FOONODES; i++, iterator = list_next( self->foonodelist, iterator ) )
 	{
 		int index;
-		index = foo_get_data( ooc_cast( list_get_item( iterator ), Foo ) );
-		check[ index ] = index;
+		index = foonode_get_data( ooc_cast( list_get_item( iterator ), FooNode ) );
+		if( index >= 0 && index <= MAX_FOONODES )
+			check[ index ] = index;
 	}
 	
-	for( i=0; i<check_size; i++ )
+	for( i=0; i<MAX_FOONODES; i++ )
 		assertTrue( check[ i ] == i );
-
-	ooc_free( ooc_pass( check ) );
 }
 
 static
 void
 prepend( ListTest self )
 {
-	static const int list_size = 100;
 	int i;
 	ListIterator    iterator;
 	
-	for( i=0; i<list_size; i++ )
-		list_prepend( self->foolist, foo_new_with_data( i ) );
+	for( i=0; i<MAX_FOONODES; i++ )
+		list_prepend( self->foonodelist, foonode_new_with_data( MAX_FOONODES-1 - i ) );
 		
-	for( i=0, iterator = list_first( self->foolist ); i<list_size; i++, iterator = list_next( self->foolist, iterator ) )
-		assertTrue( foo_get_data( ooc_cast( list_get_item( iterator ), Foo ) ) == list_size - i - 1 );
+	check_sequential( self->foonodelist );
 }
 
 static
 void
 paralell_prepend( ListTest self )
 {
-	static const int check_size = 1000;
 	ListIterator    iterator;
 	int i;
-	int * check = ooc_calloc( check_size, sizeof( int ) );
+	int check[ MAX_FOONODES ];
 	
-	ooc_manage( check, ooc_free );
-	
-	for( i=0; i<check_size; i++ )
+	for( i=0; i<MAX_FOONODES; i++ )
 		check[ i ] = 0;
 
 	#ifdef _OPENMP
-	#pragma omp parallel for private(i) schedule( guided, 10 )
+	#pragma omp parallel for private(i)
 	#endif
-	for( i=0; i<check_size; i++ )
-		list_prepend( self->foolist, foo_new_with_data( i ) );
+	for( i=0; i<MAX_FOONODES; i++ )
+		list_prepend( self->foonodelist, foonode_new_with_data( i ) );
 
-	for( i=0, iterator = list_first( self->foolist ); i<check_size; i++, iterator = list_next( self->foolist, iterator ) )
+	for( i=0, iterator = list_first( self->foonodelist ); i<MAX_FOONODES; i++, iterator = list_next( self->foonodelist, iterator ) )
 	{
 		int index;
-		index = foo_get_data( ooc_cast( list_get_item( iterator ), Foo ) );
-		check[ index ] = index;
+		index = foonode_get_data( ooc_cast( list_get_item( iterator ), FooNode ) );
+		if( index >= 0 && index <= MAX_FOONODES )
+			check[ index ] = index;
 	}
 	
-	for( i=0; i<check_size; i++ )
+	for( i=0; i<MAX_FOONODES; i++ )
 		assertTrue( check[ i ] == i );
-
-	ooc_free( ooc_pass( check ) );
 }
 
 static
@@ -451,19 +438,19 @@ insert_before( ListTest self )
 {
 	ListIterator iterator;
 	
-	list_append( self->foolist, foo_new_with_data( 1 ) );
-	list_append( self->foolist, foo_new_with_data( 3 ) );
+	list_append( self->foonodelist, foonode_new_with_data( 1 ) );
+	list_append( self->foonodelist, foonode_new_with_data( 3 ) );
 	
-	iterator = list_first( self->foolist );
-	iterator = list_next( self->foolist, iterator );
+	iterator = list_first( self->foonodelist );
+	iterator = list_next( self->foonodelist, iterator );
 
-	list_insert_before( self->foolist, iterator, foo_new_with_data( 2 ) );
+	list_insert_before( self->foonodelist, iterator, foonode_new_with_data( 2 ) );
 
-	iterator = list_first( self->foolist );
+	iterator = list_first( self->foonodelist );
 
-	list_insert_before( self->foolist, iterator, foo_new_with_data( 0 ) );
+	list_insert_before( self->foonodelist, iterator, foonode_new_with_data( 0 ) );
 	
-	check_sequential( self->foolist );
+	check_sequential( self->foonodelist );
 }
 
 static
@@ -472,38 +459,38 @@ insert_after( ListTest self )
 {
 	ListIterator iterator;
 	
-	list_append( self->foolist, foo_new_with_data( 0 ) );
-	list_append( self->foolist, foo_new_with_data( 2 ) );
+	list_append( self->foonodelist, foonode_new_with_data( 0 ) );
+	list_append( self->foonodelist, foonode_new_with_data( 2 ) );
 	
-	iterator = list_first( self->foolist );
+	iterator = list_first( self->foonodelist );
 
-	list_insert_after( self->foolist, iterator, foo_new_with_data( 1 ) );
+	list_insert_after( self->foonodelist, iterator, foonode_new_with_data( 1 ) );
 	
-	iterator = list_last( self->foolist );
+	iterator = list_last( self->foonodelist );
 
-	list_insert_after( self->foolist, iterator, foo_new_with_data( 3 ) );
+	list_insert_after( self->foonodelist, iterator, foonode_new_with_data( 3 ) );
 	
-	check_sequential( self->foolist );
+	check_sequential( self->foonodelist );
 }
 
 static
 void
 insert_first( ListTest self )
 {
-	list_insert_before( self->foolist, list_first(self->foolist), foo_new_with_data( 1 ) );
-	list_insert_before( self->foolist, list_first(self->foolist), foo_new_with_data( 0 ) );
+	list_insert_before( self->foonodelist, list_first(self->foonodelist), foonode_new_with_data( 1 ) );
+	list_insert_before( self->foonodelist, list_first(self->foonodelist), foonode_new_with_data( 0 ) );
 
-	check_sequential( self->foolist );
+	check_sequential( self->foonodelist );
 }
 
 static
 void
 insert_last( ListTest self )
 {
-	list_insert_after( self->foolist, list_last(self->foolist), foo_new_with_data( 0 ) );
-	list_insert_after( self->foolist, list_last(self->foolist), foo_new_with_data( 1 ) );
+	list_insert_after( self->foonodelist, list_last(self->foonodelist), foonode_new_with_data( 0 ) );
+	list_insert_after( self->foonodelist, list_last(self->foonodelist), foonode_new_with_data( 1 ) );
 
-	check_sequential( self->foolist );
+	check_sequential( self->foonodelist );
 }
 
 static
@@ -511,84 +498,83 @@ void
 remove_item( ListTest self )
 {
 	ListIterator 	iterator;
-	Foo				foo;
+	FooNode			foonode;
 	
-	list_append( self->foolist, foo_new_with_data( 0 ) );
-	list_append( self->foolist, foo_new_with_data( 1 ) );
-	list_append( self->foolist, foo_new_with_data( 1 ) );
-	list_append( self->foolist, foo_new_with_data( 2 ) );
+	list_append( self->foonodelist, foonode_new_with_data( 0 ) );
+	list_append( self->foonodelist, foonode_new_with_data( 1 ) );
+	list_append( self->foonodelist, foonode_new_with_data( 1 ) );
+	list_append( self->foonodelist, foonode_new_with_data( 2 ) );
 	
-	iterator = list_first( self->foolist );
-	iterator = list_next( self->foolist, iterator );
-	iterator = list_next( self->foolist, iterator );
-	
+	iterator = list_first( self->foonodelist );
+	iterator = list_next( self->foonodelist, iterator );
+	iterator = list_next( self->foonodelist, iterator );
 
-	foo = list_remove_item( self->foolist, iterator );
-	ooc_delete( (Object) foo );
+	foonode = list_remove_item( self->foonodelist, iterator );
+	ooc_release( (Object) foonode );
 		
-	check_sequential( self->foolist );	
+	check_sequential( self->foonodelist );	
 }
 
 static
 void
 remove_first_item( ListTest self )
 {
-	Foo				foo;
+	FooNode		foonode;
 	
-	list_append( self->foolist, foo_new_with_data( 34 ) );
-	list_append( self->foolist, foo_new_with_data( 0 ) );
-	list_append( self->foolist, foo_new_with_data( 1 ) );
-	list_append( self->foolist, foo_new_with_data( 2 ) );
+	list_append( self->foonodelist, foonode_new_with_data( 34 ) );
+	list_append( self->foonodelist, foonode_new_with_data( 0 ) );
+	list_append( self->foonodelist, foonode_new_with_data( 1 ) );
+	list_append( self->foonodelist, foonode_new_with_data( 2 ) );
 	
-	foo = list_remove_first_item( self->foolist );
-	ooc_delete( (Object) foo );
+	foonode = list_remove_first_item( self->foonodelist );
+	ooc_release( (Object) foonode );
 		
-	check_sequential( self->foolist );	
+	check_sequential( self->foonodelist );
 }
 
 static
 void
 remove_last_item( ListTest self )
 {
-	Foo				foo;
+	FooNode		foonode;
 	
-	list_append( self->foolist, foo_new_with_data( 0 ) );
-	list_append( self->foolist, foo_new_with_data( 1 ) );
-	list_append( self->foolist, foo_new_with_data( 2 ) );
-	list_append( self->foolist, foo_new_with_data( 34 ) );
+	list_append( self->foonodelist, foonode_new_with_data( 0 ) );
+	list_append( self->foonodelist, foonode_new_with_data( 1 ) );
+	list_append( self->foonodelist, foonode_new_with_data( 2 ) );
+	list_append( self->foonodelist, foonode_new_with_data( 34 ) );
 	
-	foo = list_remove_last_item( self->foolist );
-	ooc_delete( (Object) foo );
+	foonode = list_remove_last_item( self->foonodelist );
+	ooc_release( (Object) foonode );
 		
-	check_sequential( self->foolist );	
+	check_sequential( self->foonodelist );	
 }
 
 void
 remove_first_item_empty( ListTest self )
 {
-	assertNull( list_remove_first_item( self->foolist ) );
+	assertNull( list_remove_first_item( self->foonodelist ) );
 }
 
 void
 remove_last_item_empty( ListTest self )
 {
-	assertNull( list_remove_last_item( self->foolist ) );
+	assertNull( list_remove_last_item( self->foonodelist ) );
 }
 
 static
 void
 remove_item_single( ListTest self )
 {
-	Foo foo;
+	FooNode foonode;
 	
-	list_append( self->foolist, foo_new_with_data( 0 ) );
+	list_append( self->foonodelist, foonode_new_with_data( 0 ) );
 
-	foo = list_remove_item( self->foolist, list_first( self->foolist ) );
+	foonode = list_remove_item( self->foonodelist, list_first( self->foonodelist ) );
 	
-	assertNull( self->foolist->first );
-	assertNull( self->foolist->last );
+	assertNull( self->foonodelist->first );
+	assertNull( self->foonodelist->last );
 	
-	ooc_delete( (Object) foo );
+	ooc_release( (Object) foonode );
 }
 
 static
@@ -597,57 +583,37 @@ delete_item( ListTest self )
 {
 	ListIterator 	iterator;
 	
-	list_append( self->foolist, foo_new_with_data( 0 ) );
-	list_append( self->foolist, foo_new_with_data( 1 ) );
-	list_append( self->foolist, foo_new_with_data( 1 ) );
-	list_append( self->foolist, foo_new_with_data( 2 ) );
+	list_append( self->foonodelist, foonode_new_with_data( 0 ) );
+	list_append( self->foonodelist, foonode_new_with_data( 1 ) );
+	list_append( self->foonodelist, foonode_new_with_data( 1 ) );
+	list_append( self->foonodelist, foonode_new_with_data( 2 ) );
 	
-	iterator = list_first( self->foolist );
-	iterator = list_next( self->foolist, iterator );
-	iterator = list_next( self->foolist, iterator );
+	iterator = list_first( self->foonodelist );
+	iterator = list_next( self->foonodelist, iterator );
+	iterator = list_next( self->foonodelist, iterator );
 
-	list_delete_item( self->foolist, iterator );
+	list_delete_item( self->foonodelist, iterator );
 		
-	check_sequential( self->foolist );	
+	check_sequential( self->foonodelist );	
 }
 
 static
 void
 delete_item_single( ListTest self )
 {
-	list_append( self->foolist, foo_new_with_data( 0 ) );
+	list_append( self->foonodelist, foonode_new_with_data( 0 ) );
 
-	list_delete_item( self->foolist, list_first( self->foolist ) );
+	list_delete_item( self->foonodelist, list_first( self->foonodelist ) );
 	
-	assertNull( self->foolist->first );
-	assertNull( self->foolist->last );
+	assertNull( self->foonodelist->first );
+	assertNull( self->foonodelist->last );
 }
 
 static
 void
 unmanaged( ListTest self )
 {
-	Foo foo1, foo2;
 	FooNode foonode1, foonode2;
-	static char * const string3 = "string 3";
-	
-	list_append( self->list_um, "string 0" );
-	list_append( self->list_um, "string 1" );
-	list_append( self->list_um, "string 2" );
-	list_append( self->list_um, string3 );
-	assertTrue( list_get_item( list_last( self->list_um ) ) == string3 );
-	/* destructor must not leak */
-/*	ooc_delete_and_null( (Object*) &self->list_um );
-	
-	foo1 = foo_new();
-	foo2 = foo_new();
-	list_append( self->foolist_um, foo1 );
-	list_append( self->foolist_um, foo2 );
-	assertTrue( list_get_item( list_last( self->foolist_um ) ) == foo2 );
-	/* destructor must not leak */
-/*	ooc_delete_and_null( (Object*) &self->foolist_um );
-	ooc_delete( (Object) foo1 );
-	ooc_delete( (Object) foo2 );	
 
 	foonode1 = foonode_new();
 	foonode2 = foonode_new();
@@ -656,43 +622,9 @@ unmanaged( ListTest self )
 	assertTrue( list_get_item( list_last( self->foonodelist_um ) ) == foonode2 );
 	assertTrue( self->foonodelist_um->last == (void*) foonode2 );
 	/* destructor must not leak */
-/*	ooc_delete_and_null( (Object*) &self->foonodelist_um );
-	ooc_delete( (Object) foonode1 );
-	ooc_delete( (Object) foonode2 );
-}
-
-static
-void
-swap_1( ListTest self )
-{
-	ListIterator i1, i2, i3, i4;
-	
-	i1 = list_append( self->foolist, foo_new_with_data( 1 ) );
-	i2 = list_append( self->foolist, foo_new_with_data( 0 ) );
-	i3 = list_append( self->foolist, foo_new_with_data( 3 ) );
-	i4 = list_append( self->foolist, foo_new_with_data( 2 ) );
-	
-	list_swap( self->foolist, i1, i2 );
-	list_swap( self->foolist, i3, i4 );
-
-	check_sequential( self->foolist );
-}
-
-static
-void
-swap_2( ListTest self )
-{
-	ListIterator i1, i2, i3, i4;
-	
-	i1 = list_append( self->foolist, foo_new_with_data( 3 ) );
-	i2 = list_append( self->foolist, foo_new_with_data( 2 ) );
-	i3 = list_append( self->foolist, foo_new_with_data( 1 ) );
-	i4 = list_append( self->foolist, foo_new_with_data( 0 ) );
-	
-	list_swap( self->foolist, i1, i4 );
-	list_swap( self->foolist, i2, i3 );
-
-	check_sequential( self->foolist );
+	ooc_release( (Object) self->foonodelist_um );
+	ooc_release( (Object) foonode1 );
+	ooc_release( (Object) foonode2 );
 }
 
 static
@@ -743,25 +675,18 @@ swap_5( ListTest self )
 	check_sequential( self->foonodelist );
 }
 
-static char * const foreach_param 		= "foreach parameter";
+static ROM char *	foreach_param 		= "foreach parameter";
 static int 			foreach_counter;
-Class				foreach_expected_item_type;
 
-#define FOREACH_LOOP 100
+#define FOREACH_LOOP MAX_FOONODES
 
 static
 void
 item_executor( void * item, void * param )
 {
-	assertTrue( param == foreach_param );
-	assertTrue( ooc_get_type( item ) == foreach_expected_item_type );
-	
-	if( ooc_isInstanceOf( item, Foo ) )
-		assertTrue( foo_get_data( ooc_cast( item, Foo ) ) == foreach_counter );
-	else if( ooc_isInstanceOf( item, FooNode ) )
-		assertTrue( foonode_get_data( ooc_cast( item, FooNode ) ) == foreach_counter );
-	else
-		failMsg("Unknown item type in list");
+	assertTrue( param == (void*) foreach_param );
+	assertTrue( ooc_isInstanceOf( item, FooNode ) );
+	assertTrue( foonode_get_data( ooc_cast( item, FooNode ) ) == foreach_counter );
 		
 	foreach_counter++;
 }
@@ -773,29 +698,16 @@ foreach( ListTest self )
 	int i;
 	
 	/* check for an empty list */
-/*	foreach_expected_item_type = NULL;
 	foreach_counter = 0;
-	list_foreach( self->foolist, item_executor, foreach_param );
+	list_foreach( self->foonodelist, item_executor, (void*) foreach_param );
 	assertTrue( foreach_counter == 0 );
-	list_foreach( self->foonodelist, item_executor, foreach_param );
-	assertTrue( foreach_counter == 0 );
-
-	/* check with an ordinary data type */
-/*	for( i=0; i<FOREACH_LOOP; i++ )
-/*		list_append( self->foolist, foo_new_with_data( i ) );
-		
-	foreach_expected_item_type = &FooClass;
-	foreach_counter = 0;
-	list_foreach( self->foolist, item_executor, foreach_param );
-	assertTrue( foreach_counter == FOREACH_LOOP );
 	
 	/* check with a ListNode data type */
-/*	for( i=0; i<FOREACH_LOOP; i++ )
+	for( i=0; i<FOREACH_LOOP; i++ )
 		list_append( self->foonodelist, foonode_new_with_data( i ) );
 		
-	foreach_expected_item_type = &FooNodeClass;
 	foreach_counter = 0;
-	list_foreach( self->foonodelist, item_executor, foreach_param );
+	list_foreach( self->foonodelist, item_executor, (void*) foreach_param );
 	assertTrue( foreach_counter == FOREACH_LOOP );
 }
 
@@ -807,16 +719,9 @@ item_checker( void * item, void * param )
 {
 	int current_value;
 	
-	assertTrue( param == foreach_param );
-	assertTrue( ooc_get_type( item ) == foreach_expected_item_type );
-	
-	if( ooc_isInstanceOf( item, Foo ) )
-		current_value = foo_get_data( ooc_cast( item, Foo ) );
-	else if( ooc_isInstanceOf( item, FooNode ) )
-		current_value = foonode_get_data( ooc_cast( item, FooNode ) );
-	else
-		failMsg("Unknown item type in list");
-		
+	assertTrue( param == (void*) foreach_param );
+	assertTrue( ooc_isInstanceOf( item, FooNode ) );
+	current_value = foonode_get_data( ooc_cast( item, FooNode ) );		
 	assertTrue( current_value == foreach_counter );
 	
 	foreach_counter++;
@@ -826,12 +731,12 @@ item_checker( void * item, void * param )
 
 static
 int
-foo_comparator( void * item, void * param )
+foonode_comparator( void * item, void * param )
 {
-	assertTrue( param == foreach_param );
-	assertTrue( ooc_get_type( item ) == &FooClass );
+	assertTrue( param == (void*) foreach_param );
+	assertTrue( ooc_get_type( item ) == &FooNodeClass );
 	
-	return foo_get_data( ooc_cast( item, Foo ) ) == expected_value;
+	return foonode_get_data( ooc_cast( item, FooNode ) ) == expected_value;
 }
 
 static
@@ -842,59 +747,31 @@ foreach_until_true( ListTest self )
 	ListIterator found;
 	
 	/* check for an empty list */
-/*	foreach_expected_item_type = NULL;
 	foreach_counter = 0;
 	expected_value = FOREACH_LOOP/3;
-	found = list_foreach_until_true( self->foolist, list_first( self->foolist ), item_checker, foreach_param );
+	found = list_foreach_until_true( self->foonodelist, NULL, item_checker, (void*) foreach_param );
 	assertTrue( foreach_counter == 0 );
-	assertNull( found );
-	found = list_foreach_until_true( self->foonodelist, list_first( self->foolist ), item_checker, foreach_param );
-	assertTrue( foreach_counter == 0 );
-	assertNull( found );
-
-	/* check with an ordinary data type */
-/*	for( i=0; i<FOREACH_LOOP; i++ )
-		list_append( self->foolist, foo_new_with_data( i ) );
-		
-	foreach_expected_item_type = &FooClass;
-	foreach_counter = 0;
-	expected_value = FOREACH_LOOP/3;
-	found = list_foreach_until_true( self->foolist, list_first( self->foolist ), item_checker, foreach_param );
-	assertTrue( foreach_counter == FOREACH_LOOP/3 + 1 );
-	assertTrue( foo_get_data( list_get_item( found ) ) == FOREACH_LOOP/3 );
-
-	expected_value = FOREACH_LOOP+1;
-	foreach_counter = 0;
-	found = list_foreach_until_true( self->foolist, list_first( self->foolist ), item_checker, foreach_param );
-	assertTrue( foreach_counter == FOREACH_LOOP );
-	assertNull( found );
-	
-	expected_value = FOREACH_LOOP/3;
-	foreach_counter = FOREACH_LOOP-1;
-	found = list_foreach_until_true( self->foolist, list_last( self->foolist ), item_checker, foreach_param );
-	assertTrue( foreach_counter == FOREACH_LOOP );
 	assertNull( found );
 	
 	/* check with a ListNode data type */
-/*	for( i=0; i<FOREACH_LOOP; i++ )
+	for( i=0; i<FOREACH_LOOP; i++ )
 		list_append( self->foonodelist, foonode_new_with_data( i ) );
 		
-	foreach_expected_item_type = &FooNodeClass;
 	foreach_counter = 0;
 	expected_value = FOREACH_LOOP/4;
-	found = list_foreach_until_true( self->foonodelist, list_first( self->foonodelist ), item_checker, foreach_param );
+	found = list_foreach_until_true( self->foonodelist, list_first( self->foonodelist ), item_checker, (void*) foreach_param );
 	assertTrue( foreach_counter == FOREACH_LOOP/4 + 1 );
 	assertTrue( foonode_get_data( list_get_item( found ) ) == FOREACH_LOOP/4 );
 
 	expected_value = FOREACH_LOOP+1;
 	foreach_counter = 0;
-	found = list_foreach_until_true( self->foonodelist, list_first( self->foonodelist ), item_checker, foreach_param );
+	found = list_foreach_until_true( self->foonodelist, list_first( self->foonodelist ), item_checker, (void*) foreach_param );
 	assertTrue( foreach_counter == FOREACH_LOOP );
 	assertNull( found );
 
 	expected_value = FOREACH_LOOP/4;
 	foreach_counter = FOREACH_LOOP-1;
-	found = list_foreach_until_true( self->foonodelist, list_last( self->foonodelist ), item_checker, foreach_param );
+	found = list_foreach_until_true( self->foonodelist, list_last( self->foonodelist ), item_checker, (void*) foreach_param );
 	assertTrue( foreach_counter == FOREACH_LOOP );
 	assertNull( found );
 }
@@ -905,18 +782,17 @@ foreach_delete_if( ListTest self )
 {
 	int i;
 	
-	expected_value = FOREACH_LOOP+1;
+	expected_value = FOREACH_LOOP;
 	
-	for( i=0; i<FOREACH_LOOP; i++ )
+	for( i=0; i<FOREACH_LOOP-2; i++ )
 	{
-		list_append( self->foolist, foo_new_with_data( i ) );
-		if( i % 17 != 0 )
-			list_append( self->foolist, foo_new_with_data( expected_value ) );
+		list_append( self->foonodelist, foonode_new_with_data( i ) );
+		if( i % 2 != 0 )
+			list_append( self->foonodelist, foonode_new_with_data( expected_value ) );
 	}
 	
-	foreach_expected_item_type = &FooClass;
-	list_foreach_delete_if( self->foolist, foo_comparator, foreach_param );
-	check_sequential( self->foolist );
+	list_foreach_delete_if( self->foonodelist, foonode_comparator, (void*) foreach_param );
+	check_sequential( self->foonodelist );
 }
 
 static
@@ -927,26 +803,26 @@ find_item( ListTest self )
 	ListIterator found;
 	
 	expected_value = FOREACH_LOOP+1;
-	foreach_expected_item_type = &FooClass;
 	
-	for( i=0, to_be_found= 0; i<FOREACH_LOOP; i++ )
+	for( i=0, to_be_found= 0; i<FOREACH_LOOP-2; i++ )
 	{
-		list_append( self->foolist, foo_new_with_data( i ) );
-		if( i % 17 != 0 ) {
-			list_append( self->foolist, foo_new_with_data( expected_value ) );
+		list_append( self->foonodelist, foonode_new_with_data( i ) );
+		if( i % 2 != 0 ) {
+			list_append( self->foonodelist, foonode_new_with_data( expected_value ) );
 			to_be_found++;
 		}
 	}
-	
+	assertNotZero( to_be_found );
+
 	found_counter = 0;
 	found = NULL;
 	do {
-		found = list_find_item( self->foolist, found, foo_comparator, foreach_param );
+		found = list_find_item( self->foonodelist, found, foonode_comparator, (void*) foreach_param );
 		if( found )
 		{
 			found_counter++;
-			assertTrue( foo_get_data( ooc_cast( list_get_item( found ), Foo ) ) == expected_value );
-			found = list_next( self->foolist, found );
+			assertTrue( foonode_get_data( ooc_cast( list_get_item( found ), FooNode ) ) == expected_value );
+			found = list_next( self->foonodelist, found );
 		}
 	} while( found );
 	assertTrue( found_counter == to_be_found );
@@ -960,26 +836,26 @@ find_item_reverse( ListTest self )
 	ListIterator found;
 	
 	expected_value = FOREACH_LOOP+1;
-	foreach_expected_item_type = &FooClass;
 	
-	for( i=0, to_be_found= 0; i<FOREACH_LOOP; i++ )
+	for( i=0, to_be_found= 0; i<FOREACH_LOOP-2; i++ )
 	{
-		list_append( self->foolist, foo_new_with_data( i ) );
-		if( i % 17 != 0 ) {
-			list_append( self->foolist, foo_new_with_data( expected_value ) );
+		list_append( self->foonodelist, foonode_new_with_data( i ) );
+		if( i % 2 != 0 ) {
+			list_append( self->foonodelist, foonode_new_with_data( expected_value ) );
 			to_be_found++;
 		}
 	}
+	assertNotZero( to_be_found );
 	
 	found_counter = 0;
 	found = NULL;
 	do {
-		found = list_find_item_reverse( self->foolist, found, foo_comparator, foreach_param );
+		found = list_find_item_reverse( self->foonodelist, found, foonode_comparator, (void*) foreach_param );
 		if( found )
 		{
 			found_counter++;
-			assertTrue( foo_get_data( ooc_cast( list_get_item( found ), Foo ) ) == expected_value );
-			found = list_previous( self->foolist, found );
+			assertTrue( foonode_get_data( ooc_cast( list_get_item( found ), FooNode ) ) == expected_value );
+			found = list_previous( self->foonodelist, found );
 		}
 	} while( found );
 	assertTrue( found_counter == to_be_found );
@@ -1036,75 +912,6 @@ bad_reuse( ListTest self )
 	end_try;
 }
 
-static
-void
-duplicate_untyped( ListTest self )
-{
-	List volatile duplicate = NULL;
-
-	try {
-		duplicate = (List) ooc_duplicate( (Object) self->list );
-		fail();
-		}
-	catch_any {
-		assertTrue( exception_get_error_code( exception ) == err_can_not_be_duplicated );
-		assertNull( duplicate );
-		}
-	end_try;
-}
-
-static
-void
-duplicate_none_nodes( ListTest self )
-{
-	List volatile duplicate = NULL;
-
-	list_append( self->foolist, foo_new_with_data( 0 ) );
-	list_append( self->foolist, foo_new_with_data( 1 ) );
-	list_append( self->foolist, foo_new_with_data( 2 ) );
-	list_append( self->foolist, foo_new_with_data( 3 ) );
-
-	duplicate = (List) ooc_duplicate( (Object) self->foolist );
-
-	ooc_delete_and_null( (Object *) & self->foolist );
-
-	assertTrue( duplicate->destroy == (list_item_destroyer) ooc_delete );
-	assertTrue( duplicate->type == &FooClass );
-	assertFalse( duplicate->list_of_nodes );
-	assertNotNull( duplicate->first );
-	assertNotNull( duplicate->last );
-
-	check_sequential( duplicate );
-
-	ooc_delete( (Object) duplicate );
-}
-
-static
-void
-duplicate_nodes( ListTest self )
-{
-	List volatile duplicate = NULL;
-
-	list_append( self->foonodelist, foonode_new_with_data( 0 ) );
-	list_append( self->foonodelist, foonode_new_with_data( 1 ) );
-	list_append( self->foonodelist, foonode_new_with_data( 2 ) );
-	list_append( self->foonodelist, foonode_new_with_data( 3 ) );
-
-	duplicate = (List) ooc_duplicate( (Object) self->foonodelist );
-
-	ooc_delete_and_null( (Object *) & self->foonodelist );
-
-	assertTrue( duplicate->destroy == (list_item_destroyer) ooc_delete );
-	assertTrue( duplicate->type == &FooNodeClass );
-	assertTrue( duplicate->list_of_nodes );
-	assertNotNull( duplicate->first );
-	assertNotNull( duplicate->last );
-
-	check_sequential( duplicate );
-
-	ooc_delete( (Object) duplicate );
-}
-
 /** Test methods order table.
  * Put your test methods in this table in the order they should be executed
  * using the TEST(method) macro. 
@@ -1118,7 +925,7 @@ struct TestCaseMethod methods[] =
 	TEST(types),
 	TEST(type_safety),
 	TEST(iterator),
-/*	TEST(append),
+	TEST(append),
 	TEST(paralell_append),
 	TEST(prepend),
 	TEST(paralell_prepend),
@@ -1135,8 +942,6 @@ struct TestCaseMethod methods[] =
 	TEST(delete_item),
 	TEST(delete_item_single),
 	TEST(unmanaged),
-	TEST(swap_1),
-	TEST(swap_2),
 	TEST(swap_3),
 	TEST(swap_4),
 	TEST(swap_5),
@@ -1146,10 +951,7 @@ struct TestCaseMethod methods[] =
 	TEST(find_item),
 	TEST(find_item_reverse),
 	TEST(bad_reuse),
-	TEST(duplicate_untyped),
-	TEST(duplicate_none_nodes),
-	TEST(duplicate_nodes),
-*/	
+
 	{NULL, NULL} /* Do NOT delete this line! */
 };
 	
