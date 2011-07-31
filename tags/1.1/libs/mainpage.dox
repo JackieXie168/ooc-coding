@@ -1,0 +1,12 @@
+/*! \mainpage "ooc - Object Oriented toolkit for C"
+
+ooc is an Object Oriented Toolkit for ANSI-C.
+\n
+
+
+This manual is divided in the following sections:
+- \subpage porting
+- \subpage page_MT
+*/
+
+
