@@ -63,6 +63,9 @@
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "ooc"
 
+/* Define to the home page for this package. */
+#define PACKAGE_URL "http://ooc-coding.sourceforge.net"
+
 /* Define to the version of this package. */
 #define PACKAGE_VERSION "1.1"
 

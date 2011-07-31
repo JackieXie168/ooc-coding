@@ -44,6 +44,9 @@ Currently the following porting headers are available:
 </TR>
 </TABLE>
 
+For special comments on the existing ports see the following descriptions:
+- @subpage port_notes_mcc18 Notes on the MPLAB CC18 port
+
 @section new_port How to create a new port?
 To create a new port you must do the followings:
 	-#	Create a porting header file in the @e libs/port directory in the source tree.\n
@@ -220,5 +223,84 @@ The following memory handling functions must be available:
 (This is not an extra requirement :-) If your host does not support these functions
 then you must implement them.)
 
+//=============================================================================================================================================
+
+@page port_notes_mcc18 Notes on the MPLAB CC18 port
+
+The main issue with the MPLAB CC18 compiler and development toolchain is that it lacks the dynamic memory handling (malloc() and others).
+Due to this limitations you can not use the ooc_new() and similar functions for creating your Objects. Instead you must allocate your Objects statically
+and populate them with the ooc_use() and similar constructors. The same applies for the deletion of an Object: you can not delete it, just ooc_release(),
+wich destruct the Object properly, but does not free the memory location since it was allocated statically.\n
+\n
+Exception handling works fine. There is a hack in the exception_new() function: it returns a statically pre-allocated Exception object, 
+so feel free to use exception_new(), it is no problem.\n
+\n
+The ooc libraries support only the Large data / Large code modell! Always compile your project with these settings (-mL compiler otion)!
+\n
+The following compiler controls are defined for MCC18:
+	- ROM
+	- GEN_PTR
+	- NO_RELATIVE_INCLUDE
+	- NO_THREADS
+	- NO_INLINE
+	- OOC_NO_DYNAMIC_MEM
+	- OOC_NO_FINALIZE
+	- _OOC_VTAB_INITIALIZER
+
+The following classes are proted to the MCC18:
+
+<TABLE>
+<TR>
+	<TD>Class</TD>
+	<TD>Comment</TD>
+</TR>
+<TR>
+	<TD>ooc.h</TD>
+	<TD>No dynamic memory handling</TD>
+</TR>
+<TR>
+	<TD>exception.h</TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD>refcounted.h</TD>
+	<TD></TD>
+</TR>
+<TR>
+	<TD>vector.h</TD>
+	<TD>No dynamic memroy handling. Use vector_use_with_store() to allocate a Vector.</TD>
+</TR>
+<TR>
+	<TD>list.h</TD>
+	<TD>No dynamic memroy handling. As a consequence, List can hold only Objects the are subclasses of ListNode!
+	Use list_use_of_nodes() to allocate a List.</TD>
+</TR>
+<TR>
+	<TD>testcase.h</TD>
+	<TD>No dynamic memroy handling.</TD>
+</TR>
+</TABLE>
+
+The ooc/signal.h class is not ported to the MCC18 platform, since it uses dynamic memory handling internally.\n
+\n
+Since the MPLAB CC18 compiler is available on Windows only, this port is distributed as a windows installer only.
+For installation install the Windows installer for ooc first, then install the mcc18 installer.
+\n
+@note	There is a silly bug in the MCC18 compiler: if you define the members of two classes in sequence, then the typedef for the first
+	object struct is forgotten by the compiler. You must typedef it again by yourself, but this would hurt other compilers.\n
+	The workaround is:\n
+	@code
+		ClassMembers( First, Base )
+			int	data;
+		EndOfClassMembers;
+
+		ClassMembers( Second, Base )
+			int	data;
+		EndOfClassMembers;
+
+		#ifdef __18CXX
+		typedef struct FirstObject * First;
+		#endif
+	@endcode
 
 */
