@@ -128,8 +128,8 @@ Vector			vector_new_from_table( void * table, size_t record_size, VectorIndex ta
  * @code
 #define MY_VECTOR_SIZE	13
 
-void *          myVectorStore[ MY_VECTOR_SIZE ];
-VectorObject    myVector;
+VectoItem				myVectorStore[ MY_VECTOR_SIZE ];
+struct VectorObject		myVector;
 
 vector_use_with_store( & myVector, MY_VECTOR_SIZE, NULL, myVectorStore );
  * @endcode
