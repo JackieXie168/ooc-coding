@@ -51,6 +51,8 @@ Foo_initialize( Class this )
 /* Class finalizing
  */
 
+#ifndef OOC_NO_FINALIZE
+
 static
 void
 Foo_finalize( Class this )
@@ -58,6 +60,7 @@ Foo_finalize( Class this )
 	/* Release global resources! */
 }
 
+#endif
 
 /* Constructor
  */

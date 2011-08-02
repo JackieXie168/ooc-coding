@@ -36,6 +36,9 @@
 #if defined( _MSC_VER )
 	#include "port/msvc.h"
 	
+#elif defined( __dsPIC30 )
+	#include "port/mcc30.h"
+	
 #elif defined( __GNUC__ )
 	#include "port/gnuc.h"
 	
@@ -51,6 +54,10 @@
 
 #ifndef ROM
 #define ROM const
+#endif
+
+#ifndef ROM_SPACE
+#define ROM_SPACE ROM
 #endif
 
 /* Base objects and types
@@ -562,7 +569,8 @@ extern ROM struct ClassTable BaseClass;
 	_define_vtab_access( pClass, pParent )					\
 															\
 	/* Allocating the class description table */			\
-	ROM struct ClassTable pClass ## Class = {				\
+	ROM_SPACE												\
+	struct ClassTable pClass ## Class = {					\
 		sizeof( struct pClass ## Object ),					\
 		(ROM char *) #pClass,								\
 		& pParent ## Class,	                                \
@@ -590,7 +598,8 @@ extern ROM struct ClassTable BaseClass;
 	_define_vtab_access( pClass, pParent )					\
 															\
 	/* Allocating the class description table */			\
-	ROM struct ClassTable pClass ## Class = {				\
+	ROM_SPACE												\
+	struct ClassTable pClass ## Class = {					\
 		sizeof( struct pClass ## Object ),					\
 		(ROM char *) #pClass,								\
 		& pParent ## Class,	                                \
