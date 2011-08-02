@@ -185,8 +185,8 @@ testcase_fail( ROM char * filename, int line, ROM char * message )
 	ooc_unlock( printing );
 }
 
-static ROM char before_class[] = "before_class";
-static ROM char after_class[] = "after_class";
+static ROM_SPACE char before_class[] = "before_class";
+static ROM_SPACE char after_class[] = "after_class";
 
 #ifdef OOC_NO_DYNAMIC_MEM
 char print_buffer[PRINT_BUFFER_SIZE];
@@ -408,7 +408,9 @@ EndOfVirtuals;
 AllocateClass( SegmentationFault, Exception );
 
 static	void	SegmentationFault_initialize( Class this ) {}
+#ifndef OOC_NO_FINALIZE
 static	void	SegmentationFault_finalize( Class this ) {}
+#endif
 
 static	void	SegmentationFault_constructor( SegmentationFault self, const void * params )
 {
@@ -432,7 +434,9 @@ EndOfVirtuals;
 AllocateClass( ArithmeticFault, Exception );
 
 static	void	ArithmeticFault_initialize( Class this ) {}
+#ifndef OOC_NO_FINALIZE
 static	void	ArithmeticFault_finalize( Class this ) {}
+#endif
 
 static	void	ArithmeticFault_constructor( ArithmeticFault self, const void * params )
 {

@@ -51,6 +51,8 @@ Bar_initialize( Class this )
 /* Class finalizing
  */
 
+#ifndef OOC_NO_FINALIZE
+
 static
 void
 Bar_finalize( Class this )
@@ -58,6 +60,7 @@ Bar_finalize( Class this )
 	/* Release global resources! */
 }
 
+#endif
 
 /* Constructor
  */
