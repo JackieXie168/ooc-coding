@@ -44,7 +44,7 @@
 /* Memory model */
 
 #define ROM const
-#define ROM_SPACE __attribute__((space(auto_psv))) const
+#define ROM_ALLOC __attribute__((space(auto_psv))) const
 
 /* Longjump functions */
  
@@ -92,5 +92,7 @@
 	return tmp;
 
 #endif /* COMPILING_OOC_C */
+
+#define TESTCASE_MAIN 	int main( int argc, char ** argv )
 
 #endif /*MCC30_H_*/

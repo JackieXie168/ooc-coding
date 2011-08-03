@@ -35,7 +35,7 @@
  * Used for root Class in ooc. It must be a superclass for all classes.
  */
 
-ROM_SPACE struct ClassTable BaseClass;
+ROM_ALLOC struct ClassTable BaseClass;
 
 /* Class initialization
  */
@@ -555,6 +555,6 @@ ooc_ptr_read_and_null( void ** ptr_ptr )
 
 /* Assert message store */
 #ifdef OOC_ASSERT_MSG
-ROM_SPACE char ooc_assert_msg[] = OOC_ASSERT_MSG;
+ROM_ALLOC char ooc_assert_msg[] = OOC_ASSERT_MSG;
 #endif
 

@@ -18,7 +18,7 @@ filter_obj=*.o
 filter_lib=*.a
 filter_lkr=*.gld
 [CAT_SUBFOLDERS]
-subfolder_src=
+subfolder_src=port
 subfolder_inc=implement;port
 subfolder_obj=
 subfolder_lib=
@@ -27,11 +27,12 @@ subfolder_lkr=
 file_000=.
 file_001=.
 file_002=.
-file_003=.
+file_003=port
 file_004=.
-file_005=implement
-file_006=port
-file_007=.
+file_005=.
+file_006=implement
+file_007=port
+file_008=.
 [GENERATED_FILES]
 file_000=no
 file_001=no
@@ -41,6 +42,7 @@ file_004=no
 file_005=no
 file_006=no
 file_007=no
+file_008=no
 [OTHER_FILES]
 file_000=no
 file_001=no
@@ -50,22 +52,23 @@ file_004=no
 file_005=no
 file_006=no
 file_007=no
+file_008=no
 [FILE_INFO]
 file_000=exception.c
 file_001=ooc.c
 file_002=testcase.c
-file_003=exception.h
-file_004=ooc.h
-file_005=implement\exception.h
-file_006=port\mcc30.h
-file_007=testcase.h
+file_003=port\mcc30_ext.c
+file_004=exception.h
+file_005=ooc.h
+file_006=implement\exception.h
+file_007=port\mcc30.h
+file_008=testcase.h
 [SUITE_INFO]
 suite_guid={479DDE59-4D56-455E-855E-FFF59A3DB57E}
 suite_state=build-library generic-16bit
 [TOOL_SETTINGS]
 TS{7D9C6ECE-785D-44CB-BA22-17BF2E119622}=-g
-TS{25AC22BD-2378-4FDB-BFB6-7345A15512D3}=-g -ansi -Wall -pedantic -legacy-libc
-TS{25AC22BD-2378-4FDB-BFB6-7345A15512D3}_alt=yes
+TS{25AC22BD-2378-4FDB-BFB6-7345A15512D3}=-g -ansi -Wall -pedantic
 TS{7DAC9A1D-4C45-45D6-B25A-D117C74E8F5A}=-Map="$(BINDIR_)$(TARGETBASE).map" --report-mem -o"$(BINDIR_)$(TARGETBASE).$(TARGETSUFFIX)"
 TS{509E5861-1E2A-483B-8B6B-CA8DB7F2DD78}=
 [INSTRUMENTED_TRACE]
