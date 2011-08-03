@@ -251,7 +251,6 @@ test_init( void )
 	assertTrue( ((BaseVtable)( BarClass.vtable ))->_class_register_next == & BarSonClass );
 	assertTrue( ((BaseVtable)( BarSonClass.vtable ))->_class_register_prev == & BarClass );
 	assertNull( ((BaseVtable)( BarSonClass.vtable ))->_class_register_next );
-	#endif
 				
 	ooc_finalize_class( BarSon );
 	ooc_finalize_class( Bar );
@@ -260,6 +259,7 @@ test_init( void )
 	assertFalse( ooc_isInitialized( Foo ) );
 	assertFalse( ooc_isInitialized( Bar ) );
 	assertFalse( ooc_isInitialized( BarSon ) );
+	#endif
 }
 
 void
@@ -394,9 +394,11 @@ test_lifecycle( void )
 		assertTrue( foolife_last_called == foolife_copy );
 	ooc_delete( (Object) foolife1 );
 		assertTrue( foolife_last_called == foolife_dtor );
+	#ifndef OOC_NO_FINALIZE
 	ooc_finalize_class( FooLife );
 		assertTrue( foolife_last_called == foolife_finz );
-	
+	#endif
+
 	/* prevent leaking foolife2 */
 	ooc_init_class( FooLife );
 	ooc_delete( (Object) foolife2 );
@@ -799,7 +801,7 @@ test_cast( void )
  * 
  */
  
-ROM_SPACE
+ROM_ALLOC
 struct TestCaseMethod methods[] =
 {
 	
@@ -823,7 +825,7 @@ struct TestCaseMethod methods[] =
 /* Runs the test as an executable
  */
  
-int main(int argc, char * argv[])
+TESTCASE_MAIN
 {
 	OocTest ooctest;
 	int result;

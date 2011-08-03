@@ -185,8 +185,8 @@ testcase_fail( ROM char * filename, int line, ROM char * message )
 	ooc_unlock( printing );
 }
 
-static ROM_SPACE char before_class[] = "before_class";
-static ROM_SPACE char after_class[] = "after_class";
+static ROM_ALLOC char before_class[] = "before_class";
+static ROM_ALLOC char after_class[] = "after_class";
 
 #ifdef OOC_NO_DYNAMIC_MEM
 char print_buffer[PRINT_BUFFER_SIZE];
@@ -539,4 +539,3 @@ signal_handler( int signum )
  */
  
 /*@}*/
-

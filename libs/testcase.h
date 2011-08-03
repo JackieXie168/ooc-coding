@@ -43,7 +43,7 @@ typedef void (*test_method_type)(TestCase);
  * The table must end with a @c NULL pair. \n
  * Use of the table: \n
  * @code
-		ROM_SPACE
+		ROM_ALLOC
 		struct TestCaseMethod methods[] =
 		{
 			TEST(my_first_test_method),
