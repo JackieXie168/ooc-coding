@@ -15,6 +15,11 @@
  * @note	This class is a final class, can not be inherited.
  */ 
 
+#ifdef OOC_NO_FINALIZE
+#define ooc_finalize_class( x )
+#define ooc_finalize_all( )
+#endif
+
 DeclareClass( TestCaseTest, TestCase );
 
 Virtuals( TestCaseTest, TestCase )
@@ -68,6 +73,8 @@ TestCaseTest_initialize( Class this )
 /* Class finalizing
  */
 
+#ifndef OOC_NO_FINALIZE
+
 static
 void
 TestCaseTest_finalize( Class this )
@@ -75,6 +82,7 @@ TestCaseTest_finalize( Class this )
 	/* Release global resources! */
 }
 
+#endif
 
 /* Constructor
  */
@@ -145,6 +153,8 @@ testcasetest_after_class( TestCaseTest self )
 	Test methods
  */
 
+#ifdef OOC_HAS_UNIX_SIGNALS
+
 void
 static
 segfault( TestCaseTest self )
@@ -202,6 +212,7 @@ callnull( TestCaseTest self )
  * 
  */
  
+ROM_ALLOC
 struct TestCaseMethod methods[] =
 {
 	
@@ -227,6 +238,8 @@ run_testcasetest( void )
 	
 	return result;
 }
+
+#endif /* OOC_HAS_UNIX_SIGNALS */
 
 /*****************************************************
  * Testing the derived TestCase class
@@ -281,11 +294,15 @@ TestCaseTestChild_initialize( Class this )
 /* Class finalizing
  */
 
+#ifndef OOC_NO_FINALIZE
+
 static
 void
 TestCaseTestChild_finalize( Class this )
 {
 }
+
+#endif
 
 /* Constructor
  */
@@ -414,7 +431,8 @@ testcasetestchild_third_run( TestCaseTestChild self )
  * using the TEST(method) macro. 
  * 
  */
- 
+
+ROM_ALLOC
 struct TestCaseMethod childmethods[] =
 {
 	
@@ -452,11 +470,13 @@ run_testcasetestchild()
 /* Runs the test as an executable
  */
  
-int main(int argc, char * argv[])
+TESTCASE_MAIN
 {
 	int result;
 	
+#ifdef OOC_HAS_UNIX_SIGNALS
 	result = run_testcasetest();
+#endif
 	
 	if( result == 0 )
 		result = run_testcasetestchild();

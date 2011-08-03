@@ -2,8 +2,6 @@
 /* This is a ListTest class implementation file
  */
 
-#include <omp.h>
-
 #include "../libs/exception.h"
 #include "../libs/testcase.h"
 #include "../libs/list.h"
@@ -23,6 +21,11 @@
  * @note	This class is a final class, can not be inherited.
  * @note	Run as: valgrind --leak-check=yes --quiet ./listtest
  */ 
+
+#ifdef OOC_NO_FINALIZE
+#define ooc_finalize_class( x )
+#define ooc_finalize_all( )
+#endif
 
 DeclareClass( ListTest, TestCase );
 
@@ -80,6 +83,8 @@ ListTest_initialize( Class this )
 /* Class finalizing
  */
 
+#ifndef OOC_NO_FINALIZE
+
 static
 void
 ListTest_finalize( Class this )
@@ -87,6 +92,7 @@ ListTest_finalize( Class this )
 	/* Release global resources! */
 }
 
+#endif
 
 /* Constructor
  */
@@ -135,7 +141,9 @@ EndOfVirtuals;
 AllocateClass( FooNode, ListNode );
 
 static	void	FooNode_initialize( Class this ) {}
+#ifndef OOC_NO_FINALIZE
 static	void	FooNode_finalize( Class this ) {}
+#endif
 
 static	void	FooNode_constructor( FooNode self, const void * params )
 {
@@ -348,10 +356,12 @@ check_sequential( List list )
 	{
 		Object item = (Object) list_get_item( iterator );
 		
-		if( ooc_isInstanceOf( item, Foo ) )
+		if( ooc_isInstanceOf( item, Foo ) ) {
 			assertTrue( foo_get_data( ooc_cast( item, Foo ) ) == i );
-		else if( ooc_isInstanceOf( item, FooNode ) )
+			}
+		else if( ooc_isInstanceOf( item, FooNode ) ) {
 			assertTrue( foonode_get_data( ooc_cast( item, FooNode ) ) == i );
+			}	
 		else
 			failMsg("Unknown item type in list");
 	}
@@ -376,7 +386,7 @@ static
 void
 paralell_append( ListTest self )
 {
-	static const int check_size = 1000;
+	static const int check_size = 100;
 	ListIterator    iterator;
 	int i;
 	int * check = ooc_calloc( check_size, sizeof( int ) );
@@ -386,7 +396,9 @@ paralell_append( ListTest self )
 	for( i=0; i<check_size; i++ )
 		check[ i ] = 0;
 
+	#ifdef _OPENMP
 	#pragma omp parallel for private(i)
+	#endif
 	for( i=0; i<check_size; i++ )
 		list_append( self->foolist, foo_new_with_data( i ) );
 
@@ -422,7 +434,7 @@ static
 void
 paralell_prepend( ListTest self )
 {
-	static const int check_size = 1000;
+	static const int check_size = 100;
 	ListIterator    iterator;
 	int i;
 	int * check = ooc_calloc( check_size, sizeof( int ) );
@@ -432,7 +444,9 @@ paralell_prepend( ListTest self )
 	for( i=0; i<check_size; i++ )
 		check[ i ] = 0;
 
+	#ifdef _OPENMP
 	#pragma omp parallel for private(i) schedule( guided, 10 )
+	#endif
 	for( i=0; i<check_size; i++ )
 		list_prepend( self->foolist, foo_new_with_data( i ) );
 
@@ -751,7 +765,7 @@ static char * const foreach_param 		= "foreach parameter";
 static int 			foreach_counter;
 Class				foreach_expected_item_type;
 
-#define FOREACH_LOOP 100
+#define FOREACH_LOOP 60
 
 static
 void
@@ -760,10 +774,12 @@ item_executor( void * item, void * param )
 	assertTrue( param == foreach_param );
 	assertTrue( ooc_get_type( item ) == foreach_expected_item_type );
 	
-	if( ooc_isInstanceOf( item, Foo ) )
+	if( ooc_isInstanceOf( item, Foo ) ) {
 		assertTrue( foo_get_data( ooc_cast( item, Foo ) ) == foreach_counter );
-	else if( ooc_isInstanceOf( item, FooNode ) )
+		}
+	else if( ooc_isInstanceOf( item, FooNode ) ) {
 		assertTrue( foonode_get_data( ooc_cast( item, FooNode ) ) == foreach_counter );
+		}	
 	else
 		failMsg("Unknown item type in list");
 		
@@ -1115,7 +1131,7 @@ duplicate_nodes( ListTest self )
  * 
  */
  
-ROM
+ROM_ALLOC
 struct TestCaseMethod methods[] =
 {
 	TEST(constructor),
@@ -1160,7 +1176,7 @@ struct TestCaseMethod methods[] =
 /* Runs the test as an executable
  */
  
-int main(int argc, char * argv[])
+TESTCASE_MAIN
 {
 	ListTest listtest;
 	int result;

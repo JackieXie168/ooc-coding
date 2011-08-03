@@ -43,7 +43,7 @@ Foo_initialize( Class this )
 	
 	vtab->foo_virtual	= 	_foo_virtual;
 
-	// ooc_init_class( !!! Classes that are USED by Foo !!! ); Remove if you initialize it other place!
+	/* ooc_init_class( !!! Classes that are USED by Foo !!! ); Remove if you initialize it other place! */
 	
 	/* Allocate global resources here */
 }

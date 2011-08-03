@@ -86,6 +86,13 @@ TestCase_initialize( Class this )
 	vtab->after_class	= 	_testcase_default_virtual;
 	
 	ooc_mutex_init( printing );
+
+	ooc_init_class( Exception );
+
+	#ifdef OOC_HAS_UNIX_SIGNALS
+	ooc_init_class( SegmentationFault );
+	ooc_init_class( ArithmeticFault );
+	#endif
 }
 
 /* Class finalizing
@@ -350,9 +357,6 @@ int
 testcase_run( TestCase self)
 {
 #ifdef OOC_HAS_UNIX_SIGNALS
-	ooc_init_class( SegmentationFault );
-	ooc_init_class( ArithmeticFault );
-	
 	signal( SIGSEGV, signal_handler );
 	signal( SIGFPE, signal_handler );
 #endif

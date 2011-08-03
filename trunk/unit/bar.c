@@ -43,8 +43,6 @@ Bar_initialize( Class this )
 	
 	vtab->bar_virtual	= 	_bar_virtual;
 
-	// ooc_init_class( !!! Classes that are USED by Bar !!! ); Remove if you initialize it other place!
-	
 	/* Allocate global resources here */
 }
 

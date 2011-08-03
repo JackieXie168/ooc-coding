@@ -78,8 +78,9 @@
 /* Compilation control
  */
 
-#define OOC_HAS_UNIX_SIGNALS
-
+/* #define OOC_HAS_UNIX_SIGNALS
+ * Has, but does not work as excepted :-(
+ */
 
 #ifdef COMPILING_OOC_C
 
