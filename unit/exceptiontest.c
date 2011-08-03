@@ -19,6 +19,11 @@
  * @note	This class is a final class, can not be inherited.
  */ 
 
+#ifdef OOC_NO_FINALIZE
+#define ooc_finalize_class( x )
+#define ooc_finalize_all( )
+#endif
+
 DeclareClass( ExceptionTest, TestCase );
 
 Virtuals( ExceptionTest, TestCase )
@@ -63,6 +68,8 @@ ExceptionTest_initialize( Class this )
 /* Class finalizing
  */
 
+#ifndef OOC_NO_FINALIZE
+
 static
 void
 ExceptionTest_finalize( Class this )
@@ -70,6 +77,7 @@ ExceptionTest_finalize( Class this )
 	/* Release global resources! */
 }
 
+#endif
 
 /* Constructor
  */
@@ -321,6 +329,7 @@ test_manage( void )
  * 
  */
  
+ROM_ALLOC
 struct TestCaseMethod methods[] =
 {
 	
@@ -337,7 +346,7 @@ struct TestCaseMethod methods[] =
 /* Runs the test as an executable
  */
  
-int main(int argc, char * argv[])
+TESTCASE_MAIN
 {
 	ExceptionTest exceptiontest;
 	int result;

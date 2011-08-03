@@ -12,7 +12,9 @@ EndOfVirtuals;
 AllocateClass( FooException, Exception );
 
 static	void	FooException_initialize( Class this ) {}
+#ifndef OOC_NO_FINALIZE
 static	void	FooException_finalize( Class this ) {}
+#endif
 
 static	void	FooException_constructor( FooException self, const void * params )
 {

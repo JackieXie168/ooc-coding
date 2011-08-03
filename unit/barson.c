@@ -43,8 +43,6 @@ BarSon_initialize( Class this )
 	
 	vtab->barson_virtual	= 	_barson_virtual;
 
-	// ooc_init_class( !!! Classes that are USED by BarSon !!! ); Remove if you initialize it other place!
-	
 	/* Allocate global resources here */
 }
 

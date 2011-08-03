@@ -43,8 +43,6 @@ BarDaughter_initialize( Class this )
 	
 	vtab->bardaughter_virtual	= 	_bardaughter_virtual;
 
-	// ooc_init_class( !!! Classes that are USED by BarDaughter !!! ); Remove if you initialize it other place!
-	
 	/* Allocate global resources here */
 }
 

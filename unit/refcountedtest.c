@@ -2,7 +2,9 @@
 /* This is a RefCountedTest class implementation file
  */
 
+#ifdef _OPENMP
 #include <omp.h>
+#endif
 
 #include "../libs/testcase.h"
 
@@ -20,6 +22,11 @@
  * @note	This class is a final class, can not be inherited.
  * @note	Run as: valgrind --leak-check=yes --quiet ./refcountedtest
  */ 
+
+#ifdef OOC_NO_FINALIZE
+#define ooc_finalize_class( x )
+#define ooc_finalize_all( )
+#endif
 
 DeclareClass( RefCountedTest, TestCase );
 
@@ -69,6 +76,8 @@ RefCountedTest_initialize( Class this )
 /* Class finalizing
  */
 
+#ifndef OOC_NO_FINALIZE
+
 static
 void
 RefCountedTest_finalize( Class this )
@@ -76,6 +85,7 @@ RefCountedTest_finalize( Class this )
 	/* Release global resources! */
 }
 
+#endif
 
 /* Constructor
  */
@@ -157,7 +167,9 @@ EndOfVirtuals;
 AllocateClass( FooRefCnt, RefCounted );
 
 static	void	FooRefCnt_initialize( Class this ) {}
+#ifndef OOC_NO_FINALIZE
 static	void	FooRefCnt_finalize( Class this ) {}
+#endif
 
 static	void	FooRefCnt_constructor( FooRefCnt self, const void * params )
 {
@@ -239,7 +251,9 @@ test_multithread( void )
 	foo_destructor_counter = 0;
 	assertTrue( foo->RefCounted.counter == 1 );
 	
+	#ifdef _OPENMP
 	#pragma omp parallel for private(i) schedule( guided, 10 )
+	#endif
 	for( i = 0; i<TEST_CYCLE_NUMBER; i++ )
 		refcnt_addref( (RefCounted) foo );
 	
@@ -264,6 +278,7 @@ test_multithread( void )
  * 
  */
  
+ROM_ALLOC
 struct TestCaseMethod methods[] =
 {
 	
@@ -277,7 +292,7 @@ struct TestCaseMethod methods[] =
 /* Runs the test as an executable
  */
  
-int main(int argc, char * argv[])
+TESTCASE_MAIN
 {
 	RefCountedTest refcountedtest;
 	int result;

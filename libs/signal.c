@@ -81,11 +81,13 @@ SignalItem_initialize( Class this )
 /* Class finalizing
  */
 
+#ifndef OOC_NO_FINALIZE
 static
 void
 SignalItem_finalize( Class this )
 {
 }
+#endif
 
 
 /* Constructor
@@ -154,7 +156,9 @@ EndOfVirtuals;
 AllocateClass( SignalQueued, ListNode );
 
 static	void	SignalQueued_initialize( Class this ) {}
+#ifndef OOC_NO_FINALIZE
 static	void	SignalQueued_finalize( Class this ) {}
+#endif
 
 static
 void
@@ -217,6 +221,8 @@ Signal_initialize( Class this )
 /* Class finalizing
  */
 
+#ifndef OOC_NO_FINALIZE
+
 static
 void
 Signal_finalize( Class this )
@@ -227,6 +233,8 @@ Signal_finalize( Class this )
 	ooc_mutex_release( signal_queue_critical_section );
 	
 }
+
+#endif
 
 /* Constructor
  */

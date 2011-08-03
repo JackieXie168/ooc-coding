@@ -12,6 +12,11 @@
 #include "barson.h"
 #include "bardaughter.h"
 
+#ifdef OOC_NO_FINALIZE
+#define ooc_finalize_class( x )
+#define ooc_finalize_all( )
+#endif
+
 /** @class VectorTest
  *  @brief VectorTest class - brief description.
  * 	@see vectortest.h
@@ -74,12 +79,16 @@ VectorTest_initialize( Class this )
  * 
  */
 
+#ifndef OOC_NO_FINALIZE
+
 static
 void
 VectorTest_finalize( Class this )
 {
 	/* Release global resources! */
 }
+
+#endif
 
 /* Constructor
  */
@@ -157,7 +166,9 @@ test_pushback( void )
 	Vector vector = vector_new_type( 10, Foo, TRUE );
 	int i;
 	
+	#ifdef _OPENMP
 	#pragma omp parallel for private(i) schedule( guided, 10 )
+	#endif
 	for( i = 0; i<100; i++ )
 		vector_push_back( vector, foo_new_with_data( i ) );
 		
@@ -173,7 +184,9 @@ test_string_vector( void )
 	Vector vector = vector_new( 10, (vector_item_destroyer) ooc_free );
 	int i;
 
+	#ifdef _OPENMP
 	#pragma omp parallel for private(i) schedule( guided, 10 )
+	#endif
 	for( i = 0; i<100; i++ )
 		vector_push_back( vector, ooc_strdup( "Test string." ) );
 		
@@ -320,13 +333,17 @@ test_set_item( void )
 	Vector vector = vector_new_type( 10, Foo, TRUE );
 	int i;
 
+	#ifdef _OPENMP
 	#pragma omp parallel for private(i) schedule( guided, 10 )
+	#endif
 	for( i = 0; i<100; i++ )
 		vector_push_back( vector, foo_new_with_const_text( "Test string." ) );
 		
 	assertTrue( vector_items( vector ) == 100 );
 	
+	#ifdef _OPENMP
 	#pragma omp parallel for private(i) schedule( guided, 10 )
+	#endif
 	for( i = 0; i<100; i++ )
 		vector_set_item( vector, i, foo_new_with_data( 100 - i ) );
 		
@@ -422,8 +439,6 @@ static
 void
 test_item_executor( Foo item, void * param )
 {
-	static int previous;
-	
 	assertTrue( ooc_isInstanceOf( item, Foo ) );
 	assertTrue( param == foreach_param );
 	
@@ -860,7 +875,7 @@ duplicate_typed( VectorTest self )
  * 
  */
 
-ROM
+ROM_ALLOC
 struct TestCaseMethod methods[] =
 {
 	
@@ -895,7 +910,7 @@ struct TestCaseMethod methods[] =
 /* Runs the test as an executable
  */
  
-int main(int argc, char * argv[])
+TESTCASE_MAIN
 {
 	VectorTest vectortest;
 	int result;

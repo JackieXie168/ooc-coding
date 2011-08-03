@@ -2,8 +2,6 @@
 /* This is a SignalTest class implementation file
  */
 
-#include <omp.h>
-
 #include "../libs/testcase.h"
 
 #include "../libs/signal.h"
@@ -19,6 +17,11 @@
  * @note	This class is a final class, can not be inherited.
  * @note	Run as: valgrind --leak-check=yes --quiet ./signaltest
  */ 
+
+#ifdef OOC_NO_FINALIZE
+#define ooc_finalize_class( x )
+#define ooc_finalize_all( )
+#endif
 
 /*	=====================================================
 	Test helper classes
@@ -37,7 +40,9 @@ ClassMembers( Source, Base )
 	int		counter_max;
 	int		counter;
 	
+	#ifdef _OPENMP
 	ooc_Mutex	modify;
+	#endif
 
 	Signal	on_counter_reached;
 	
@@ -52,11 +57,14 @@ Source_initialize( Class this )
 	ooc_init_class( Signal );
 }
 
+#ifndef OOC_NO_FINALIZE
+
 static
 void
 Source_finalize( Class this )
 {
 }
+#endif
 
 static
 void
@@ -163,7 +171,9 @@ ClassMembers( Listener, Base )
 
 	int		source_fired_count[ MAX_SOURCES ];
 	
+	#ifdef _OPENMP
 	ooc_Mutex	modify;
+	#endif
 	
 EndOfClassMembers;
 
@@ -176,11 +186,13 @@ Listener_initialize( Class this )
 	ooc_init_class( Signal );
 }
 
+#ifndef OOC_NO_FINALIZE
 static
 void
 Listener_finalize( Class this )
 {
 }
+#endif
 
 static
 void
@@ -284,13 +296,14 @@ SignalTest_initialize( Class this )
 /* Class finalizing
  */
 
+#ifndef OOC_NO_FINALIZE
 static
 void
 SignalTest_finalize( Class this )
 {
 	/* Release global resources! */
 }
-
+#endif
 
 /* Constructor
  */
@@ -688,6 +701,7 @@ signaltest_process_parallel( SignalTest self )
  * 
  */
  
+ROM_ALLOC
 struct TestCaseMethod methods[] =
 {
 	TEST(signaltest_bad_connect),
@@ -711,7 +725,7 @@ struct TestCaseMethod methods[] =
 /* Runs the test as an executable
  */
  
-int main(int argc, char * argv[])
+TESTCASE_MAIN
 {
 	SignalTest signaltest;
 	int result;

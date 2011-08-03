@@ -127,11 +127,15 @@ _ListNodeVoidp_initialize( Class this )
 {
 }
 
+#ifndef OOC_NO_FINALIZE
+
 static
 void
 _ListNodeVoidp_finalize( Class this )
 {
 }
+
+#endif
 
 static
 void
