@@ -28,7 +28,7 @@ LDLIBS = $(TESTABLE_TARGET) $(OOC_LIB)
 !IF "$(CONFIG)" == "Debug_st"
 OOC_LIB =
 TESTABLE_LIB = libooc_st_d.lib
-CFLAGS = /DEBUG /D"WIN32" /Od /RTC1 /MDd /W3 /nologo /Zi /TC
+CFLAGS = /DEBUG /D"NO_THREADS" /D"WIN32" /Od /RTC1 /MDd /W3 /nologo /Zi /TC
 LDFLAGS = /DEBUG /Zi /MDd /nologo
 LINKEROPTIONS = /link /OPT:NOICF /OPT:NOREF
 !ENDIF
@@ -44,7 +44,7 @@ LINKEROPTIONS = /link /OPT:NOICF /OPT:NOREF
 !IF "$(CONFIG)" == "Release_st"
 OOC_LIB =
 TESTABLE_LIB = libooc_st.lib
-CFLAGS = /D"WIN32" /DNDEBUG /O2 /MD /W3 /nologo /TC
+CFLAGS = /D"WIN32" /D"NO_THREADS" /DNDEBUG /O2 /MD /W3 /nologo /TC
 LDFLAGS = /DNDEBUG /MD /nologo
 LINKEROPTIONS = /link
 !ENDIF
