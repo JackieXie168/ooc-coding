@@ -178,15 +178,10 @@ TLS struct ooc_Manageable * 	managed 		= NULL;
  */
 
 
-#ifndef OOC_NO_DYNAMIC_MEM
-
-Exception
-exception_new( enum error_codes err_code )
-{
-	return (Exception) ooc_new( Exception, &err_code );
-}
-
-#else
+/* The ExceptionObject is always static! Te reason is, that in case of an out_of_memory
+ * Exception, we may be not able to allocate additional place for the ExceptionObject itself,
+ * thus we preallocate it statically.
+ */
 
 TLS struct ExceptionObject static_exception;
 
@@ -196,8 +191,6 @@ exception_new( enum error_codes err_code )
 	ooc_use( (void*)  &static_exception, Exception, (void *) &err_code );
 	return &static_exception;
 }
-
-#endif
 
 int
 exception_get_error_code( const Exception self )
@@ -251,7 +244,8 @@ ooc_throw( Exception exc_obj_ptr )
 		/* if we are in an exception handling, then its a rethrow with the new Exception */
 		if( try_pt->exc_obj != NULL && try_pt->exc_obj != exc_obj_ptr ) {
 #ifndef OOC_NO_DYNAMIC_MEM
-			ooc_delete( (Object) try_pt->exc_obj );
+			if( try_pt->exc_obj != & static_exception )
+				ooc_delete( (Object) try_pt->exc_obj );
 #else
 			ooc_release( (Object) try_pt->exc_obj );
 #endif
@@ -329,7 +323,8 @@ ooc_end_try( void )
 			else {
 				/* if we have caught, and handled, just rewind the buffer stack */
 #ifndef OOC_NO_DYNAMIC_MEM
-				ooc_delete( (Object) try_pt->exc_obj );
+				if( try_pt->exc_obj != & static_exception )
+					ooc_delete( (Object) try_pt->exc_obj );
 #else
 				ooc_release( (Object) try_pt->exc_obj );
 #endif

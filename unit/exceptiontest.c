@@ -161,24 +161,24 @@ test_constructor( ExceptionTest self )
 	assertTrue( exception_get_error_code( exception ) == err_bad_throw );
 	assertTrue( exception_get_user_code( exception ) == 0 );
 
-	ooc_delete( (Object) exception );
+	/* Must NOT delete exception here, baceuse it is allocated statically! */
 }
 
 void
 static
 test_inheritance( ExceptionTest self )
 {
-	Exception exception;
+	Exception fooexception;
 
-	exception = foo_exception_new( 13 );
+	fooexception = foo_exception_new( 13 );
 
-	assertNotNull( exception );
-	assertTrue( ooc_isInstanceOf( exception, FooException ) );
-	assertTrue( ooc_isInstanceOf( exception, Exception ) );
-	assertTrue( exception_get_error_code( exception ) == err_user_code );
-	assertTrue( exception_get_user_code( exception ) == 13 );
+	assertNotNull( fooexception );
+	assertTrue( ooc_isInstanceOf( fooexception, FooException ) );
+	assertTrue( ooc_isInstanceOf( fooexception, Exception ) );
+	assertTrue( exception_get_error_code( fooexception ) == err_user_code );
+	assertTrue( exception_get_user_code( fooexception ) == 13 );
 
-	ooc_delete( (Object) exception );
+	ooc_delete( (Object) fooexception );
 }
 
 static
