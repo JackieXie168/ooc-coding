@@ -36,7 +36,6 @@
 /* Inlcude standard headers */
 
 #include <stdlib.h>
-#include <stdio.h>
 
 #ifdef COMPILING_OOC_C
 #include <stddef.h>
@@ -66,9 +65,8 @@
 #ifdef NDEBUG
 #define assert(e)
 #else
-extern ROM char ooc_assert_msg[];
-#define OOC_ASSERT_MSG "*** Assertion failed in %HS:%d ***\n"
-#define assert(e) if(!(e)) { printf( ooc_assert_msg, __FILE__, __LINE__ ); for(;;); }
+extern void _fassert( int, ROM char * );
+#define assert(e) if(!(e)) { _fassert(  __LINE__, __FILE__ ); }
 #endif
 
 
