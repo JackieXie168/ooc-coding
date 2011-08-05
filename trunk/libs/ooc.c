@@ -552,9 +552,3 @@ ooc_ptr_read_and_null( void ** ptr_ptr )
 {
 	OOC_IMPLEMENT_PTR_READ_AND_NULL
 }
-
-/* Assert message store */
-#ifdef OOC_ASSERT_MSG
-ROM_ALLOC char ooc_assert_msg[] = OOC_ASSERT_MSG;
-#endif
-
