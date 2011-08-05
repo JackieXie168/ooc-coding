@@ -923,12 +923,14 @@ static
 void
 foreach_delete_if( ListTest self )
 {
-	int i;
+	int i, k;
 	
 	expected_value = FOREACH_LOOP+1;
 	
 	for( i=0; i<FOREACH_LOOP; i++ )
 	{
+if( i == 85 )
+	k= i;
 		list_append( self->foolist, foo_new_with_data( i ) );
 		if( i % 17 != 0 )
 			list_append( self->foolist, foo_new_with_data( expected_value ) );
