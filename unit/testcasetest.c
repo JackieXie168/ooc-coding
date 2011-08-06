@@ -472,7 +472,7 @@ run_testcasetestchild()
  
 TESTCASE_MAIN
 {
-	int result;
+	int result = 0;
 	
 #ifdef OOC_HAS_UNIX_SIGNALS
 	result = run_testcasetest();

@@ -34,7 +34,7 @@ file_000=no
 file_001=no
 [FILE_INFO]
 file_000=testcasetest.c
-file_001=C:\Documents and Settings\Admin\Dokumentumok\Visual Studio 2008\Projects\ooc_project\libs\ooc_libs.lib
+file_001=..\libs\ooc_mcc18.lib
 [SUITE_INFO]
 suite_guid={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
 suite_state=

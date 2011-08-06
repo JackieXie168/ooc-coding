@@ -825,7 +825,7 @@ static
 int
 item_checker( void * item, void * param )
 {
-	int current_value;
+	int current_value = -1;
 	
 	assertTrue( param == foreach_param );
 	assertTrue( ooc_get_type( item ) == foreach_expected_item_type );

@@ -50,7 +50,7 @@ file_001=foo.c
 file_002=fooexception.c
 file_003=foo.h
 file_004=fooexception.h
-file_005=..\libs\ooc_libs.lib
+file_005=..\libs\ooc_mcc18.lib
 [SUITE_INFO]
 suite_guid={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
 suite_state=
