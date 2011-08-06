@@ -82,7 +82,7 @@ file_009=barson.h
 file_010=implement\barson.h
 file_011=implement\bar.h
 file_012=implement\bardaughter.h
-file_013=C:\Documents and Settings\Admin\Dokumentumok\Visual Studio 2008\Projects\ooc_project\libs\ooc_libs.lib
+file_013=..\libs\ooc_mcc18.lib
 [SUITE_INFO]
 suite_guid={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
 suite_state=

@@ -31,10 +31,9 @@ file_003=.
 file_004=.
 file_005=.
 file_006=.
-file_007=port
+file_007=implement
 file_008=implement
-file_009=implement
-file_010=.
+file_009=.
 [GENERATED_FILES]
 file_000=no
 file_001=no
@@ -46,7 +45,6 @@ file_006=no
 file_007=no
 file_008=no
 file_009=no
-file_010=no
 [OTHER_FILES]
 file_000=no
 file_001=no
@@ -58,7 +56,6 @@ file_006=no
 file_007=no
 file_008=no
 file_009=no
-file_010=no
 [FILE_INFO]
 file_000=bar.c
 file_001=foo.c
@@ -67,10 +64,9 @@ file_003=listtest.c
 file_004=bar.h
 file_005=foo.h
 file_006=fooexception.h
-file_007=..\libs\port\mcc18.h
-file_008=implement\foo.h
-file_009=implement\bar.h
-file_010=..\libs\ooc_libs.lib
+file_007=implement\foo.h
+file_008=implement\bar.h
+file_009=..\libs\ooc_mcc18.lib
 [SUITE_INFO]
 suite_guid={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
 suite_state=

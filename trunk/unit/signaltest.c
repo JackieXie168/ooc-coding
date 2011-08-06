@@ -40,7 +40,7 @@ ClassMembers( Source, Base )
 	int		counter_max;
 	int		counter;
 	
-	#ifndef NO_THREADS
+	#ifndef OOC_NO_THREADS
 	ooc_Mutex	modify;
 	#endif
 
@@ -171,7 +171,7 @@ ClassMembers( Listener, Base )
 
 	int		source_fired_count[ MAX_SOURCES ];
 	
-	#ifndef NO_THREADS
+	#ifndef OOC_NO_THREADS
 	ooc_Mutex	modify;
 	#endif
 	
