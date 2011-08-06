@@ -18,6 +18,7 @@ Install on Linux/Unix:
 The usual:
 	./configure
 	make all pdf html
+	make check
 	sudo make install install-pdf install-html
 
 Read the tutorials, (usually) installed here:
@@ -36,11 +37,15 @@ Compile your own code:
 Install on Windows or other platforms:
 ======================================
 
+1. Install with the Windows installer
+
 Download the Windows installer package: ooc_win32.msi and install it.
 This installer will install the occ files that are necessary for program development with ooc.
 It installs the header files, libraries, documentation and the ooc tool.
 Also sets the LIB, INCLUDE and PATH environment variables.
 Check the Start menu -> All Programs for the ooc folder.
+
+2. Build from scratch
 
 Or alternatively you can compile from source code:
 
@@ -67,7 +72,13 @@ For the ooc core functions (class and object management, exception handling) cop
 
 If you'd like to use the other stuff as well, copy the rest.
 
-Install on platforms:
+Install for the MPLAB IDE:
+======================================
+
+The MPLAB C18 and C30 compiler support is included in the Windows installer.
+Install the Windows installer as described above!
+
+Install on other platforms:
 ======================================
 Not ready yet.
 

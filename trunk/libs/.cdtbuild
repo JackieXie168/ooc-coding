@@ -46,7 +46,7 @@
 <option id="gnu.c.compiler.option.warnings.pedantic.1261827712" name="Pedantic (-pedantic)" superClass="gnu.c.compiler.option.warnings.pedantic" value="true" valueType="boolean"/>
 <option id="gnu.c.compiler.option.preprocessor.preprocess.860650352" name="Preprocess only (-E)" superClass="gnu.c.compiler.option.preprocessor.preprocess" value="false" valueType="boolean"/>
 <option id="gnu.c.compiler.option.preprocessor.def.symbols.1100320847" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
-<listOptionValue builtIn="false" value="NO_THREADS"/>
+<listOptionValue builtIn="false" value="OOC_NO_THREADS"/>
 </option>
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.archiver.lib.debug.1926284730" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.lib.debug"/>
@@ -64,7 +64,7 @@
 <option id="gnu.c.compiler.option.misc.ansi.998297544" name="Support ANSI programs (-ansi)" superClass="gnu.c.compiler.option.misc.ansi" value="true" valueType="boolean"/>
 <option id="gnu.c.compiler.option.preprocessor.def.symbols.55930772" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
 <listOptionValue builtIn="false" value="NDEBUG"/>
-<listOptionValue builtIn="false" value="NO_THREADS"/>
+<listOptionValue builtIn="false" value="OOC_NO_THREADS"/>
 </option>
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.archiver.lib.release.1205484454" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.lib.release"/>

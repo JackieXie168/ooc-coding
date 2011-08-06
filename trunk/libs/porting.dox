@@ -42,10 +42,16 @@ Currently the following porting headers are available:
 	There is no dynamic memory allocation and multithreading support in this port.\n
 	Supports the large data + large code configuration only.</TD>
 </TR>
+<TR>
+	<TD>mcc30.h</TD>
+	<TD>MPLAB C30 compiler support for 16 bit Microchip controllers. \n
+	There is no multithreading support in this port.</TD>
+</TR>
 </TABLE>
 
 For special comments on the existing ports see the following descriptions:
-- @subpage port_notes_mcc18 Notes on the MPLAB CC18 port
+- @subpage port_notes_mcc18
+- @subpage port_notes_mcc30
 
 @section new_port How to create a new port?
 To create a new port you must do the followings:
@@ -127,8 +133,17 @@ You can use several macros that alter the behavior of the code according to the 
 <TR>
 	<TD>ROM</TD>
 	<TD>In case of a microcontroller, the @c const data could be located in Read Only Memory.\n
-	For those targets define ROM macro as the appropriate storage specifier.\n
+	For those targets define @c ROM macro as the appropriate storage specifier.\n
+	@c ROM is used when dereferencing a ROM based variable. For allocation purposes see the @c ROM_ALLOC macro!
 	If not specified it is defined automatically as: @code #define ROM const @endcode
+	</TD>
+</TR>
+<TR>
+	<TD>ROM_ALLOC</TD>
+	<TD>In case of a microcontroller, the @c const data could be located in Read Only Memory.\n
+	Define the @c ROM_ALLOC macro as it is required for allocating a variable in the read only memory.\n
+	@c ROM_ALLOC is used only for the allocation of a ROM based variable. For other purposes see the @c ROM macro!
+	If not specified it is defined automatically as: @code #define ROM_ALLOC ROM @endcode
 	</TD>
 </TR>
 <TR>
@@ -156,7 +171,7 @@ You can use several macros that alter the behavior of the code according to the 
 	</TD>
 </TR>
 <TR>
-	<TD>NO_THREADS</TD>
+	<TD>OOC_NO_THREADS</TD>
 	<TD>If defined then a single threaded version is built.\n
 	You must define dummy threading primitives in case of a single threaded version, as well! See @ref port_locks
 	</TD>
@@ -225,29 +240,29 @@ then you must implement them.)
 
 //=============================================================================================================================================
 
-@page port_notes_mcc18 Notes on the MPLAB CC18 port
+@page port_notes_mcc18 Notes on the MPLAB C18 port
 
-The main issue with the MPLAB CC18 compiler and development toolchain is that it lacks the dynamic memory handling (malloc() and others).
+The main issue with the MPLAB C18 compiler and development toolchain is that it lacks the dynamic memory handling (malloc() and others).
 Due to this limitations you can not use the ooc_new() and similar functions for creating your Objects. Instead you must allocate your Objects statically
 and populate them with the ooc_use() and similar constructors. The same applies for the deletion of an Object: you can not delete it, just ooc_release(),
 wich destruct the Object properly, but does not free the memory location since it was allocated statically.\n
 \n
-Exception handling works fine. There is a hack in the exception_new() function: it returns a statically pre-allocated Exception object, 
+Exception handling works fine. Since exception_new() returns a statically pre-allocated Exception object, it is available in this port too,
 so feel free to use exception_new(), it is no problem.\n
 \n
-The ooc libraries support only the Large data / Large code modell! Always compile your project with these settings (-mL compiler otion)!
+The ooc libraries support only the Large data / Large code model! Always compile your project with these settings ("-mL" compiler otion)!
 \n
-The following compiler controls are defined for MCC18:
+The following compiler controls are defined for MPLAB C18:
 	- ROM
 	- GEN_PTR
 	- NO_RELATIVE_INCLUDE
-	- NO_THREADS
+	- OOC_NO_THREADS
 	- NO_INLINE
 	- OOC_NO_DYNAMIC_MEM
 	- OOC_NO_FINALIZE
 	- _OOC_VTAB_INITIALIZER
 
-The following classes are proted to the MCC18:
+The following classes are proted to the MPLAB C18:
 
 <TABLE>
 <TR>
@@ -281,26 +296,49 @@ The following classes are proted to the MCC18:
 </TR>
 </TABLE>
 
-The ooc/signal.h class is not ported to the MCC18 platform, since it uses dynamic memory handling internally.\n
+The ooc/signal.h class is not ported to the MPLAB C18 platform, since it uses dynamic memory handling internally.\n
 \n
-Since the MPLAB CC18 compiler is available on Windows only, this port is distributed as a windows installer only.
-For installation install the Windows installer for ooc first, then install the mcc18 installer.
+Since the MPLAB C18 compiler is available on Windows only, this port is distributed in the Windows installer package only.
 \n
-@note	There is a silly bug in the MCC18 compiler: if you define the members of two classes in sequence, then the typedef for the first
-	object struct is forgotten by the compiler. You must typedef it again by yourself, but this would hurt other compilers.\n
+@note	There is a silly bug in the MPLAB C18 compiler: if you define the members of two classes in sequence, then the typedef for the first
+	object struct is forgotten by the compiler. :-( You must typedef it again by yourself, but this would hurt other compilers.\n
 	The workaround is:\n
 	@code
-		ClassMembers( First, Base )
-			int	data;
-		EndOfClassMembers;
-
-		ClassMembers( Second, Base )
-			int	data;
-		EndOfClassMembers;
+		DeclareClass( First, Base );
+		DeclareClass( Second, Base )
 
 		#ifdef __18CXX
 		typedef struct FirstObject * First;
 		#endif
 	@endcode
+	
+	
+@note	The libraries are built with the Lite version of the MPLAB C18 compiler, so they are not optimized!
+		For real live projects build your own ooc libraries with optimization (with the Enterprise or Pro editions)!
+	
+//=============================================================================================================================================
+
+@page port_notes_mcc30 Notes on the MPLAB C30 port
+
+There are not too much comments for the MPLAB C30 compiler and development toolchain, it is a fully functional port. ;-)
+
+Every functionality works fine in this port.\n
+
+The ooc libraries supports only the default memory model!
+\n
+The following compiler controls are defined for MCC30:
+	- ROM
+	- ROM_ALLOC
+	- OOC_NO_THREADS
+	- OOC_NO_FINALIZE
+
+All ooc classes are proted to the MCC30.\n
+Comment on TestCase: for some mistery reason, the Unix signals (SIGSEGV, SIGFPE) do not work, as expected, so TestCase does not use them.
+I the future it would be great to integrate the PIC traps as well into the TestCase.\n
+
+Since the MPLAB C30 compiler is available on Windows only, this port is distributed in the Windows installer package only.
+
+@note	The libraries are built with the Lite version of the MPLAB C30 compiler, so they are not optimized!
+		For real live projects build your own ooc libraries with optimization (with the Enterprise or Pro editions)!
 
 */

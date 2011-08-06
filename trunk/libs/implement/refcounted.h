@@ -30,7 +30,7 @@ ClassMembers( RefCounted, Base )
 
 	int			counter;
 
-#ifndef NO_THREADS
+#ifndef OOC_NO_THREADS
 	ooc_Mutex	access;
 #endif
 

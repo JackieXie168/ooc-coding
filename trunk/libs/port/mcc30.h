@@ -62,7 +62,7 @@
 #define NO_INLINE
 #endif
 
-#define NO_THREADS
+#define OOC_NO_THREADS
 
 /* Threadless implementation */
 

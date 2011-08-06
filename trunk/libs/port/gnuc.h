@@ -49,7 +49,7 @@
 #define NO_INLINE
 #endif
 
-#ifndef NO_THREADS
+#ifndef OOC_NO_THREADS
 
 /* implementing Thread Local Storage */
 

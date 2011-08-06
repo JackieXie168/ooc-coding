@@ -99,7 +99,7 @@ inherit_vtable_from_parent( const Class self )
 
 static Class 		class_register = NULL;		/* Points to the most recently initialized Class */
 
-#ifndef NO_THREADS
+#ifndef OOC_NO_THREADS
 static ooc_Mutex	class_register_change;
 #endif
 

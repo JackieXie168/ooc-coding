@@ -2,10 +2,6 @@
 /* This is a RefCountedTest class implementation file
  */
 
-#ifdef _OPENMP
-#include <omp.h>
-#endif
-
 #include "../libs/testcase.h"
 
 #include "../libs/refcounted.h"

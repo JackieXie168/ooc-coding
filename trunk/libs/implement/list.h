@@ -38,7 +38,7 @@ ClassMembers( List, Base )
     Class				type;
     list_item_destroyer	destroy;
     
-#ifndef NO_THREADS
+#ifndef OOC_NO_THREADS
 	ooc_Mutex			modify;
 #endif
 
