@@ -144,7 +144,7 @@ ClassMembers( SignalQueued, ListNode )
 	
 	int				invalid;				/* Signal in the queue became invalid, should not be emitted. */
 
-#ifndef NO_THREADS
+#ifndef OOC_NO_THREADS
 	ooc_Mutex		processing;
 #endif
 	
@@ -181,7 +181,7 @@ static	int		SignalQueued_copy( SignalQueued self, const SignalQueued from ) { re
 
 static	List		signal_queue	= 	NULL; 	/* List of SignalQueued pointers */
 
-#ifndef NO_THREADS
+#ifndef OOC_NO_THREADS
 static	ooc_Mutex	signal_queue_critical_section;
 #endif
 

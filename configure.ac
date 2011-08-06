@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.61)
 
-AC_INIT([Object Oriented C], [1.1], [old-fashioned@users.sourceforge.net], [ooc], [http://ooc-coding.sourceforge.net])
+AC_INIT([Object Oriented C], [1.2], [old-fashioned@users.sourceforge.net], [ooc], [http://ooc-coding.sourceforge.net])
 
 AC_CONFIG_SRCDIR([libs/ooc.c])
 AC_CONFIG_HEADER([config.h])

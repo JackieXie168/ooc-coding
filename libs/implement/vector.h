@@ -44,7 +44,7 @@ ClassMembers( Vector, Base )
 	VectorIndex		allocation_chunks;
 #endif
 
-#ifndef NO_THREADS
+#ifndef OOC_NO_THREADS
 	ooc_Mutex		modify;
 #endif
 

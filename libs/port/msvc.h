@@ -45,7 +45,7 @@
 /* implementing static inline */
 #define STIN static _inline
 
-#ifndef NO_THREADS
+#ifndef OOC_NO_THREADS
 
 /* implementing Thread Local Storage */
 #define TLS static _declspec( thread )

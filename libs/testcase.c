@@ -56,7 +56,7 @@
 
 AllocateClass( TestCase, Base );
 
-#ifndef NO_THREADS
+#ifndef OOC_NO_THREADS
 static ooc_Mutex	printing;
 #endif
 

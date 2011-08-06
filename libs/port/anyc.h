@@ -47,7 +47,7 @@
 #define STIN static
 #define NO_INLINE
 
-#define NO_THREADS
+#define OOC_NO_THREADS
 
 /* Threadless implementation */
 
