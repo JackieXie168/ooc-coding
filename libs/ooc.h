@@ -38,6 +38,9 @@
 	
 #elif defined( __C30__ )
 	#include "port/mcc30.h"
+
+#elif defined( __PIC32MX__ )
+	#include "port/mcc32.h"
 	
 #elif defined( __GNUC__ )
 	#include "port/gnuc.h"
