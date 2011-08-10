@@ -44,7 +44,8 @@
 /* Memory model */
 
 #define ROM const
-#define ROM_ALLOC __attribute__ ((section (".sdata2"))) const
+/*#define ROM_ALLOC __attribute__ ((section (".sdata2"))) const
+*/
 
 /* Longjump functions */
  
@@ -92,6 +93,6 @@
 
 #endif /* COMPILING_OOC_C */
 
-#define TESTCASE_MAIN 	int main( int argc, char ** argv )
+#define TESTCASE_MAIN 	int main (void)
 
 #endif /*MCC32_H_*/
