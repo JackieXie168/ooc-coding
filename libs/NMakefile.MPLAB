@@ -14,19 +14,21 @@ MCC18_SOURCES = ooc.c exception.c refcounted.c vector.c list.c testcase.c mcc18_
 
 MCC30_SOURCES = ooc.c exception.c refcounted.c vector.c list.c testcase.c signal.c mcc30_ext.c
 
-##################################################
-
-AS = MPASMWIN.exe
-CC18 = mcc18.exe
-CC30 = pic30-gcc.exe
-LD = mplink.exe
-AR18 = mplib.exe
-AR30 = pic30-ar.exe
-
+MCC32_SOURCES = ooc.c exception.c refcounted.c vector.c list.c testcase.c signal.c
 
 ###################################################
 
-all : ODIRS ooc_mcc18.lib ooc_mcc18_d.lib ooc_mcc30_d.a ooc_mcc30.a 
+all : ODIRS ooc_mcc18.lib ooc_mcc18_d.lib ooc_mcc30_d.a ooc_mcc30.a ooc_mcc32.a ooc_mcc32_d.a
+
+##################################################
+
+CC18 = mcc18.exe
+CC30 = pic30-gcc.exe
+CC32 = pic32-gcc.exe
+
+AR18 = mplib.exe
+AR30 = pic30-ar.exe
+AR32 = pic32-ar.exe
 
 ####################################################
 
@@ -86,11 +88,41 @@ ooc_mcc30.a : $(MCC30_OBJECTS)
 
 ####################################################
 
+MCC32_ODIR_D = mcc32_d
+_MCC32_OBJECTS_D = $(MCC32_SOURCES:.c=.o)
+MCC32_OBJECTS_D = mcc32_d\$(_MCC32_OBJECTS_D: = mcc32_d\)
+
+CC32_FLAGS_D = -x c -c -D__DEBUG -g -ansi -Wall -pedantic
+
+ooc_mcc32_d.a : $(MCC32_OBJECTS_D)
+	$(AR32) r $@ $**
+
+{}.c{$(MCC32_ODIR_D)\}.o :
+	$(CC32) $(CC32_FLAGS_D) $< -o $@
+
+####################################################
+
+MCC32_ODIR = mcc32
+_MCC32_OBJECTS = $(MCC32_SOURCES:.c=.o)
+MCC32_OBJECTS = mcc32\$(_MCC32_OBJECTS: = mcc32\)
+
+CC32_FLAGS = -x c -c -ffunction-sections -ansi -Wall -pedantic -Os 
+
+ooc_mcc32.a : $(MCC32_OBJECTS)
+	$(AR32) r $@ $**
+
+{}.c{$(MCC32_ODIR)\}.o :
+	$(CC32) $(CC32_FLAGS) $< -o $@
+
+####################################################
+
 clean :
 	-rmdir $(MCC18_ODIR_D) /S /Q
 	-rmdir $(MCC18_ODIR) /S /Q
 	-rmdir $(MCC30_ODIR_D) /S /Q
 	-rmdir $(MCC30_ODIR) /S /Q
+	-rmdir $(MCC32_ODIR_D) /S /Q
+	-rmdir $(MCC32_ODIR) /S /Q
 
 	-del ooc_mc*.lib
 
@@ -101,5 +133,5 @@ ODIRS :
 	-mkdir $(MCC18_ODIR)
 	-mkdir $(MCC30_ODIR_D)
 	-mkdir $(MCC30_ODIR)
-
-
+	-mkdir $(MCC32_ODIR_D)
+	-mkdir $(MCC32_ODIR)
