@@ -44,8 +44,6 @@
 /* Memory model */
 
 #define ROM const
-/*#define ROM_ALLOC __attribute__ ((section (".sdata2"))) const
-*/
 
 /* Longjump functions */
  
@@ -79,7 +77,9 @@
 /* Compilation control
  */
 
-#define OOC_HAS_UNIX_SIGNALS
+/* #define OOC_HAS_UNIX_SIGNALS
+	Has, but does not work as expected :-(
+ */
 
 #ifdef COMPILING_OOC_C
 
