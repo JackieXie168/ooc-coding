@@ -7,10 +7,10 @@
     <ROW Property="ARPNOMODIFY" MultiBuildValue="DefaultBuild:1"/>
     <ROW Property="ARPURLINFOABOUT" Value="http://ooc-coding.sourceforge.net/"/>
     <ROW Property="Manufacturer" Value="old_fashioned" ValueLocId="*"/>
-    <ROW Property="ProductCode" Value="1033:{F3829626-8DD4-4E08-85D0-FD72ECBBC354} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{F77C72EE-285E-4B2F-A5EC-4A69FAA7FC31} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="ooc" ValueLocId="*"/>
-    <ROW Property="ProductVersion" Value="1.2"/>
+    <ROW Property="ProductVersion" Value="1.2.1"/>
     <ROW Property="REBOOT" MultiBuildValue="DefaultBuild:ReallySuppress"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{CF565570-C73B-45C8-8B37-F8528F62C4E0}"/>
@@ -49,11 +49,11 @@
     <ROW Directory="unit_mcc18_DIR" Directory_Parent="New_Folder_DIR" DefaultDir="unit_m~1|unit_mcc18"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
-    <ROW Component="Class_manipulation_tool.html" ComponentId="{87227E4D-47A4-44EA-9184-4AD5D4856023}" Directory_="ooc.html_DIR" Attributes="0" KeyPath="Class_manipulation_tool.html" Type="0"/>
+    <ROW Component="Class_manipulation_tool.html" ComponentId="{596439FF-34B3-4A91-9172-D6968EC5FBDC}" Directory_="ooc.html_DIR" Attributes="0" KeyPath="Class_manipulation_tool.html" Type="0"/>
     <ROW Component="Makefile.am" ComponentId="{4DB1EFA8-C8A2-4331-963E-905E64B5F164}" Directory_="unit_DIR" Attributes="0" KeyPath="Makefile.am" Type="0"/>
     <ROW Component="SHORTCUTDIR" ComponentId="{E746CB27-5823-4491-BA5A-72B663C58064}" Directory_="SHORTCUTDIR" Attributes="0"/>
-    <ROW Component="all_5f.html" ComponentId="{AE12469C-6884-4B7C-92C7-01DFD665BCB4}" Directory_="search_DIR" Attributes="0" KeyPath="all_5f.html" Type="0"/>
-    <ROW Component="annotated.html" ComponentId="{6E4F1544-735C-4208-B352-25A4F7518389}" Directory_="html_DIR" Attributes="0" KeyPath="annotated.html" Type="0"/>
+    <ROW Component="all_5f.html" ComponentId="{1CFBDAC8-0129-44C3-AB84-3E9474B80868}" Directory_="search_DIR" Attributes="0" KeyPath="all_5f.html" Type="0"/>
+    <ROW Component="annotated.html" ComponentId="{860B0CDA-97C3-436C-BA1A-A8866AA09C39}" Directory_="html_DIR" Attributes="0" KeyPath="annotated.html" Type="0"/>
     <ROW Component="anyc.h" ComponentId="{6DF649F2-0564-40B1-9BFF-8F5EC7F87527}" Directory_="port_DIR" Attributes="0" KeyPath="anyc.h" Type="0"/>
     <ROW Component="anyc.h_1" ComponentId="{7C0A7F8D-4949-408C-B528-13F4E8695883}" Directory_="port_1_DIR" Attributes="0" KeyPath="anyc.h_1" Type="0"/>
     <ROW Component="bar.c" ComponentId="{5D273AF9-61AC-4355-9725-DA8812C423A7}" Directory_="unit_mcc18_DIR" Attributes="0" KeyPath="bar.c_1" Type="0"/>
@@ -65,8 +65,6 @@
     <ROW Component="exception.h" ComponentId="{84758494-DF08-4DED-9606-2AE90BAD25C5}" Directory_="ooc_DIR" Attributes="0" KeyPath="exception.h" Type="0"/>
     <ROW Component="exception.h_1" ComponentId="{95C87522-650D-493A-8291-A3DD489E1DC9}" Directory_="implement_1_DIR" Attributes="0" KeyPath="exception.h_1" Type="0"/>
     <ROW Component="exception.h_2" ComponentId="{EFB70EEA-2006-47E9-89F6-79CC8348B96C}" Directory_="implement_2_DIR" Attributes="0" KeyPath="exception.h_3" Type="0"/>
-    <ROW Component="index.html" ComponentId="{6C69505E-1B5D-4223-B520-931BE9740CDB}" Directory_="ooc.html_DIR" Attributes="0" KeyPath="index.html_1"/>
-    <ROW Component="index.html_1" ComponentId="{31EFEC13-6921-499F-956C-1157A9912B93}" Directory_="html_DIR" Attributes="0" KeyPath="index.html"/>
     <ROW Component="intl.dll" ComponentId="{2203B013-5B92-435C-8BF7-CDEEE80E28BE}" Directory_="APPDIR" Attributes="0" KeyPath="intl.dll"/>
     <ROW Component="lgpl.html" ComponentId="{AC23E3E3-B0F7-45E2-96A4-376068C2880B}" Directory_="docs_DIR" Attributes="0" KeyPath="lgpl.html"/>
     <ROW Component="libglib_2.0_0.dll" ComponentId="{535C6421-5849-45A0-B9B0-087DB875047B}" Directory_="APPDIR" Attributes="0" KeyPath="libglib_2.0_0.dll"/>
@@ -81,7 +79,7 @@
     <ROW Component="sample.h_1" ComponentId="{DB317336-9058-4D18-A13F-029E79BCCBC4}" Directory_="implement_3_DIR" Attributes="0" KeyPath="sample.h_2" Type="0"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
-    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0" Components="Class_manipulation_tool.html Makefile.am SHORTCUTDIR all_5f.html annotated.html anyc.h anyc.h_1 bar.c bar.h bar.h_1 cdtbuild cdtbuild_1 cdtproject exception.h exception.h_1 exception.h_2 index.html index.html_1 intl.dll lgpl.html libglib_2.0_0.dll libooc.lib libooc_d.pdb_1 minimal.c minimal.c_1 ooc.exe ooc.pdf ooc.sln sample.h sample.h_1"/>
+    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0" Components="Class_manipulation_tool.html Makefile.am SHORTCUTDIR all_5f.html annotated.html anyc.h anyc.h_1 bar.c bar.h bar.h_1 cdtbuild cdtbuild_1 cdtproject exception.h exception.h_1 exception.h_2 intl.dll lgpl.html libglib_2.0_0.dll libooc.lib libooc_d.pdb_1 minimal.c minimal.c_1 ooc.exe ooc.pdf ooc.sln sample.h sample.h_1"/>
     <ATTRIBUTE name="CurrentFeature" value="MainFeature"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
@@ -91,7 +89,7 @@
     <ROW File="Class_manipulation_tool.html" Component_="Class_manipulation_tool.html" FileName="Class-~1.htm|Class-manipulation-tool.html" Attributes="0" SourcePath="docs\ooc.html\Class-manipulation-tool.html" SelfReg="false" NextFile="Exception_handling.html"/>
     <ROW File="Exception_handling.html" Component_="Class_manipulation_tool.html" FileName="Except~1.htm|Exception-handling.html" Attributes="0" SourcePath="docs\ooc.html\Exception-handling.html" SelfReg="false" NextFile="fig_003aex1.html"/>
     <ROW File="GNU_Free_Documentation_License.html" Component_="Class_manipulation_tool.html" FileName="GNU-Fr~1.htm|GNU-Free-Documentation-License.html" Attributes="0" SourcePath="docs\ooc.html\GNU-Free-Documentation-License.html" SelfReg="false" NextFile="Implementing_Classes.html"/>
-    <ROW File="INSTALL" Component_="ooc.sln" FileName="INSTALL" Attributes="0" SourcePath="INSTALL" SelfReg="false" NextFile="annotated.html"/>
+    <ROW File="INSTALL" Component_="ooc.sln" FileName="INSTALL" Attributes="0" SourcePath="INSTALL" SelfReg="false" NextFile="ooc_mcc30_d.a"/>
     <ROW File="Implementing_Classes.html" Component_="Class_manipulation_tool.html" FileName="Implem~1.htm|Implementing-Classes.html" Attributes="0" SourcePath="docs\ooc.html\Implementing-Classes.html" SelfReg="false" NextFile="index.html_1"/>
     <ROW File="Indices.html" Component_="Class_manipulation_tool.html" FileName="Indice~1.htm|Indices.html" Attributes="0" SourcePath="docs\ooc.html\Indices.html" SelfReg="false" NextFile="Introduction.html"/>
     <ROW File="Introduction.html" Component_="Class_manipulation_tool.html" FileName="Introd~1.htm|Introduction.html" Attributes="0" SourcePath="docs\ooc.html\Introduction.html" SelfReg="false" NextFile="Memory_handling.html"/>
@@ -101,13 +99,14 @@
     <ROW File="MakefileEclipse.linux" Component_="Makefile.am" FileName="Makefi~1.lin|MakefileEclipse.linux" Attributes="0" SourcePath="tools\template\unit\MakefileEclipse.linux" SelfReg="false" NextFile="suite.bat"/>
     <ROW File="Memory_handling.html" Component_="Class_manipulation_tool.html" FileName="Memory~1.htm|Memory-handling.html" Attributes="0" SourcePath="docs\ooc.html\Memory-handling.html" SelfReg="false" NextFile="Objects_and_Classes.html"/>
     <ROW File="NEWS" Component_="ooc.sln" FileName="NEWS" Attributes="0" SourcePath="NEWS" SelfReg="false" NextFile="README"/>
+    <ROW File="NMakefile.MPLAB" Component_="cdtbuild" FileName="NMakef~1.MPL|NMakefile.MPLAB" Attributes="0" SourcePath="libs\NMakefile.MPLAB" SelfReg="false" NextFile="ooc_mcc32.mcp"/>
     <ROW File="Objects_and_Classes.html" Component_="Class_manipulation_tool.html" FileName="Object~1.htm|Objects-and-Classes.html" Attributes="0" SourcePath="docs\ooc.html\Objects-and-Classes.html" SelfReg="false" NextFile="ooc_doc_data.png"/>
     <ROW File="README" Component_="ooc.sln" FileName="README" Attributes="0" SourcePath="README" SelfReg="false" NextFile="AUTHORS"/>
     <ROW File="Table_of_Figures.html" Component_="Class_manipulation_tool.html" FileName="Table-~1.htm|Table-of-Figures.html" Attributes="0" SourcePath="docs\ooc.html\Table-of-Figures.html" SelfReg="false" NextFile="Unit_testing_support.html"/>
     <ROW File="Unit.vcproj" Component_="cdtproject" FileName="Unit~1.vcp|Unit.vcproj" Attributes="0" SourcePath="unit\Unit.vcproj" SelfReg="false" NextFile="vectortest.c"/>
     <ROW File="Unit_testing_support.html" Component_="Class_manipulation_tool.html" FileName="Unit-t~1.htm|Unit-testing-support.html" Attributes="0" SourcePath="docs\ooc.html\Unit-testing-support.html" SelfReg="false" NextFile="Using_Classes.html"/>
     <ROW File="Using_Classes.html" Component_="Class_manipulation_tool.html" FileName="Using-~1.htm|Using-Classes.html" Attributes="0" SourcePath="docs\ooc.html\Using-Classes.html" SelfReg="false" NextFile="Using_fake_objects.html"/>
-    <ROW File="Using_fake_objects.html" Component_="Class_manipulation_tool.html" FileName="Using-~2.htm|Using-fake-objects.html" Attributes="0" SourcePath="docs\ooc.html\Using-fake-objects.html" SelfReg="false" NextFile="ooc_mcc30_d.a"/>
+    <ROW File="Using_fake_objects.html" Component_="Class_manipulation_tool.html" FileName="Using-~2.htm|Using-fake-objects.html" Attributes="0" SourcePath="docs\ooc.html\Using-fake-objects.html" SelfReg="false"/>
     <ROW File="all_5f.html" Component_="all_5f.html" FileName="all_5f~1.htm|all_5f.html" Attributes="0" SourcePath="docs\api\html\search\all_5f.html" SelfReg="false" NextFile="all_61.html"/>
     <ROW File="all_61.html" Component_="all_5f.html" FileName="all_61~1.htm|all_61.html" Attributes="0" SourcePath="docs\api\html\search\all_61.html" SelfReg="false" NextFile="all_62.html"/>
     <ROW File="all_62.html" Component_="all_5f.html" FileName="all_62~1.htm|all_62.html" Attributes="0" SourcePath="docs\api\html\search\all_62.html" SelfReg="false" NextFile="all_63.html"/>
@@ -194,6 +193,8 @@
     <ROW File="exceptiontest_d.mcp" Component_="bar.c" FileName="except~2.mcp|exceptiontest_d.mcp" Attributes="0" SourcePath="unit_mcc18\exceptiontest_d.mcp" SelfReg="false" NextFile="listtest_d.mcp"/>
     <ROW File="exceptiontest_mcc30.mcp" Component_="cdtproject" FileName="except~1.mcp|exceptiontest_mcc30.mcp" Attributes="0" SourcePath="unit\exceptiontest_mcc30.mcp" SelfReg="false" NextFile="vectortest_mcc30_d.mcp"/>
     <ROW File="exceptiontest_mcc30_d.mcp" Component_="cdtproject" FileName="except~2.mcp|exceptiontest_mcc30_d.mcp" Attributes="0" SourcePath="unit\exceptiontest_mcc30_d.mcp" SelfReg="false" NextFile="vectortest_d.mcp"/>
+    <ROW File="exceptiontest_mcc32.mcp" Component_="cdtproject" FileName="except~3.mcp|exceptiontest_mcc32.mcp" Attributes="0" SourcePath="unit\exceptiontest_mcc32.mcp" SelfReg="false" NextFile="exceptiontest_mcc32_d.mcp"/>
+    <ROW File="exceptiontest_mcc32_d.mcp" Component_="cdtproject" FileName="except~4.mcp|exceptiontest_mcc32_d.mcp" Attributes="0" SourcePath="unit\exceptiontest_mcc32_d.mcp" SelfReg="false" NextFile="listtest_mcc32.mcp"/>
     <ROW File="fig_003aex1.html" Component_="Class_manipulation_tool.html" FileName="fig_00~1.htm|fig_003aex1.html" Attributes="0" SourcePath="docs\ooc.html\fig_003aex1.html" SelfReg="false" NextFile="GNU_Free_Documentation_License.html"/>
     <ROW File="files.html" Component_="annotated.html" FileName="files~1.htm|files.html" Attributes="0" SourcePath="docs\api\html\files.html" SelfReg="false" NextFile="ftv2blank.png"/>
     <ROW File="files_65.html" Component_="all_5f.html" FileName="files_~1.htm|files_65.html" Attributes="0" SourcePath="docs\api\html\search\files_65.html" SelfReg="false" NextFile="files_6c.html"/>
@@ -250,8 +251,8 @@
     <ROW File="graph_legend.html" Component_="annotated.html" FileName="graph_~1.htm|graph_legend.html" Attributes="0" SourcePath="docs\api\html\graph_legend.html" SelfReg="false" NextFile="graph_legend.md5"/>
     <ROW File="graph_legend.md5" Component_="annotated.html" FileName="graph_~1.md5|graph_legend.md5" Attributes="0" SourcePath="docs\api\html\graph_legend.md5" SelfReg="false" NextFile="graph_legend.png"/>
     <ROW File="graph_legend.png" Component_="annotated.html" FileName="graph_~1.png|graph_legend.png" Attributes="0" SourcePath="docs\api\html\graph_legend.png" SelfReg="false" NextFile="index.html"/>
-    <ROW File="index.html" Component_="index.html_1" FileName="index~1.htm|index.html" Attributes="0" SourcePath="docs\api\html\index.html" SelfReg="false" NextFile="installdox"/>
-    <ROW File="index.html_1" Component_="index.html" FileName="index~1.htm|index.html" Attributes="0" SourcePath="docs\ooc.html\index.html" SelfReg="false" NextFile="Indices.html"/>
+    <ROW File="index.html" Component_="annotated.html" FileName="index~1.htm|index.html" Attributes="0" SourcePath="docs\api\html\index.html" SelfReg="false" NextFile="installdox"/>
+    <ROW File="index.html_1" Component_="Class_manipulation_tool.html" FileName="index~1.htm|index.html" Attributes="0" SourcePath="docs\ooc.html\index.html" SelfReg="false" NextFile="Indices.html"/>
     <ROW File="installdox" Component_="annotated.html" FileName="instal~1|installdox" Attributes="0" SourcePath="docs\api\html\installdox" SelfReg="false" NextFile="jquery.js"/>
     <ROW File="intl.dll" Component_="intl.dll" FileName="intl.dll" Attributes="0" SourcePath="..\..\..\..\..\..\GTK\bin\intl.dll" SelfReg="false" NextFile="ooc_mcc18_d.lib"/>
     <ROW File="jquery.js" Component_="annotated.html" FileName="jquery.js" Attributes="0" SourcePath="docs\api\html\jquery.js" SelfReg="false" NextFile="list_8h.html"/>
@@ -282,14 +283,19 @@
     <ROW File="listtest_d.mcp" Component_="bar.c" FileName="listte~1.mcp|listtest_d.mcp" Attributes="0" SourcePath="unit_mcc18\listtest_d.mcp" SelfReg="false" NextFile="ooctest_d.mcp"/>
     <ROW File="listtest_mcc30.mcp" Component_="cdtproject" FileName="listte~2.mcp|listtest_mcc30.mcp" Attributes="0" SourcePath="unit\listtest_mcc30.mcp" SelfReg="false" NextFile="exceptiontest_mcc30_d.mcp"/>
     <ROW File="listtest_mcc30_d.mcp" Component_="cdtproject" FileName="listte~1.mcp|listtest_mcc30_d.mcp" Attributes="0" SourcePath="unit\listtest_mcc30_d.mcp" SelfReg="false" NextFile="listtest_mcc30.mcp"/>
+    <ROW File="listtest_mcc32.mcp" Component_="cdtproject" FileName="listte~3.mcp|listtest_mcc32.mcp" Attributes="0" SourcePath="unit\listtest_mcc32.mcp" SelfReg="false" NextFile="listtest_mcc32_d.mcp"/>
+    <ROW File="listtest_mcc32_d.mcp" Component_="cdtproject" FileName="listte~4.mcp|listtest_mcc32_d.mcp" Attributes="0" SourcePath="unit\listtest_mcc32_d.mcp" SelfReg="false" NextFile="mplabSIMc32Ext.c_1"/>
     <ROW File="mag_sel.png" Component_="all_5f.html" FileName="mag_sel.png" Attributes="0" SourcePath="docs\api\html\search\mag_sel.png" SelfReg="false" NextFile="nomatches.html"/>
     <ROW File="main.c" Component_="cdtbuild_1" FileName="main.c" Attributes="0" SourcePath="tools\main.c" SelfReg="false" NextFile="sample.h_2"/>
     <ROW File="mcc18.h" Component_="anyc.h" FileName="mcc18.h" Attributes="0" SourcePath="libs\port\mcc18.h" SelfReg="false" NextFile="msvc.h"/>
     <ROW File="mcc18.h_1" Component_="anyc.h_1" FileName="mcc18.h" Attributes="0" SourcePath="libs\port\mcc18.h" SelfReg="false" NextFile="msvc.h_1"/>
     <ROW File="mcc30.h" Component_="anyc.h" FileName="mcc30.h" Attributes="0" SourcePath="libs\port\mcc30.h" SelfReg="false" NextFile="mcc30.h_1"/>
     <ROW File="mcc30.h_1" Component_="anyc.h_1" FileName="mcc30.h" Attributes="0" SourcePath="libs\port\mcc30.h" SelfReg="false" NextFile="ooc_mcc18.mcp"/>
+    <ROW File="mcc32.h" Component_="anyc.h_1" FileName="mcc32.h" Attributes="0" SourcePath="libs\port\mcc32.h" SelfReg="false" NextFile="NMakefile.MPLAB"/>
     <ROW File="minimal.c" Component_="minimal.c" FileName="minimal.c" Attributes="0" SourcePath="tools\template\minimal.c" SelfReg="false" NextFile="private.c"/>
     <ROW File="minimal.c_1" Component_="minimal.c_1" FileName="minimal.c" Attributes="0" SourcePath="tools\template\minimal.c" SelfReg="false" NextFile="private.c_1"/>
+    <ROW File="mplabSIMc32Ext.c" Component_="Makefile.am" FileName="mplabS~1.c|mplabSIMc32Ext.c" Attributes="0" SourcePath="tools\template\unit\mplabSIMc32Ext.c" SelfReg="false" NextFile="win32_check_all.bat"/>
+    <ROW File="mplabSIMc32Ext.c_1" Component_="cdtproject" FileName="mplabS~1.c|mplabSIMc32Ext.c" Attributes="0" SourcePath="unit\mplabSIMc32Ext.c" SelfReg="false" NextFile="ooctest_mcc32.mcp"/>
     <ROW File="msvc.h" Component_="anyc.h" FileName="msvc.h" Attributes="0" SourcePath="libs\port\msvc.h" SelfReg="false" NextFile="vector.h_1"/>
     <ROW File="msvc.h_1" Component_="anyc.h_1" FileName="msvc.h" Attributes="0" SourcePath="libs\port\msvc.h" SelfReg="false" NextFile="porting.dox"/>
     <ROW File="multi_thread.dox" Component_="cdtbuild" FileName="multi_~1.dox|multi_thread.dox" Attributes="0" SourcePath="libs\multi_thread.dox" SelfReg="false" NextFile="ooc.c"/>
@@ -321,17 +327,24 @@
     <ROW File="ooc_mcc30.mcp" Component_="cdtbuild" FileName="ooc_mc~3.mcp|ooc_mcc30.mcp" Attributes="0" SourcePath="libs\ooc_mcc30.mcp" SelfReg="false" NextFile="ooc_mcc30_d.mcp"/>
     <ROW File="ooc_mcc30_d.a" Component_="libooc.lib" FileName="ooc_mc~1.a|ooc_mcc30_d.a" Attributes="0" SourcePath="libs\ooc_mcc30_d.a" SelfReg="false" NextFile="ooc_mcc30.a"/>
     <ROW File="ooc_mcc30_d.mcp" Component_="cdtbuild" FileName="ooc_mc~4.mcp|ooc_mcc30_d.mcp" Attributes="0" SourcePath="libs\ooc_mcc30_d.mcp" SelfReg="false" NextFile="exceptiontest_mcc30.mcp"/>
+    <ROW File="ooc_mcc32.a" Component_="libooc.lib" FileName="ooc_mc~4.a|ooc_mcc32.a" Attributes="0" SourcePath="libs\ooc_mcc32.a" SelfReg="false" NextFile="annotated.html"/>
+    <ROW File="ooc_mcc32.mcp" Component_="cdtbuild" FileName="ooc_mc~5.mcp|ooc_mcc32.mcp" Attributes="0" SourcePath="libs\ooc_mcc32.mcp" SelfReg="false" NextFile="ooc_mcc32_d.mcp"/>
+    <ROW File="ooc_mcc32_d.a" Component_="libooc.lib" FileName="ooc_mc~3.a|ooc_mcc32_d.a" Attributes="0" SourcePath="libs\ooc_mcc32_d.a" SelfReg="false" NextFile="ooc_mcc32.a"/>
+    <ROW File="ooc_mcc32_d.mcp" Component_="cdtbuild" FileName="ooc_mc~6.mcp|ooc_mcc32_d.mcp" Attributes="0" SourcePath="libs\ooc_mcc32_d.mcp" SelfReg="false" NextFile="win32_check_all.bat_1"/>
     <ROW File="ooctest.c" Component_="cdtproject" FileName="ooctest.c" Attributes="0" SourcePath="unit\ooctest.c" SelfReg="false" NextFile="refcountedtest.c"/>
     <ROW File="ooctest.c_1" Component_="bar.c" FileName="ooctest.c" Attributes="0" SourcePath="unit_mcc18\ooctest.c" SelfReg="false" NextFile="ooctest.mcp"/>
     <ROW File="ooctest.mcp" Component_="bar.c" FileName="ooctest.mcp" Attributes="0" SourcePath="unit_mcc18\ooctest.mcp" SelfReg="false" NextFile="refcountedtest.c_1"/>
     <ROW File="ooctest_d.mcp" Component_="bar.c" FileName="ooctes~1.mcp|ooctest_d.mcp" Attributes="0" SourcePath="unit_mcc18\ooctest_d.mcp" SelfReg="false" NextFile="refcountedtest_d.mcp"/>
     <ROW File="ooctest_mcc30.mcp" Component_="cdtproject" FileName="ooctes~2.mcp|ooctest_mcc30.mcp" Attributes="0" SourcePath="unit\ooctest_mcc30.mcp" SelfReg="false" NextFile="listtest_mcc30_d.mcp"/>
     <ROW File="ooctest_mcc30_d.mcp" Component_="cdtproject" FileName="ooctes~1.mcp|ooctest_mcc30_d.mcp" Attributes="0" SourcePath="unit\ooctest_mcc30_d.mcp" SelfReg="false" NextFile="ooctest_mcc30.mcp"/>
+    <ROW File="ooctest_mcc32.mcp" Component_="cdtproject" FileName="ooctes~3.mcp|ooctest_mcc32.mcp" Attributes="0" SourcePath="unit\ooctest_mcc32.mcp" SelfReg="false" NextFile="ooctest_mcc32_d.mcp"/>
+    <ROW File="ooctest_mcc32_d.mcp" Component_="cdtproject" FileName="ooctes~4.mcp|ooctest_mcc32_d.mcp" Attributes="0" SourcePath="unit\ooctest_mcc32_d.mcp" SelfReg="false" NextFile="refcountedtest_mcc32.mcp"/>
     <ROW File="open.png" Component_="annotated.html" FileName="open.png" Attributes="0" SourcePath="docs\api\html\open.png" SelfReg="false" NextFile="pages.html"/>
     <ROW File="page_MT.html" Component_="annotated.html" FileName="page_M~1.htm|page_MT.html" Attributes="0" SourcePath="docs\api\html\page_MT.html" SelfReg="false" NextFile="porting.html"/>
     <ROW File="pages.html" Component_="annotated.html" FileName="pages~1.htm|pages.html" Attributes="0" SourcePath="docs\api\html\pages.html" SelfReg="false" NextFile="page_MT.html"/>
     <ROW File="port_notes_mcc18.html" Component_="annotated.html" FileName="port_n~1.htm|port_notes_mcc18.html" Attributes="0" SourcePath="docs\api\html\port_notes_mcc18.html" SelfReg="false" NextFile="port_notes_mcc30.html"/>
-    <ROW File="port_notes_mcc30.html" Component_="annotated.html" FileName="port_n~2.htm|port_notes_mcc30.html" Attributes="0" SourcePath="docs\api\html\port_notes_mcc30.html" SelfReg="false" NextFile="refcounted_8h.html"/>
+    <ROW File="port_notes_mcc30.html" Component_="annotated.html" FileName="port_n~2.htm|port_notes_mcc30.html" Attributes="0" SourcePath="docs\api\html\port_notes_mcc30.html" SelfReg="false" NextFile="port_notes_mcc32.html"/>
+    <ROW File="port_notes_mcc32.html" Component_="annotated.html" FileName="port_n~3.htm|port_notes_mcc32.html" Attributes="0" SourcePath="docs\api\html\port_notes_mcc32.html" SelfReg="false" NextFile="refcounted_8h.html"/>
     <ROW File="porting.dox" Component_="cdtbuild" FileName="porting.dox" Attributes="0" SourcePath="libs\porting.dox" SelfReg="false" NextFile="refcounted.c"/>
     <ROW File="porting.html" Component_="annotated.html" FileName="portin~1.htm|porting.html" Attributes="0" SourcePath="docs\api\html\porting.html" SelfReg="false" NextFile="port_notes_mcc18.html"/>
     <ROW File="private.c" Component_="minimal.c" FileName="private.c" Attributes="0" SourcePath="tools\template\private.c" SelfReg="false" NextFile="private.h"/>
@@ -353,6 +366,8 @@
     <ROW File="refcountedtest_d.mcp" Component_="bar.c" FileName="refcou~2.mcp|refcountedtest_d.mcp" Attributes="0" SourcePath="unit_mcc18\refcountedtest_d.mcp" SelfReg="false" NextFile="testcasetest_d.mcp"/>
     <ROW File="refcountedtest_mcc30.mcp" Component_="cdtproject" FileName="refcou~2.mcp|refcountedtest_mcc30.mcp" Attributes="0" SourcePath="unit\refcountedtest_mcc30.mcp" SelfReg="false" NextFile="ooctest_mcc30_d.mcp"/>
     <ROW File="refcountedtest_mcc30_d.mcp" Component_="cdtproject" FileName="refcou~1.mcp|refcountedtest_mcc30_d.mcp" Attributes="0" SourcePath="unit\refcountedtest_mcc30_d.mcp" SelfReg="false" NextFile="refcountedtest_mcc30.mcp"/>
+    <ROW File="refcountedtest_mcc32.mcp" Component_="cdtproject" FileName="refcou~3.mcp|refcountedtest_mcc32.mcp" Attributes="0" SourcePath="unit\refcountedtest_mcc32.mcp" SelfReg="false" NextFile="refcountedtest_mcc32_d.mcp"/>
+    <ROW File="refcountedtest_mcc32_d.mcp" Component_="cdtproject" FileName="refcou~4.mcp|refcountedtest_mcc32_d.mcp" Attributes="0" SourcePath="unit\refcountedtest_mcc32_d.mcp" SelfReg="false" NextFile="signaltest_mcc32.mcp"/>
     <ROW File="resize.js" Component_="annotated.html" FileName="resize.js" Attributes="0" SourcePath="docs\api\html\resize.js" SelfReg="false" NextFile="all_5f.html"/>
     <ROW File="sample.c" Component_="minimal.c" FileName="sample.c" Attributes="0" SourcePath="tools\template\sample.c" SelfReg="false" NextFile="sample.h_1"/>
     <ROW File="sample.c_1" Component_="minimal.c_1" FileName="sample.c" Attributes="0" SourcePath="tools\template\sample.c" SelfReg="false" NextFile="sample.h_3"/>
@@ -375,6 +390,8 @@
     <ROW File="signaltest.c" Component_="cdtproject" FileName="signal~1.c|signaltest.c" Attributes="0" SourcePath="unit\signaltest.c" SelfReg="false" NextFile="suite.bat_2"/>
     <ROW File="signaltest_mcc30.mcp" Component_="cdtproject" FileName="signal~2.mcp|signaltest_mcc30.mcp" Attributes="0" SourcePath="unit\signaltest_mcc30.mcp" SelfReg="false" NextFile="refcountedtest_mcc30_d.mcp"/>
     <ROW File="signaltest_mcc30_d.mcp" Component_="cdtproject" FileName="signal~1.mcp|signaltest_mcc30_d.mcp" Attributes="0" SourcePath="unit\signaltest_mcc30_d.mcp" SelfReg="false" NextFile="signaltest_mcc30.mcp"/>
+    <ROW File="signaltest_mcc32.mcp" Component_="cdtproject" FileName="signal~3.mcp|signaltest_mcc32.mcp" Attributes="0" SourcePath="unit\signaltest_mcc32.mcp" SelfReg="false" NextFile="signaltest_mcc32_d.mcp"/>
+    <ROW File="signaltest_mcc32_d.mcp" Component_="cdtproject" FileName="signal~4.mcp|signaltest_mcc32_d.mcp" Attributes="0" SourcePath="unit\signaltest_mcc32_d.mcp" SelfReg="false" NextFile="testcasetest_mcc32.mcp"/>
     <ROW File="structBaseObject.html" Component_="annotated.html" FileName="struct~1.htm|structBaseObject.html" Attributes="0" SourcePath="docs\api\html\structBaseObject.html" SelfReg="false" NextFile="structClassTable.html"/>
     <ROW File="structClassTable.html" Component_="annotated.html" FileName="struct~2.htm|structClassTable.html" Attributes="0" SourcePath="docs\api\html\structClassTable.html" SelfReg="false" NextFile="structTestCaseMethod.html"/>
     <ROW File="structTestCaseMethod.html" Component_="annotated.html" FileName="struct~3.htm|structTestCaseMethod.html" Attributes="0" SourcePath="docs\api\html\structTestCaseMethod.html" SelfReg="false" NextFile="structTestCaseVtable_stru.html"/>
@@ -399,9 +416,11 @@
     <ROW File="testcasetest.c" Component_="cdtproject" FileName="testca~1.c|testcasetest.c" Attributes="0" SourcePath="unit\testcasetest.c" SelfReg="false" NextFile="Unit.vcproj"/>
     <ROW File="testcasetest.c_1" Component_="bar.c" FileName="testca~1.c|testcasetest.c" Attributes="0" SourcePath="unit_mcc18\testcasetest.c" SelfReg="false" NextFile="testcasetest.mcp"/>
     <ROW File="testcasetest.mcp" Component_="bar.c" FileName="testca~1.mcp|testcasetest.mcp" Attributes="0" SourcePath="unit_mcc18\testcasetest.mcp" SelfReg="false" NextFile="vectortest.c_1"/>
-    <ROW File="testcasetest_d.mcp" Component_="bar.c" FileName="testca~2.mcp|testcasetest_d.mcp" Attributes="0" SourcePath="unit_mcc18\testcasetest_d.mcp" SelfReg="false"/>
+    <ROW File="testcasetest_d.mcp" Component_="bar.c" FileName="testca~2.mcp|testcasetest_d.mcp" Attributes="0" SourcePath="unit_mcc18\testcasetest_d.mcp" SelfReg="false" NextFile="mplabSIMc32Ext.c"/>
     <ROW File="testcasetest_mcc30.mcp" Component_="cdtproject" FileName="testca~2.mcp|testcasetest_mcc30.mcp" Attributes="0" SourcePath="unit\testcasetest_mcc30.mcp" SelfReg="false" NextFile="signaltest_mcc30_d.mcp"/>
     <ROW File="testcasetest_mcc30_d.mcp" Component_="cdtproject" FileName="testca~1.mcp|testcasetest_mcc30_d.mcp" Attributes="0" SourcePath="unit\testcasetest_mcc30_d.mcp" SelfReg="false" NextFile="testcasetest_mcc30.mcp"/>
+    <ROW File="testcasetest_mcc32.mcp" Component_="cdtproject" FileName="testca~3.mcp|testcasetest_mcc32.mcp" Attributes="0" SourcePath="unit\testcasetest_mcc32.mcp" SelfReg="false" NextFile="testcasetest_mcc32_d.mcp"/>
+    <ROW File="testcasetest_mcc32_d.mcp" Component_="cdtproject" FileName="testca~4.mcp|testcasetest_mcc32_d.mcp" Attributes="0" SourcePath="unit\testcasetest_mcc32_d.mcp" SelfReg="false" NextFile="vectortest_mcc32.mcp"/>
     <ROW File="todo.html" Component_="annotated.html" FileName="todo~1.htm|todo.html" Attributes="0" SourcePath="docs\api\html\todo.html" SelfReg="false" NextFile="vector_8h.html"/>
     <ROW File="tools.vcproj" Component_="cdtbuild_1" FileName="tools~1.vcp|tools.vcproj" Attributes="0" SourcePath="tools\tools.vcproj" SelfReg="false" NextFile="bar.c"/>
     <ROW File="typedefs_65.html" Component_="all_5f.html" FileName="typede~1.htm|typedefs_65.html" Attributes="0" SourcePath="docs\api\html\search\typedefs_65.html" SelfReg="false" NextFile="typedefs_6c.html"/>
@@ -425,6 +444,10 @@
     <ROW File="vectortest_d.mcp" Component_="bar.c" FileName="vector~2.mcp|vectortest_d.mcp" Attributes="0" SourcePath="unit_mcc18\vectortest_d.mcp" SelfReg="false" NextFile="exceptiontest_d.mcp"/>
     <ROW File="vectortest_mcc30.mcp" Component_="cdtproject" FileName="vector~2.mcp|vectortest_mcc30.mcp" Attributes="0" SourcePath="unit\vectortest_mcc30.mcp" SelfReg="false" NextFile="testcasetest_mcc30_d.mcp"/>
     <ROW File="vectortest_mcc30_d.mcp" Component_="cdtproject" FileName="vector~1.mcp|vectortest_mcc30_d.mcp" Attributes="0" SourcePath="unit\vectortest_mcc30_d.mcp" SelfReg="false" NextFile="vectortest_mcc30.mcp"/>
+    <ROW File="vectortest_mcc32.mcp" Component_="cdtproject" FileName="vector~3.mcp|vectortest_mcc32.mcp" Attributes="0" SourcePath="unit\vectortest_mcc32.mcp" SelfReg="false" NextFile="vectortest_mcc32_d.mcp"/>
+    <ROW File="vectortest_mcc32_d.mcp" Component_="cdtproject" FileName="vector~4.mcp|vectortest_mcc32_d.mcp" Attributes="0" SourcePath="unit\vectortest_mcc32_d.mcp" SelfReg="false" NextFile="ooc_mcc32_d.a"/>
+    <ROW File="win32_check_all.bat" Component_="Makefile.am" FileName="win32-~1.bat|win32-check-all.bat" Attributes="0" SourcePath="tools\template\unit\win32-check-all.bat" SelfReg="false" NextFile="mcc32.h"/>
+    <ROW File="win32_check_all.bat_1" Component_="cdtproject" FileName="win32-~1.bat|win32-check-all.bat" Attributes="0" SourcePath="unit\win32-check-all.bat" SelfReg="false" NextFile="exceptiontest_mcc32.mcp"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
     <ROW BuildKey="DefaultBuild" BuildName="DefaultBuild" BuildOrder="1" BuildType="0" PackageFolder="." PackageFileName="ooc_setup_1.2" Languages="en" InstallationType="4"/>
@@ -501,9 +524,7 @@
     <ROW Condition="VersionNT" Description="[ProductName] cannot be installed on [WindowsType9XDisplay]" DescriptionLocId="AI.LaunchCondition.No9X" IsPredefined="true" Builds="DefaultBuild"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiShortsComponent">
-    <ROW Shortcut="API_documentation_HTML" Directory_="SHORTCUTDIR" Name="APIdoc~1|API documentation (HTML)" Component_="index.html_1" Target="[#index.html]" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="html_DIR"/>
     <ROW Shortcut="Licensing" Directory_="SHORTCUTDIR" Name="Licens~1|Licensing" Component_="lgpl.html" Target="[#lgpl.html]" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="docs_DIR"/>
-    <ROW Shortcut="ooc_manual_HTML" Directory_="SHORTCUTDIR" Name="oocman~2|ooc manual (HTML)" Component_="index.html" Target="[#index.html_1]" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="ooc.html_DIR"/>
     <ROW Shortcut="ooc_manual_PDF" Directory_="SHORTCUTDIR" Name="oocman~1|ooc manual (PDF)" Component_="ooc.pdf" Target="[#ooc.pdf]" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="docs_DIR"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiThemeComponent">
