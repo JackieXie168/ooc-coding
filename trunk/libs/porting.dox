@@ -47,11 +47,17 @@ Currently the following porting headers are available:
 	<TD>MPLAB C30 compiler support for 16 bit Microchip controllers. \n
 	There is no multithreading support in this port.</TD>
 </TR>
+<TR>
+	<TD>mcc32.h</TD>
+	<TD>MPLAB C32 compiler support for 32 bit Microchip controllers. \n
+	There is no multithreading support in this port.</TD>
+</TR>
 </TABLE>
 
 For special comments on the existing ports see the following descriptions:
 - @subpage port_notes_mcc18
 - @subpage port_notes_mcc30
+- @subpage port_notes_mcc32
 
 @section new_port How to create a new port?
 To create a new port you must do the followings:
@@ -341,4 +347,32 @@ Since the MPLAB C30 compiler is available on Windows only, this port is distribu
 @note	The libraries are built with the Lite version of the MPLAB C30 compiler, so they are not optimized!
 		For real live projects build your own ooc libraries with optimization (with the Enterprise or Pro editions)!
 
+//=============================================================================================================================================
+
+@page port_notes_mcc32 Notes on the MPLAB C32 port
+
+There are not too much comments for the MPLAB C32 compiler and development toolchain, it is a fully functional port. ;-)
+
+Every functionality works fine in this port.\n
+
+The following compiler controls are defined for MCC32:
+	- ROM
+	- OOC_NO_THREADS
+	- OOC_NO_FINALIZE
+
+All ooc classes are proted to the MCC32.\n
+Comment on TestCase: for some mistery reason, the Unix signals (SIGSEGV, SIGFPE) do not work, as expected, so TestCase does not use them.
+I the future it would be great to integrate the PIC traps as well into the TestCase.\n
+
+Since the MPLAB C32 compiler is available on Windows only, this port is distributed in the Windows installer package only.\n
+
+@warning	You can't use the MPLAB SIM simulator for running PIC32 TestCases unless you compile your test cases together with the provided 
+			@c mplabSIMc32Ext.c extension file, that is located in the @c template/unit directory!
+
+The MPLAB C32 library uses the UART2 as default for @c stdout, so all the @c printf() calls will put their output to UART2. Unfortunatly MPLAB
+SIM can catch and display only UART1 outputs, so it is necessary to redirect all @c printf() outputs to UART1 in the testcases.
+Compiling and linking your testcase together with mplabSIMc32Ext.c will do this job for you.
+
+@note	The libraries are built with the Lite version of the MPLAB C32 compiler, so they are not optimized!
+		For real live projects build your own ooc libraries with optimization (with the Enterprise or Pro editions)!
 */

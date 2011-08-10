@@ -13,5 +13,5 @@ TESTS = $(check_PROGRAMS) $(test_suites)
 
 nobase_pkginclude_HEADERS= *.h implement/*.h
 
-EXTRA_DIST = $(test_suites) *.bat Makefile.Windows MakefileEclipse.linux *.mcp
+EXTRA_DIST = $(test_suites) *.bat Makefile.Windows MakefileEclipse.linux *.mcp win32-check-all.bat
 
