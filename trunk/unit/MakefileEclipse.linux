@@ -1,8 +1,10 @@
 
 SOURCES = $(wildcard *.c)
+EXCLUDE = mplabSIMc32Ext.c
 
-TESTS = $(filter $(wildcard *test.c), $(SOURCES))
-FAKES = $(filter-out $(TESTS), $(SOURCES))
+EFFECTIVE_SOURCES = $(filter-out $(EXCLUDE), $(SOURCES))
+TESTS = $(filter $(wildcard *test.c), $(EFFECTIVE_SOURCES))
+FAKES = $(filter-out $(TESTS), $(EFFECTIVE_SOURCES))
 FAKEOBJECTS = $(patsubst %.c, %.o, $(FAKES))
 TARGETS = $(patsubst %.c, %, $(TESTS))
 

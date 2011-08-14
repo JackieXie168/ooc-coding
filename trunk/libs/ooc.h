@@ -644,7 +644,29 @@ extern ROM struct ClassTable BaseClass;
 	if( pClass ## Class.parent != &BaseClass ) pClass ## Class.parent->ctor( (Object) pSelf, pParam )
 
 /*@}*/
-	
+
+/* Managing Interfaces
+ */
+
+struct
+InterfaceID
+{
+	char _dummy;
+};
+
+#define DeclareInterface( pInterface )						\
+	extern ROM struct InterfaceID pInterface ## ID;			\
+	typedef struct pInterface ## Methods * pInterface;		\
+	struct pInterface ## Methods {
+
+#define EndOfInterface }
+
+#define Interface( pInterface )								\
+	struct pInterface ## Methods pInterface
+
+#define AllocateInterface( pInterface )						\
+	ROM_ALLOC struct InterfaceID pInterface ## ID
+
 /*  Function marchaler types
  */
 

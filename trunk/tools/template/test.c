@@ -156,7 +156,7 @@ sample_method1( Sample self )
  * 
  */
  
-static ROM struct TestCaseMethod methods[] =
+static ROM_ALLOC struct TestCaseMethod methods[] =
 {
 	
 	TEST(sample_method1),
