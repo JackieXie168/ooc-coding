@@ -1,6 +1,6 @@
 testable_library = $(top_srcdir)/libs/libooc.a
 
-check_PROGRAMS = testcasetest ooctest exceptiontest refcountedtest listtest vectortest signaltest
+check_PROGRAMS = testcasetest ooctest exceptiontest interfacetest refcountedtest listtest vectortest signaltest
 
 check_LIBRARIES = libfakes.a
 libfakes_a_SOURCES = bar.c barson.c bardaughter.c foo.c fooexception.c
