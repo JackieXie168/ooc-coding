@@ -47,6 +47,7 @@ error_codes
 	err_wrong_position,					/**< insertion at wrong position into a container */
 	err_bad_connect,					/**< signal connection failure */
 	err_already_in_use,					/**< resource (Object) is already in use */
+	err_interface_not_implemented,		/**< The requested interface is not implemented for the class */
 
 	err_user_code		= ~0			/**< Non ooc core exception == user defined exception */
 };

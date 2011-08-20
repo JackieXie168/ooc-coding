@@ -89,7 +89,7 @@ inherit_vtable_from_parent( const Class self )
 
 		/* Inherit the virtual functions */
 		if( self->parent->vtab_size > virtual_function_alignment )
-		    memcpy( ((GEN_PTR) self->vtable)+ virtual_function_alignment,			/* destination */
+		    memcpy( ((GEN_PTR) self->vtable)+ virtual_function_alignment,		/* destination */
 			    ((GEN_PTR) self->parent->vtable) + virtual_function_alignment,	/* source */
 			    self->parent->vtab_size - virtual_function_alignment );			/* bytes to copy */
 		}
@@ -551,4 +551,46 @@ void *
 ooc_ptr_read_and_null( void ** ptr_ptr )
 {
 	OOC_IMPLEMENT_PTR_READ_AND_NULL
+}
+
+/* Interface handling
+ *
+ * ***********************************************************/
+
+void *
+_ooc_get_interface( const Object self, InterfaceID id )
+{
+	Vtable									vtab;
+	Class 									type, next_type;
+	ROM struct InterfaceOffsets_struct * 	itable;
+	size_t 									i;
+
+	vtab		= self->_vtab;
+	next_type	= vtab->_class;
+
+	do
+	{
+		type = next_type,	next_type = type->parent;
+
+		itable	= type->itable;
+		if( itable )
+		{
+			for( i = type->itab_size; i; i--, itable++ )
+				if( itable->id == id )
+					return	(char*) vtab + itable->offset;
+		}
+	} while( ooc_class_has_parent( type ) );
+
+	return NULL;
+}
+
+void *
+_ooc_get_interface_must_have( const Object self, InterfaceID id )
+{
+	void * interface = _ooc_get_interface( self, id );
+
+	if( interface == NULL )
+		ooc_throw( exception_new( err_interface_not_implemented ) );
+
+	return interface;
 }
