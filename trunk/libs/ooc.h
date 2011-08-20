@@ -514,12 +514,10 @@ extern ROM struct ClassTable BaseClass;
 
 #define Virtuals( pClass, pParent )												\
 																				\
-	/* defining inline function for virtual function access: */					\
 	typedef struct pClass ## Vtable_stru * pClass ## Vtable;                    \
                                                                                 \
 	_declare_vtab_access( pClass, pParent )										\
 																				\
-	/* defining virtual function members */										\
 	struct pClass ## Vtable_stru {												\
 		struct pParent ## Vtable_stru	pParent;
 		
@@ -576,19 +574,16 @@ extern ROM struct ClassTable BaseClass;
 
 #define AllocateClass( pClass, pParent )					\
 															\
-	/* Prototyping */										\
 	static void   pClass ## _initialize ( Class );	        \
 	static void   pClass ## _finalize ( Class );	        \
 	static void   pClass ## _constructor( pClass, const void * ); \
 	static void   pClass ## _destructor ( pClass, pClass ## Vtable ); \
 	static int	  pClass ## _copy ( pClass, const pClass );	\
 															\
-	/* Allocating the Vtable */								\
-	struct pClass ## Vtable_stru pClass ## VtableInstance _OOC_VTAB_INITIALIZER; \
+	static struct pClass ## Vtable_stru pClass ## VtableInstance _OOC_VTAB_INITIALIZER; \
 															\
 	_define_vtab_access( pClass, pParent )					\
 															\
-	/* Allocating the class description table */			\
 	ROM_ALLOC												\
 	struct ClassTable pClass ## Class = {					\
 		sizeof( struct pClass ## Object ),					\
@@ -607,19 +602,16 @@ extern ROM struct ClassTable BaseClass;
 
 #define AllocateClassWithInterface( pClass, pParent )		\
 															\
-	/* Prototyping */										\
 	static void   pClass ## _initialize ( Class );	        \
 	static void   pClass ## _finalize ( Class );	        \
 	static void   pClass ## _constructor( pClass, const void * ); \
 	static void   pClass ## _destructor ( pClass, pClass ## Vtable ); \
 	static int	  pClass ## _copy ( pClass, const pClass );	\
 															\
-	/* Allocating the Vtable */								\
-	struct pClass ## Vtable_stru pClass ## VtableInstance _OOC_VTAB_INITIALIZER; \
+	static struct pClass ## Vtable_stru pClass ## VtableInstance _OOC_VTAB_INITIALIZER; \
 															\
 	_define_vtab_access( pClass, pParent )					\
 															\
-	/* Allocating the class description table */			\
 	ROM_ALLOC												\
 	struct ClassTable pClass ## Class = {					\
 		sizeof( struct pClass ## Object ),					\
@@ -628,30 +620,27 @@ extern ROM struct ClassTable BaseClass;
 		(Vtable) & pClass ## VtableInstance,				\
 		sizeof( struct pClass ## Vtable_stru ),				\
 		pClass ## Itable,									\
-		sizeof(pClass ## Itable)/sizeof(struct InterfaceOffsets_struct),	\
+		sizeof(pClass ## Itable)/sizeof(struct InterfaceOffsets_struct),\
 												pClass ## _initialize,	\
 												pClass ## _finalize,	\
 		(void (*)( Object, const void *)) 		pClass ## _constructor,	\
 		(void (*)( Object, Vtable ))        	pClass ## _destructor,	\
 		(int  (*)( Object, const Object)) 		pClass ## _copy,        \
 		}
-																													\
+
 #else
 
 #define AllocateClass( pClass, pParent )					\
 															\
-	/* Prototyping */										\
 	static void   pClass ## _initialize ( Class );	        \
 	static void   pClass ## _constructor( pClass, const void * ); \
 	static void   pClass ## _destructor ( pClass, pClass ## Vtable ); \
 	static int	  pClass ## _copy ( pClass, const pClass );	\
 															\
-	/* Allocating the Vtable */								\
-	struct pClass ## Vtable_stru pClass ## VtableInstance _OOC_VTAB_INITIALIZER; \
+	static struct pClass ## Vtable_stru pClass ## VtableInstance _OOC_VTAB_INITIALIZER; \
 															\
 	_define_vtab_access( pClass, pParent )					\
 															\
-	/* Allocating the class description table */			\
 	ROM_ALLOC												\
 	struct ClassTable pClass ## Class = {					\
 		sizeof( struct pClass ## Object ),					\
@@ -659,10 +648,38 @@ extern ROM struct ClassTable BaseClass;
 		& pParent ## Class,	                                \
 		(Vtable) & pClass ## VtableInstance,				\
 		sizeof( struct pClass ## Vtable_stru ),				\
+		(Itable) NULL, 										\
+		(size_t) 0,											\
 											pClass ## _initialize,	\
 		(void (*)( Object, const void *)) 	pClass ## _constructor,	\
 		(void (*)( Object, Vtable ))        pClass ## _destructor,	\
 		(int  (*)( Object, const Object)) 	pClass ## _copy	        \
+		}
+
+#define AllocateClassWithInterface( pClass, pParent )		\
+															\
+	static void   pClass ## _initialize ( Class );	        \
+	static void   pClass ## _constructor( pClass, const void * ); \
+	static void   pClass ## _destructor ( pClass, pClass ## Vtable ); \
+	static int	  pClass ## _copy ( pClass, const pClass );	\
+															\
+	static struct pClass ## Vtable_stru pClass ## VtableInstance _OOC_VTAB_INITIALIZER; \
+															\
+	_define_vtab_access( pClass, pParent )					\
+															\
+	ROM_ALLOC												\
+	struct ClassTable pClass ## Class = {					\
+		sizeof( struct pClass ## Object ),					\
+		(ROM char *) #pClass,								\
+		& pParent ## Class,	                                \
+		(Vtable) & pClass ## VtableInstance,				\
+		sizeof( struct pClass ## Vtable_stru ),				\
+		pClass ## Itable,									\
+		sizeof(pClass ## Itable)/sizeof(struct InterfaceOffsets_struct),\
+												pClass ## _initialize,	\
+		(void (*)( Object, const void *)) 		pClass ## _constructor,	\
+		(void (*)( Object, Vtable ))        	pClass ## _destructor,	\
+		(int  (*)( Object, const Object)) 		pClass ## _copy,        \
 		}
 
 #endif /* OOC_NO_FINALIZE */
@@ -705,9 +722,6 @@ InterfaceID_struct
 	char dummy;					/* Just a space holder to ensure that all InterfaceID is unique */
 };
 
-
-
-
 #define DeclareInterface( pInterface )						\
 	extern ROM struct InterfaceID_struct pInterface ## ID;	\
 	typedef struct pInterface ## Methods * pInterface;		\
@@ -733,6 +747,10 @@ InterfaceID_struct
 
 void * _ooc_get_interface( Object, InterfaceID );
 
+#define ooc_get_interface_must_have( pObject, pInterface )			\
+	( (pInterface) _ooc_get_interface_must_have( (Object) pObject, & pInterface ## ID ) )
+
+void * _ooc_get_interface_must_have( Object, InterfaceID );
 
 /*  Function marchaler types
  */
