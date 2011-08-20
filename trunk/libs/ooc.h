@@ -745,12 +745,12 @@ InterfaceID_struct
 #define ooc_get_interface( pObject, pInterface )			\
 	( (pInterface) _ooc_get_interface( (Object) pObject, & pInterface ## ID ) )
 
-void * _ooc_get_interface( Object, InterfaceID );
+void * _ooc_get_interface( const Object, InterfaceID );
 
 #define ooc_get_interface_must_have( pObject, pInterface )			\
 	( (pInterface) _ooc_get_interface_must_have( (Object) pObject, & pInterface ## ID ) )
 
-void * _ooc_get_interface_must_have( Object, InterfaceID );
+void * _ooc_get_interface_must_have( const Object, InterfaceID );
 
 /*  Function marchaler types
  */

@@ -369,8 +369,8 @@ check_classtable( InterfaceTest self )
 	assertTrue( InterfaceTestItable[0].id == & MyInterfaceID );
 	assertNotZero( InterfaceTestItable[0].offset );
 	assertTrue( InterfaceTestItable[0].offset == offsetof( struct InterfaceTestVtable_stru, MyInterface ) );
-	assertTrue( ((void*) self->TestCase.Base._vtab) + InterfaceTestItable[0].offset
-				== (void*) & InterfaceTestVirtual(self)->MyInterface );
+	assertTrue( ((char*) self->TestCase.Base._vtab) + InterfaceTestItable[0].offset
+				== (char*) & InterfaceTestVirtual(self)->MyInterface );
 
 	assertTrue( self->TestCase.Base._vtab->_class->itable == (Itable) &InterfaceTestItable );
 	assertTrue( self->TestCase.Base._vtab->_class->itab_size == 1 );
