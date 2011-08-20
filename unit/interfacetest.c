@@ -23,6 +23,8 @@ DeclareInterface( MyInterface )
 
 EndOfInterface;
 
+AllocateInterface( MyInterface );
+
 
 DeclareClass( InterfaceTest, TestCase );
 
@@ -45,7 +47,12 @@ EndOfClassMembers;
 /* Allocating the class description table and the vtable
  */
 
-AllocateClass( InterfaceTest, TestCase );
+InterfaceRegister( InterfaceTest )
+{
+	AddInterface( InterfaceTest, MyInterface )
+};
+
+AllocateClassWithInterface( InterfaceTest, TestCase );
 
 
 /* Class initializing
@@ -166,6 +173,17 @@ dummy_method( Object self )
 
 static
 void
+check_classtable( InterfaceTest self )
+{
+	assertTrue( InterfaceTestItable[0].id == & MyInterfaceID );
+	assertNotZero( InterfaceTestItable[0].offset );
+	assertTrue( InterfaceTestItable[0].offset == offsetof( struct InterfaceTestVtable_stru, MyInterface ) );
+	assertTrue( self->TestCase.Base._vtab->_class->itable == (Itable) &InterfaceTestItable );
+	assertTrue( self->TestCase.Base._vtab->_class->itab_size == 1 );
+}
+
+static
+void
 check_init( InterfaceTest self )
 {
 	self->data = 0;
@@ -190,6 +208,7 @@ check_init( InterfaceTest self )
 static ROM_ALLOC struct TestCaseMethod methods[] =
 {
 	
+	TEST(check_classtable),
 	TEST(check_init),
 	
 	{NULL, NULL} /* Do NOT delete this line! */

@@ -158,9 +158,9 @@ static void signal_handler( int signum );
 #ifndef _FMT_Failed_ssu
 
 #define _FMT_Failed_ssu		"\tFailed: %s [%s : %u]\n"
-#define _FMT_Func_ss		"%s.%s()"
-#define _FMT_Func_dss		"[%d] %s.%s()"
-#define _FMT_Func_dsss		"[%d] %s.%s.%s()"
+#define _FMT_Func_ss		"%s::%s()"
+#define _FMT_Func_dss		"[%d] %s::%s()"
+#define _FMT_Func_dsss		"[%d] %s::%s.%s()"
 #define _FMT_Exc_sdd		"\tUnexpected exception: %s, code: %d, user code: %d\n"
 #define _FMT_Exc_ssdd		"\n\tUnexpected exception %s in %s, code: %d, user code: %d\n"
 #define _FMT_Failed_sdd		"Test case %s failed: %d/%d (methods run/failed)\n"
