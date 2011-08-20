@@ -128,7 +128,6 @@ RefCounted_copy( RefCounted self, const RefCounted from )
     return OOC_COPY_DONE;
 }
 
-
 /*	=====================================================
 	Class member functions
  */

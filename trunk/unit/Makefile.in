@@ -33,8 +33,9 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 check_PROGRAMS = testcasetest$(EXEEXT) ooctest$(EXEEXT) \
-	exceptiontest$(EXEEXT) refcountedtest$(EXEEXT) \
-	listtest$(EXEEXT) vectortest$(EXEEXT) signaltest$(EXEEXT)
+	exceptiontest$(EXEEXT) interfacetest$(EXEEXT) \
+	refcountedtest$(EXEEXT) listtest$(EXEEXT) vectortest$(EXEEXT) \
+	signaltest$(EXEEXT)
 subdir = unit
 DIST_COMMON = $(nobase_pkginclude_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
@@ -57,6 +58,10 @@ exceptiontest_SOURCES = exceptiontest.c
 exceptiontest_OBJECTS = exceptiontest.$(OBJEXT)
 exceptiontest_LDADD = $(LDADD)
 exceptiontest_DEPENDENCIES = ./libfakes.a $(testable_library)
+interfacetest_SOURCES = interfacetest.c
+interfacetest_OBJECTS = interfacetest.$(OBJEXT)
+interfacetest_LDADD = $(LDADD)
+interfacetest_DEPENDENCIES = ./libfakes.a $(testable_library)
 listtest_SOURCES = listtest.c
 listtest_OBJECTS = listtest.$(OBJEXT)
 listtest_LDADD = $(LDADD)
@@ -89,11 +94,12 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libfakes_a_SOURCES) exceptiontest.c listtest.c ooctest.c \
-	refcountedtest.c signaltest.c testcasetest.c vectortest.c
-DIST_SOURCES = $(libfakes_a_SOURCES) exceptiontest.c listtest.c \
-	ooctest.c refcountedtest.c signaltest.c testcasetest.c \
-	vectortest.c
+SOURCES = $(libfakes_a_SOURCES) exceptiontest.c interfacetest.c \
+	listtest.c ooctest.c refcountedtest.c signaltest.c \
+	testcasetest.c vectortest.c
+DIST_SOURCES = $(libfakes_a_SOURCES) exceptiontest.c interfacetest.c \
+	listtest.c ooctest.c refcountedtest.c signaltest.c \
+	testcasetest.c vectortest.c
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -264,6 +270,9 @@ clean-checkPROGRAMS:
 exceptiontest$(EXEEXT): $(exceptiontest_OBJECTS) $(exceptiontest_DEPENDENCIES) 
 	@rm -f exceptiontest$(EXEEXT)
 	$(LINK) $(exceptiontest_OBJECTS) $(exceptiontest_LDADD) $(LIBS)
+interfacetest$(EXEEXT): $(interfacetest_OBJECTS) $(interfacetest_DEPENDENCIES) 
+	@rm -f interfacetest$(EXEEXT)
+	$(LINK) $(interfacetest_OBJECTS) $(interfacetest_LDADD) $(LIBS)
 listtest$(EXEEXT): $(listtest_OBJECTS) $(listtest_DEPENDENCIES) 
 	@rm -f listtest$(EXEEXT)
 	$(LINK) $(listtest_OBJECTS) $(listtest_LDADD) $(LIBS)
@@ -295,6 +304,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exceptiontest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/foo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fooexception.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/interfacetest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/listtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ooctest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/refcountedtest.Po@am__quote@

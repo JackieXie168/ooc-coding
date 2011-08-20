@@ -378,6 +378,20 @@ void * 		ooc_ptr_read_and_null( void ** ptr_ptr );
 
 /*@}*/
 
+/* Interface definitions
+ *
+ */
+
+typedef ROM struct InterfaceID_struct * InterfaceID;
+
+struct InterfaceOffsets_struct
+{
+	InterfaceID		id;			/* The interface ID of the implemented interface */
+	size_t			offset;		/* The offset of the interface in the class's virtual table */
+};
+
+typedef ROM struct InterfaceOffsets_struct * Itable;
+
 /* Class definitions.
  */
 
@@ -394,7 +408,10 @@ struct ClassTable
 	ROM   Class		 	parent;				/* parent of the class */
 	Vtable			    vtable;				/* the pointer to the virtual function's table */
 	const size_t		vtab_size;			/* the size of the vtable */
+	Itable				itable;				/* the implemented interfaces' Itable */
+	const size_t		itab_size;			/* the number of implemented Interfaces */
 	
+
 	void				(* init) ( Class this );        				/* class initializer */
 #ifndef OOC_NO_FINALIZE	
 	void				(* finz) ( Class this );						/* class finalizer */
@@ -579,12 +596,46 @@ extern ROM struct ClassTable BaseClass;
 		& pParent ## Class,	                                \
 		(Vtable) & pClass ## VtableInstance,				\
 		sizeof( struct pClass ## Vtable_stru ),				\
-											pClass ## _initialize,	\
-											pClass ## _finalize,	\
-		(void (*)( Object, const void *)) 	pClass ## _constructor,	\
-		(void (*)( Object, Vtable ))        pClass ## _destructor,	\
-		(int  (*)( Object, const Object)) 	pClass ## _copy	        \
+		(Itable) NULL, 										\
+		(size_t) 0,											\
+												pClass ## _initialize,	\
+												pClass ## _finalize,	\
+		(void (*)( Object, const void *)) 		pClass ## _constructor,	\
+		(void (*)( Object, Vtable ))        	pClass ## _destructor,	\
+		(int  (*)( Object, const Object)) 		pClass ## _copy,        \
 		}
+
+#define AllocateClassWithInterface( pClass, pParent )		\
+															\
+	/* Prototyping */										\
+	static void   pClass ## _initialize ( Class );	        \
+	static void   pClass ## _finalize ( Class );	        \
+	static void   pClass ## _constructor( pClass, const void * ); \
+	static void   pClass ## _destructor ( pClass, pClass ## Vtable ); \
+	static int	  pClass ## _copy ( pClass, const pClass );	\
+															\
+	/* Allocating the Vtable */								\
+	struct pClass ## Vtable_stru pClass ## VtableInstance _OOC_VTAB_INITIALIZER; \
+															\
+	_define_vtab_access( pClass, pParent )					\
+															\
+	/* Allocating the class description table */			\
+	ROM_ALLOC												\
+	struct ClassTable pClass ## Class = {					\
+		sizeof( struct pClass ## Object ),					\
+		(ROM char *) #pClass,								\
+		& pParent ## Class,	                                \
+		(Vtable) & pClass ## VtableInstance,				\
+		sizeof( struct pClass ## Vtable_stru ),				\
+		pClass ## Itable,									\
+		sizeof(pClass ## Itable)/sizeof(struct InterfaceOffsets_struct),	\
+												pClass ## _initialize,	\
+												pClass ## _finalize,	\
+		(void (*)( Object, const void *)) 		pClass ## _constructor,	\
+		(void (*)( Object, Vtable ))        	pClass ## _destructor,	\
+		(int  (*)( Object, const Object)) 		pClass ## _copy,        \
+		}
+																													\
 #else
 
 #define AllocateClass( pClass, pParent )					\
@@ -649,13 +700,16 @@ extern ROM struct ClassTable BaseClass;
  */
 
 struct
-InterfaceID
+InterfaceID_struct
 {
-	char _dummy;
+	char dummy;					/* Just a space holder to ensure that all InterfaceID is unique */
 };
 
+
+
+
 #define DeclareInterface( pInterface )						\
-	extern ROM struct InterfaceID pInterface ## ID;			\
+	extern ROM struct InterfaceID_struct pInterface ## ID;	\
 	typedef struct pInterface ## Methods * pInterface;		\
 	struct pInterface ## Methods {
 
@@ -665,7 +719,20 @@ InterfaceID
 	struct pInterface ## Methods pInterface
 
 #define AllocateInterface( pInterface )						\
-	ROM_ALLOC struct InterfaceID pInterface ## ID
+	ROM_ALLOC struct InterfaceID_struct pInterface ## ID
+
+#define InterfaceRegister( pClass )							\
+	static ROM_ALLOC										\
+	struct InterfaceOffsets_struct pClass ## Itable[] =
+
+#define AddInterface( pClass, pInterface )					\
+	{ & pInterface ## ID, offsetof( struct pClass ## Vtable_stru, pInterface ) }
+
+#define ooc_get_interface( pObject, pInterface )			\
+	( (pInterface) _ooc_get_interface( (Object) pObject, & pInterface ## ID ) )
+
+void * _ooc_get_interface( Object, InterfaceID );
+
 
 /*  Function marchaler types
  */
