@@ -587,10 +587,10 @@ _ooc_get_interface( const Object self, InterfaceID id )
 void *
 _ooc_get_interface_must_have( const Object self, InterfaceID id )
 {
-	void * interface = _ooc_get_interface( self, id );
+	void * ifc = _ooc_get_interface( self, id );
 
-	if( interface == NULL )
+	if( ifc == NULL )
 		ooc_throw( exception_new( err_interface_not_implemented ) );
 
-	return interface;
+	return ifc;
 }
