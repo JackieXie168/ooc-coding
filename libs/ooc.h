@@ -379,9 +379,14 @@ void * 		ooc_ptr_read_and_null( void ** ptr_ptr );
 /*@}*/
 
 /* Interface definitions
- *
  */
 
+/**	Interface ID.
+ * 	Each interface has a unique ID.\n
+ * 	In this implementation the ID is a pointer to an interafce descriptor table in the memory,
+ *  similarly to the Class definition.
+ *  @hideinitializer
+ */
 typedef ROM struct InterfaceID_struct * InterfaceID;
 
 struct InterfaceOffsets_struct
@@ -448,11 +453,11 @@ extern ROM struct ClassTable BaseClass;
 		_vtab_access_prototype( pClass )										\
 			{ return ( pClass ## Vtable ) ( ((struct BaseObject *) this )->_vtab ); }
 
-#define _parent_vtab_access_prototype( pClass, pParent )									\
+#define _parent_vtab_access_prototype( pClass, pParent )						\
 			pParent ## Vtable pClass ## ParentVirtual( pClass this )
 
-#define _parent_vtab_access_fn( pClass, pParent )										\
-			_parent_vtab_access_prototype( pClass, pParent )	{							\
+#define _parent_vtab_access_fn( pClass, pParent )								\
+			_parent_vtab_access_prototype( pClass, pParent )	{				\
 				assert ( ((struct BaseObject *) this )->_vtab->_class->parent != &BaseClass ); \
 				return ( pParent ## Vtable ) ( ((struct BaseObject *) this )->_vtab->_class->parent->vtable ); \
 				}
@@ -460,19 +465,23 @@ extern ROM struct ClassTable BaseClass;
 #if !defined( NO_INLINE )	/* Compilers that support function inlining */
 
 #define _declare_vtab_access( pClass, pParent )									\
-			STIN _vtab_access_fn( pClass )								\
+			STIN _vtab_access_fn( pClass )										\
 			STIN _parent_vtab_access_fn( pClass, pParent )
 #define _define_vtab_access( pClass, pParent )
 
 #else				/* Compilers that does not support function inlining */
 
 #define _declare_vtab_access( pClass, pParent )									\
-			extern _vtab_access_prototype( pClass );					\
+			extern _vtab_access_prototype( pClass );							\
 			extern _parent_vtab_access_prototype( pClass, pParent );
 #define _define_vtab_access( pClass, pParent )									\
-			_vtab_access_fn( pClass )									\
+			_vtab_access_fn( pClass )											\
 			_parent_vtab_access_fn( pClass, pParent )
 
+#endif
+
+#ifndef _OOC_VTAB_INITIALIZER
+#define _OOC_VTAB_INITIALIZER
 #endif
 
 /** @name Class definitions.
@@ -503,7 +512,7 @@ extern ROM struct ClassTable BaseClass;
  * Use:
  * @code
  * Virtuals( MyClass, Base )
- *     int   (* my_method) ( int parameter );
+ *     int   (* my_method) ( MyClass self, int param );
  * EndOfVirtuals;
  * @endcode
  * @param	pClass	The name of the class.
@@ -521,10 +530,6 @@ extern ROM struct ClassTable BaseClass;
 	struct pClass ## Vtable_stru {												\
 		struct pParent ## Vtable_stru	pParent;
 		
-#ifndef _OOC_VTAB_INITIALIZER
-#define _OOC_VTAB_INITIALIZER
-#endif		
-
 /** End of virtual functions.
  * This macro terminates the @c Virtuals block.
  * @see		Virtuals()
@@ -559,6 +564,8 @@ extern ROM struct ClassTable BaseClass;
 #define EndOfClassMembers	}
 
 
+#ifndef OOC_NO_FINALIZE
+
 /** Class allocation macro.
  * This macro should be put int the implementation file of the class.
  * Use:
@@ -569,8 +576,6 @@ extern ROM struct ClassTable BaseClass;
  * @param	pParent	The name of the parent class of the class. Must be @c Base if class does not have other parent.
  * @hideinitializer
  */
-
-#ifndef OOC_NO_FINALIZE
 
 #define AllocateClass( pClass, pParent )					\
 															\
@@ -599,6 +604,16 @@ extern ROM struct ClassTable BaseClass;
 		(void (*)( Object, Vtable ))        	pClass ## _destructor,	\
 		(int  (*)( Object, const Object)) 		pClass ## _copy,        \
 		}
+
+/** Class allocation macro for classes with interfaces.
+ * Allocates the class using the InterfaceRegister for the given class.
+ * The InterfaceRegister must be put right before this class allocator.
+ * For proper use see InterfaceRegister.
+ * @param	pClass	The name of the class.
+ * @param	pParent	The name of the parent class of the class. Must be @c Base if class does not have other parent.
+ * @see		InterfaceRegister, AllocateClass
+ * @hideinitializer
+ */
 
 #define AllocateClassWithInterface( pClass, pParent )		\
 															\
@@ -713,8 +728,12 @@ extern ROM struct ClassTable BaseClass;
 
 /*@}*/
 
-/* Managing Interfaces
+/** @name Managing Interfaces.
+ * These macros help define and use the interfaces and mixins.
+ * @nosubgrouping
  */
+
+/*@{*/
 
 struct
 InterfaceID_struct
@@ -722,33 +741,146 @@ InterfaceID_struct
 	char dummy;					/* Just a space holder to ensure that all InterfaceID is unique */
 };
 
+/**	Declare an interface.
+ * This declaration should be placed in a publicly available header file. The declaration is followed by a semicolon
+ * separated list of function pointers. These function pointers represent the behavior of the interface.
+ * The first parameters of the function pointers should be an Object, since we do not know the exact type of the
+ * object right now, that implements the interface.
+ * @code
+ * DeclareInterface( Printable )
+ *     void		(* print) ( Object );
+ *     int		(* set_header) ( Object, const char * );
+ *     ...
+ * EndOfInterface;
+ * @endcode
+ * @param	pInterface	The name of the interface.
+ * @see		EndOfInterface
+ * @hideinitializer
+ */
+
 #define DeclareInterface( pInterface )						\
 	extern ROM struct InterfaceID_struct pInterface ## ID;	\
 	typedef struct pInterface ## Methods * pInterface;		\
 	struct pInterface ## Methods {
 
+/**	Terminates the interface declaration.
+ * @see		DeclareInterface
+ * @hideinitializer
+ */
+
 #define EndOfInterface }
+
+/**	Place an interface into the class's virtual table.
+ * This macro places the interface methods into the class's virtual table.
+ * This marks that he interface methods can be accessed via the virtual table,
+ * and are inherited as any normal virtual function.
+ * Use:
+ * @code
+ * Virtuals( MyClass, Base )
+ *		int   (* my_method) ( MyClass self, int param );
+ *			...
+ * 		Interface( HasProperties );
+ * 		Interface( Printable );
+ * EndOfVirtuals;
+ * @endcode
+ * @param	pInterface	The name of the interface to be implemented by the class.
+ * @hideinitializer
+ */
 
 #define Interface( pInterface )								\
 	struct pInterface ## Methods pInterface
 
+/**	Allocates the interface descriptor table.
+ * The interface descriptor table is used to uniquely identify an interface.
+ * This macro allocates this table and must be placed in a publicly available source file.
+ * In larger projects all interface descriptor table allocators can be put in a single file
+ * (e.g. in interfaces.c ).
+ * @param	pInterface	The name of the interface to be allocated.
+ * @see 	InterfaceID
+ * @hideinitializer
+ */
+
 #define AllocateInterface( pInterface )						\
 	ROM_ALLOC struct InterfaceID_struct pInterface ## ID
+
+/**	Register for implemented interfaces of the class.
+ * In the class implementation code you must define, which interfaces are implemented by the class.
+ * These interfaces must be listed in the InterfaceRegister right before the AllocateClassWithInterface macro.
+ * Typical use (in myclass.c):
+ * @code
+ * InterfaceRegister( MyClass )
+ * {
+ * 		AddInterface( MyClass, HasProperties ),
+ * 		AddInterface( MyClass, Printable )
+ * };
+ *
+ * AllocateClassWithInterface( MyClass, Base );
+ * @endcode
+ * @param	pClass	The name of the class that implements the listed interfaces.
+ * @note	Listen to the different syntax! Internally this is a table of structs, so you must end it with a semicolon,
+ * 			and use comma as the internal list separator. You must not put a comma after the last item in the list!
+ * @see 	AddInterface, AllocateClassWithInterface
+ * @warning	Using AllocateClass instead of AllocateClassWithInterface will not put the registered interfaces into the
+ * 			class table, thus none of the interfaces could be used! Always use AllocateClassWithInterface after an InterfaceRegister!
+ * @hideinitializer
+ */
 
 #define InterfaceRegister( pClass )							\
 	static ROM_ALLOC										\
 	struct InterfaceOffsets_struct pClass ## Itable[] =
 
+/**	Adds an interface to the class's interface register.
+ * @param	pClass		The name of the class that implements the interfaces.
+ * @param	pInterface	The name of the interface to be implemented for the class.
+ * @see 	InterfaceRegister
+ * @hideinitializer
+ */
+
 #define AddInterface( pClass, pInterface )					\
 	{ & pInterface ## ID, offsetof( struct pClass ## Vtable_stru, pInterface ) }
+
+/**	Retrieves an interface of the Object.
+ * Returns the interface pointer for the given Object.
+ * Typical use:
+ * @code
+ * void
+ * print_if_printable( Object object )
+ * {
+ * 		Printable printable = get_interface( object, Printable );
+ *
+ * 		if( printable )
+ * 			printable->print( object );
+ * }
+ * @endcode
+ * @param	pObject		The Object of which's interface we are interested in.
+ * @param	pInterface	The name of the interface to be retrieved.
+ * @return	The interface (pointer to the interface methods table), or NULL if
+ * 			this interface is not implemented for the class.
+ * @see 	ooc_get_interface_must_have, DeclareInterface
+ * @hideinitializer
+ */
 
 #define ooc_get_interface( pObject, pInterface )			\
 	( (pInterface) _ooc_get_interface( (Object) pObject, & pInterface ## ID ) )
 
-void * _ooc_get_interface( const Object, InterfaceID );
+/**	Retrieves a mandatory interface of the Object.
+ * Returns the interface pointer for the given Object.
+ * The Interface must have been implemented for the given Object, otherwise
+ * @c err_interface_not_implemented Exception is thrown.
+ * @param	pObject		The Object of which's interface we are interested in.
+ * @param	pInterface	The name of the interface to be retrieved.
+ * @return	The interface (pointer to the interface methods table), never returns NULL.
+ * 			Throws an Exception if the interface is not implemented.
+ * @see 	ooc_get_interface
+ * @hideinitializer
+ */
 
 #define ooc_get_interface_must_have( pObject, pInterface )			\
 	( (pInterface) _ooc_get_interface_must_have( (Object) pObject, & pInterface ## ID ) )
+
+/*@}*/
+
+void * _ooc_get_interface( const Object, InterfaceID );
 
 void * _ooc_get_interface_must_have( const Object, InterfaceID );
 
