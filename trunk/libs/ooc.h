@@ -870,7 +870,8 @@ InterfaceID_struct
  * @param	pObject		The Object of which's interface we are interested in.
  * @param	pInterface	The name of the interface to be retrieved.
  * @return	The interface (pointer to the interface methods table), never returns NULL.
- * 			Throws an Exception if the interface is not implemented.
+ * 			Throws an Exception with error code of err_interface_not_implemented
+ * 			if the interface is not implemented for this class.
  * @see 	ooc_get_interface
  * @hideinitializer
  */

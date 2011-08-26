@@ -49,6 +49,7 @@ supports it in developing GNU and promoting software freedom.''
 * Exception handling::
 * Using Classes::
 * Implementing Classes::
+* Interfaces::
 * Memory handling::
 * Testing your classes : Unit testing support
 * Type less, produce more : Class manipulation tool
@@ -192,6 +193,7 @@ The vtable itself is basically a struct holding function pointers to the impleme
 @sp 1
 For virtual function calls we use the macros and inline functions. @*
 For those compilers that the inline functions are not supported there is a function version for virtual function calls, but that is slower of course. This is the price for the better type safety.
+
 
 @example
 
@@ -1016,6 +1018,130 @@ Of course, in this case you can access the member of the included Bar objects a 
 
 Never use the object inclusion for reference counted objects! The reference counting will not work for included objects!
 
+
+@node Interfaces
+@chapter Interfaces
+
+Since version 1.3 @strong{ooc} introduces a kind of multiple inheritance by the help of interfaces. The idea behind is a bit a mix of the Java and C++ interfaces, but differs in the way of inheritance and the use.@*
+
+@section What is an interface?
+
+An interface is simply a collection of functions that describe the behavior of the Object in some aspect. The interface itself does not implement any functionality, it just defines what methods the Object must have, and behave according to it. In some design methods this is called a contract for the Object. The Object should implement its own implementation of the contract: this is called impementing the interface. In Java the interface is a pure abstract class without a data member, in C++ it is called a pure virtual class without constructor, destructor and data members.@*
+The easiest way to define a group of functions is to collect some function pointers in a C struct. For example:
+@example
+struct DrawableInterafce
+@{
+    void     (* draw)( Object );
+    void     (* rotate)( Object, double );
+    int      (* get_heigth)( Object );
+    int      (* get_width)( Object );
+@};
+@end example
+
+This describes the behavior of a drawable @code{Object}. Any Object type that implements a @code{DrawableInterafce} can be asked for its dimensions and can be drawn and rotated.
+
+@subsection Interfaces an inheritance
+
+The use of interfaces provides a kind of multiple inheritance for @strong{ooc}. While the classes can be inherited in a single inheritance chain (each class can have only one superclass), every class can implement as many interfaces as nedded. Since interfaces can be implemented by unrelated classes, it is a kind of multiple inheritance, like in Java.@*
+In @strong{ooc} interfaces are simply added to the virtual table, so you can reference and use them as any other virtual function of the class! This is very similar to the C++ implementation of an interface.@*
+As a consequence, in @strong{ooc} the interface implementation is inherited by the subclasses and can be overriden (like in C++, and unlike Java).@*
+The good news is that by the help of interfaces @strong{ooc} introduces multiple inheritance. The bad news is, that multiple inheritance calls for the dread problem of diamond inheritance (@uref{http://en.wikipedia.org/wiki/Diamond_problem}).@*
+Since an ANSI-C compiler has nothing to handle such a situation, we must avoid any possibility of a diamond inheritance, thus the interfaces themselves can not be inherited (other words: can not be extended) in @strong{ooc}.@*
+The following table summarizes the behaviour of interfaces in different languages:
+
+@multitable {This is the description field length} { yes } { yes } { yes }
+
+@headitem   @tab ooc @tab C++ @tab Java
+
+@item Implementation of the interface is inherited by subclassing a class
+@tab yes
+@tab yes
+@tab no
+
+@item Interface methods can be overriden in subclasses
+@tab yes
+@tab yes
+@tab must be
+
+@item The interface itself can be inherited (extended in Java)
+@tab no
+@tab yes
+@tab yes
+
+@end multitable
+
+@subsection Creating an interface
+
+Creating an interface is very easy in @strong{ooc}: you just simply deaclare its members in a publicly available header file. For example we create an interface for a drawable Object:@*
+In @code{drawable.h}:
+@example
+DeclareInterface( Drawable )
+
+    void     (* draw        )( Object );
+    void     (* rotate      )( Object, double );
+    int      (* get_heigth  )( Object );
+    int      (* get_width   )( Object );
+
+EndOfInterface;
+@end example
+Please note, that the first parameter for each method in the interface is @code{Object}! This is, because any kind of a @code{Class} can implement the interface, so we can not limit the type of the @code{Object} for just a given class.@*
+Each interafce has a unique identifier and an interface descriptor, that must be statically allocated (in ROM on microcomputers). This can be done in @code{drawable.c}, or if we have many interfaces, collected them together in e.g. @code{interfaces.c}:
+@example
+#include "drawable.h"
+
+AllocateInterface( Drawable );
+@end example
+That's it! We have done: the interface is declared and has a unique id: @code{Drawable}.@*
+To minimize your work you can use the ooc tool to create the skeleton:
+@example
+~$ ooc --new Drawable --template interface
+@end example
+
+@subsection Implementing an interface
+To implement an interface for a class, we must do the followings:
+
+@enumerate
+@item
+Add the interface to the class's virtual table.
+
+@item
+Implement the interface methods for the class
+
+@item
+Initialize the virtual table with the interface method implementations
+
+@item
+Register the implemented interface(s) for the class
+
+@item
+Allocate the ClassTable using the interface register
+@end enumerate
+
+So let's say we implement the Drawable interface for the @code{Cat} class! In the followings we
+show only the steps necessary to implement the interface, other issues covered earlier are not repeated here!@*
+Implelemnting multiple interfaces for the class is the same, just repeat the necessary macros and lines!
+As an example, along with the @code{Drawable} interface we add the @code{Pet} interafce as well.
+
+@subsubsection Adding the interface to the virtual table
+In the public header (@kbd{cat.h}) locate the @code{Virtuals}, and add interface with the @code{Interface} macro:
+@example
+Virtuals( Cat, Animal )
+
+    void     ( * miau )( Cat );
+
+    Interface( Drawable );
+    Interface( Pet );
+
+EndOfVirtuals;
+@end example
+
+@subsection Using an interface
+
+@subsubsection If the type of the Object is known
+@subsubsection If the type of the Object is unknown
+
+@section Mixins
+
 @node Memory handling
 @chapter Memory handling
 
@@ -1090,7 +1216,7 @@ This creates the necessary makefiles and test suite batch files into this direct
 @item
 Create your test case with the following command:@*
 @example
-~$ ooc --new MyClassTest --source test
+~$ ooc --new MyClassTest --template test
 @end example
 As a naming convention I recommend using "Test" as a tail for your test classes. This helps identify them, but also lets you use the automatic makefile rules in Linux! In Windows you must add this file to the Makefile: edit it according to the comments in it.
 @item
@@ -1116,7 +1242,7 @@ The test method can throw an @code{Exception} or a subclass of it. If the except
 @sp 1
 You must put your test method into the test method order table, to let your test case know what methods to invoke! You can do this using the @code{TEST} macro:@*
 @example
-static ROM struct TestCaseMethod methods[] =
+static ROM_ALLOC struct TestCaseMethod methods[] =
 @{
     TEST(myclasstest_method1),
 	
@@ -1148,8 +1274,8 @@ iterator( ListTest self )
     assertTrue( self->foolist->first == list_first( self->foolist ) );
     assertTrue( self->foolist->last == list_last( self->foolist ) );
     assertFalse( list_first( self->foolist ) == list_last( self->foolist ) );
-    assertTrue( list_last( self->foolist ) == list_next( list_first( self->foolist ) ) );
-    assertTrue( list_first( self->foolist ) == list_previous( list_last( self->foolist ) ) );
+    assertTrue( list_last( self->foolist ) == list_next( self->foolist, list_first( self->foolist ) ) );
+    assertTrue( list_first( self->foolist ) == list_previous( self->foolist, list_last( self->foolist ) ) );
 @}
 @end example
 For the complete list of @code{assertCondition} macros see the @strong{ooc} API documentation, or the @code{testcase.h} header file.
@@ -1308,7 +1434,7 @@ Copy your injector file into your unit testing directory, and rewrite it as it i
 
 @end enumerate
 
-However in Java there is only a idiom called "inject while constructing", in @strong{ooc} it makes sense "inject while initializing". Implement injectors for your initialization methods separately, when it makes sense. (e.g. Injecting virtual functions into the virtual table.)@*
+Altough in Java there is only a idiom called "inject while constructing", in @strong{ooc} it makes sense "inject while initializing". Implement injectors for your initialization methods separately, when it makes sense. (e.g. Injecting virtual functions, like mixins into the virtual table.)@*
 @strong{Important!} Take care of your design in your classes, that if there is a circular dependency (typically a reference-back) between your classes, this approach will result in an endless loop! Break up the circular dependency, and pass the back reference as a constructor parameter!
 
 
