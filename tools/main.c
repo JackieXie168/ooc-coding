@@ -430,7 +430,10 @@ replace_templates( Settings set )
 		input = g_io_channel_new_file( input_filename, "r", & error );
 		if( not input ) goto Error;
 		
-		g_string_assign( str, set->output_file );
+		if( ( g_strcmp0( set->input_file, "interface" ) == 0 ) && ( g_strcmp0( set->output_file, set->new_class.lowercase ) == 0 ) )
+			g_string_assign( str, "interfaces" );
+		else
+			g_string_assign( str, set->output_file );
 		g_string_append( str, ".c" );
 		output_filename = g_build_filename( set->output_dir, str->str, NULL );
 		file_processing = output_filename;
