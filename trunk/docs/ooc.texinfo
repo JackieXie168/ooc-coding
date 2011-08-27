@@ -1027,7 +1027,7 @@ Since version 1.3 @strong{ooc} introduces a kind of multiple inheritance by the 
 @section What is an interface?
 
 An interface is simply a collection of functions that describe the behavior of the Object in some aspect. The interface itself does not implement any functionality, it just defines what methods the Object must have, and behave according to it. In some design methods this is called a contract for the Object. The Object should implement its own implementation of the contract: this is called impementing the interface. In Java the interface is a pure abstract class without a data member, in C++ it is called a pure virtual class without constructor, destructor and data members.@*
-The easiest way to define a group of functions is to collect some function pointers in a C struct. For example:
+The easiest way to define a group of functions is to collect some function pointers in a C struct. For example in pure C we would write:
 @example
 struct DrawableInterafce
 @{
@@ -1098,7 +1098,7 @@ To minimize your work you can use the ooc tool to create the skeleton:
 @end example
 
 @subsection Implementing an interface
-To implement an interface for a class, we must do the followings:
+To implement an interface for a class, you must do the followings:
 
 @enumerate
 @item
@@ -1119,7 +1119,7 @@ Allocate the ClassTable using the interface register
 
 So let's say we implement the Drawable interface for the @code{Cat} class! In the followings we
 show only the steps necessary to implement the interface, other issues covered earlier are not repeated here!@*
-Implelemnting multiple interfaces for the class is the same, just repeat the necessary macros and lines!
+Implelementing multiple interfaces for the class is the same, just repeat the necessary macros and lines!
 As an example, along with the @code{Drawable} interface we add the @code{Pet} interafce as well.
 
 @subsubsection Adding the interface to the virtual table
@@ -1135,10 +1135,108 @@ Virtuals( Cat, Animal )
 EndOfVirtuals;
 @end example
 
+@subsubsection Implementing the interafce methods
+
+The interface method impementations are @code{static} functions in the class implementation file.
+This is exactly the same aproach to the implementation of any virtual method. (Do not forget: an interface is just a
+collection of virtual functions in ooc.)@*
+So in @kbd{cat.c} write:
+@example
+static
+void
+cat_rotate( Cat self, double arcus )
+@{
+    assert( ooc_isInstanceOf( self, Cat ) );
+
+    // Rotate your cat here :-)
+@}
+@end example
+
+@subsubsection Initializing the virtual table
+
+In the class initialization code you must assign the the implementation methods with the appropriate function pointers
+in the virtual table. Again, see the section about virtual functions.
+
+@example
+static
+void
+Cat_initialize( Class this )
+@{
+    CatVtable virtuals = (CatVtable) this->vtable;
+
+    virtuals->Drawable.rotate = (void (*)(Object, double)) cat_rotate;
+    // add the other methods as well ...
+@}
+@end example
+
+@subsubsection Registering the implemented interafces
+
+There is a way to retrieve the implemented interfaces for any class, that is the @code{ooc_get_interface()} function. To let it work, we must 
+register all implemented interfaces for the class. This is done in the class implementation file, preferably just right before the class allocation.
+So, in @kbd{cat.c} we register the Drawable and Pet interfaces for the Cat class:
+@example
+InterfaceRegister( Cat )
+@{
+    AddInterface( Cat, Drawable ),
+    AddInterface( Cat, Pet )
+@};
+@end example
+Listen to the different syntax! Internally this is a table of structs, so you must end it with a semicolon, and use comma as the internal list separator.
+You must not put a comma after the last item in the list!@*
+@code{ooc_get_interface()} scans this table, so you can get some increase in speed of average execution, if you place your most frequently used interfaces
+in the first positions.
+
+@subsubsection Allocating the class with interfaces
+
+The only thing remained is to let the ClassTable know about the interface register. So instead of @code{AllocateClass} use @code{AllocateClassWithInterface}:
+
+@example
+AllocateClassWithInterface( Cat, Animal );
+@end example
+
+If you forget this step, @code{ooc_get_interface()} will always return @code{NULL}, since it will not know about the registered interfaces for the class.@*
+@*
+With this step we have finished the implementation of an interface for a class.
+
 @subsection Using an interface
 
+When we need to invoke an interface method, simply call the virtual function via the function pointer in the virtual table.
+There can be two situation in practice: we may know the type of the object we have, or may not.
+
 @subsubsection If the type of the Object is known
+
+If we know the type of the object we have, and this type has implemented the interface that we need, then we can simply call the virtual function of the interface.
+@example
+Cat mycat = cat_new();
+
+// rotating mycat:
+CatVirtual(mycat)->Drawable.rotate( (Object) mycat );
+@end example
+
+This is the fastest way to invoke an interface method, since this is a dereferencing of a function pointer only.
+
 @subsubsection If the type of the Object is unknown
+
+The main use of an interface is when we do not know the exact type of the object we have, but we want it to behave according its interface method. The @code{ooc_get_interface()} method can retrieve a given interface from any kind of @code{Object}. The @code{ooc_get_interface()} function returns a pointer to the interface 
+methods of the class, and the desired method can be called via this function pointer.
+@example
+void
+rotate_an_animal( Animal self )
+@{
+    Drawable drawable = ooc_get_interface( (Object) self );
+
+    if( drawable )
+        drawable->rotate( (Object) self );
+@}
+@end example
+
+@code{ooc_get_interface()} returns @code{NULL} if the desired interface is not implemented for the object. If you use this function, always check for a @code{NULL} pointer, unless you will generate a segmentation fault, if the interface is not implemented.@*
+In case you know that your object has implemented the desired interface, but you do not know the exact type of your object, you can use the @code{ooc_get_interface_must_have()} function instead. This will never return a @code{NULL} pointer, but throws an @code{Exception} if the object does not have the desired interface.
+@example
+    ooc_get_interface_must_have( (Object) self )->rotate( (Object) self );
+@end example
+
+@code{ooc_get_interface()} traveses the InterfaceRegister for the class and its superclasses, so it may be relative slow. If you use the interface for an object multiple times, it is  worth to retrieve the interface pointer only ones for the object, and keep it around until needed.
 
 @section Mixins
 
