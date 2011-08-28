@@ -557,16 +557,26 @@ ooc_ptr_read_and_null( void ** ptr_ptr )
  *
  * ***********************************************************/
 
+TLS		void*			prev_interface	= NULL;		/* previously returned interface */
+TLS		Vtable			prev_vtab		= NULL;		/* previously checked Vtable */
+TLS		InterfaceID		prev_id			= NULL;		/* previously checked InterfaceID */
+
 void *
 _ooc_get_interface( const Object self, InterfaceID id )
 {
-	Vtable									vtab;
 	Class 									type, next_type;
 	ROM struct InterfaceOffsets_struct * 	itable;
 	size_t 									i;
 
-	vtab		= self->_vtab;
-	next_type	= vtab->_class;
+	/* Add some cache functionality to accelerate subsequent calls. Will be useful in mixins. */
+	if( id == prev_id && self->_vtab == prev_vtab )
+		return prev_interface;
+	else {
+		prev_vtab	= self->_vtab;
+		prev_id		= id;
+		}
+
+	next_type	= self->_vtab->_class;
 
 	do
 	{
@@ -577,7 +587,7 @@ _ooc_get_interface( const Object self, InterfaceID id )
 		{
 			for( i = type->itab_size; i; i--, itable++ )
 				if( itable->id == id )
-					return	(char*) vtab + itable->offset;
+					return ( prev_interface = (char*) self->_vtab + itable->offset );
 		}
 	} while( ooc_class_has_parent( type ) );
 
