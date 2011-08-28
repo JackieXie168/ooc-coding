@@ -2,6 +2,7 @@
 /* This is a Sample class implementation file
  */
 
+#include "sample.h"
 #include "implement/sample.h"
 
 #include <ooc/exception.h>
