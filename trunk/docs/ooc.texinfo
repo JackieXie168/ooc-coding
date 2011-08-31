@@ -1198,6 +1198,7 @@ If you forget this step, @code{ooc_get_interface()} will always return @code{NUL
 @*
 With this step we have finished the implementation of an interface for a class.
 
+@anchor{Using an interface}
 @subsection Using an interface
 
 When we need to invoke an interface method, simply call the virtual function via the function pointer in the virtual table.
@@ -1233,12 +1234,107 @@ rotate_an_animal( Animal self )
 @code{ooc_get_interface()} returns @code{NULL} if the desired interface is not implemented for the object. If you use this function, always check for a @code{NULL} pointer, unless you will generate a segmentation fault, if the interface is not implemented.@*
 In case you know that your object has implemented the desired interface, but you do not know the exact type of your object, you can use the @code{ooc_get_interface_must_have()} function instead. This will never return a @code{NULL} pointer, but throws an @code{Exception} if the object does not have the desired interface.
 @example
-    ooc_get_interface_must_have( (Object) self )->rotate( (Object) self );
+ooc_get_interface_must_have( (Object) self )->rotate( (Object) self );
 @end example
 
-@code{ooc_get_interface()} traveses the InterfaceRegister for the class and its superclasses, so it may be relative slow. If you use the interface for an object multiple times, it is  worth to retrieve the interface pointer only ones for the object, and keep it around until needed.
+@strong{Note}: the @code{ooc_get_interface()} function traveses the InterfaceRegister for the class and its superclasses, so it may be relative slow. If you use the interface for an object multiple times within a context, it is worth to retrieve the interface pointer only ones for the object, and keep it around until needed.
 
 @section Mixins
+
+The mixins are interfaces that have default implementations and have their own data (@uref{http://en.wikipedia.org/wiki/Mixin}). In @strong{ooc} I plan to introduce two type of mixins: a light-weight one, that is fast and has as minimum overhead as possible, and a fully fumctional one, which supports a complete "mixing in" a class into an other one.@*
+
+A mixin does not know anything about the enclosing Object / Class!@*
+
+From the user point of view a mixin looks identical to an interface! @xref{Using an interface}.
+
+@subsection Light-weight mixins
+
+A light-weight mixin has the following features:
+@itemize @bullet
+@item
+May have default implementation of the interface methods (usually has, but this is not mandatory)
+@item
+Has its own data (this is accessible by the enclosing class as well)
+@item
+The default implementation of the interface methods can be overriden by the enclosing class.
+@end itemize
+
+A light-weight mixin can not be used in the following situations:
+@itemize @bullet
+@item
+When global resources are required by the default impelmentation of the mixin. The light-weight mixins do not has initialization phase, thus shared global resources can not be acquired safely.
+@item
+Inheritance of the incorporated data fields is required.
+@end itemize
+
+@subsubsection Creating a light-weight mixin
+
+The light-weight mixin is nothing else than an interface impementation plus a data structure with the additional glue code to access the data fields in the interface methods in any situations.@*
+In this section only the additional code is shown (compared to an interface).@*
+To create the mixin skeleton for @code{Flavour}, just type:
+@example
+~$ ooc --new Flavour --template mixin
+@end example
+The @kbd{flavour.h} is familiar, it looks like a normal interface declaration except it has a mandatory method: @code{_get_data_()}.@*
+This method is mandatory, because the mixin does not know where its data is stored. Only the class, that implements the mixin will know this information. The mandatory @code{_get_data_()} method lets the mixin retrieve its data.@*
+Put your additional interafce methods (function pointers, of course) into the table as needed.
+@sp 1
+There is a @kbd{implement/flavour.h} file, that contains the data members for the mixin. Add your data members as needed.@*
+These data fields will be mixed into the enclosing class's object structure, and can be referenced via a @code{FlavourData} type pointer (interface name + @code{Data} suffix).@*
+The structure itself is "typedefd" as interface name + @code{Fields} suffix.@*
+There are some function prototypes, non of them are mandatory.
+@sp 1
+In the @kbd{flavour.c} file you will find the necessary @code{AllocateInterface} macro, and you must provide the method implementations for the mixin. The following methods could be implemented:
+
+@table @code
+@item Flavour_constructor( FlavourData )
+Initializes the data fields of the mixin. All data fields are garanteed to be zero at entrance.@*
+This method is to be called from the enclosing class's constructor.@*
+If your data fields do not require any construction, you can omit this method.
+
+@item Flavour_destructor( FlavourData )
+Destroys the data fields of the mixin.@*
+This method is to be called from the enclosing class's destructor, and the normal rules within a desctructor must be applied here as well!@*
+If your data fields do not require any destruction, you can omit this method.
+
+@item Flavour_populate( Flavour )
+Populates the interface method table with function pointers to the default mixin method implementations. This method should be called from the enclosing class's initialization method.@*
+Leave the @code{_get_data_()} method uninitialized, since this method must be initialized by the enclosing class!@*
+Implementing the @code{..._populate()} method is not mandatory, but recommended for convenience.
+@end table
+@sp 1
+The mixin implementation methods must follow an important rule! Since the mixin does not know where are its data located, it must retrieve first!@*
+The only thing that a mixin method knows is the enclosing @code{Object} (always the first parameter for an interface method!). Retrieving the mixin's data fields can be done in two steps:
+@itemize	
+@item
+@code{get_interface()} returns the interface, than
+@item
+@code{_get_data_()} returns the data fileds for the mixin.
+@end itemize
+Since we are within the mixin's default implementation file, we expect that an @code{Object} has implemented this interface (these methods are invoked via the interface method table, so if we were able to call them then they have to had implemented this interface), we can use @code{get_interface_must_have()} as well.@*
+Therefore a typical mixin method starts with the followings:
+@example
+static
+void
+flavour_set( Object obj, /* obj is the enclosing Object! */
+             const char * flavour_name )
+@{
+    FlavourData self;
+ 
+    /* retrieving the FlavourData form the enclosing Object */
+    self = ooc_get_interface_must_have( obj, Flavour )->_get_data_( obj );
+
+    self->name = flavour_name;
+@}
+@end example
+
+@subsubsection Implementing a light-weight mixin
+
+The implementation of a light-weight mixin is the same as the implementation of an interface, with the following additional tasks.
+
+@subsection Fully functional mixins
+
+@emph{Not ready yet.}
 
 @node Memory handling
 @chapter Memory handling
@@ -1495,7 +1591,7 @@ So I recommend using the "dependency lookup" idiom in @strong{ooc} with a very s
 @item
 In your class's implementation source file define an external function prototype, like this:@*
 @example
-void injectMyClass( MyClass self );
+extern void injectMyClass( MyClass self );
 @end example
 This is your injector method for your class.
 @item
