@@ -14,7 +14,8 @@ _SampleDataFields
 
 } SampleDataFields;
 
-extern	void	Sample_initialize( Sample );
+extern	void	Sample_populate( Sample );
+
 extern	void	Sample_constructor( SampleData, x ); /* add additional parameters as needed! */
 extern	void	Sample_destructor( SampleData );
 

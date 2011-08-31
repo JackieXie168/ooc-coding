@@ -1,5 +1,5 @@
 
-/* This is a Sample interface (mixin) implementation file
+/* This is a Sample interface (light-weight mixin) implementation file
  */
 
 #include "sample.h"
@@ -45,20 +45,17 @@ static
 void
 sample_my_method1( Object obj, ... )
 {
-	SampleData self;
-
-	assert( ooc_isInstanceOf( obj, Base ) );
-	self = ooc_get_interface_must_have( obj, Sample )->_get_data_( obj );
+	SampleData self = ooc_get_interface_must_have( obj, Sample )->_get_data_( obj );
 
 	self->data = ...
 }
 
 
-/* Initialization
+/* Populating the interface's virtual table
  */
 
 void
-Sample_initialize( Sample sample )
+Sample_populate( Sample sample )
 {
 	// Fill the Sample virtual table with the virtual methods.
 	// Do NOT assign any method to (*_get_data_)() !!!
