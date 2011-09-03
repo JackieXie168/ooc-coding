@@ -24,7 +24,7 @@ static
 FlavourData
 icecream_flavourdata( Object self )
 {
-	return & ( (IceCream) self )->Flavour;
+	return FlavourData( (IceCream) self );
 }
 
 
@@ -64,7 +64,7 @@ IceCream_constructor( IceCream self, const void * flavour )
 	
 	chain_constructor( IceCream, self, NULL );
 
-	Flavour_constructor( & self->Flavour, (const char *) flavour );
+	Flavour_constructor( FlavourData( self ), (const char *) flavour );
 }
 
 /* Destructor
@@ -74,7 +74,7 @@ static
 void
 IceCream_destructor( IceCream self, IceCreamVtable vtab )
 {
-	Flavour_destructor( & self->Flavour );
+	Flavour_destructor( FlavourData( self ) );
 }
 
 /* Copy constuctor
