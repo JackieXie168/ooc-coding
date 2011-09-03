@@ -569,7 +569,7 @@ _ooc_get_interface( const Object self, InterfaceID id )
 	size_t 									i;
 
 	/* Add some cache functionality to accelerate subsequent calls. Will be useful in mixins. */
-	if( id == prev_id && self->_vtab == prev_vtab )
+	if( ( id == prev_id ) && ( self->_vtab == prev_vtab ) )
 		return prev_interface;
 	else {
 		prev_vtab	= self->_vtab;
@@ -591,7 +591,7 @@ _ooc_get_interface( const Object self, InterfaceID id )
 		}
 	} while( ooc_class_has_parent( type ) );
 
-	return NULL;
+	return ( prev_interface = NULL );
 }
 
 void *

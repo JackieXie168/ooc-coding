@@ -19,7 +19,7 @@ ClassMembers( IceCream, Tonic )
 
 	int					scoop;
 
-	FlavourDataFields	Flavour;
+	InterfaceData( Flavour );
 
 EndOfClassMembers;
 

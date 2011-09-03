@@ -790,6 +790,25 @@ InterfaceID_struct
 #define Interface( pInterface )								\
 	struct pInterface ## Methods pInterface
 
+/**	Place the interface data fields into the class members.
+ * This macro places the interface data fields (in case of Mixins) into the object struct.
+ * Use:
+ * @code
+ * ClassMembers( IceCream, Tonic )
+ *		int			scoop;
+ *		InterfaceData( Flavour );
+ * EndOfClassMembers;
+ * @endcode
+ * @param	pInterface	The name of the interface to be implemented by the class.
+ * @note	This macro puts the interface data into the Object struct as private! The enclosing
+ * 			class can not access the members of the mixed in class with a simple pointer dereferencing.
+ * @hideinitializer
+ */
+
+#define InterfaceData( pInterface )							\
+		char pInterface[ sizeof( pInterface ## DataFields )/sizeof(char) ];
+
+
 /**	Allocates the interface descriptor table.
  * The interface descriptor table is used to uniquely identify an interface.
  * This macro allocates this table and must be placed in a publicly available source file.

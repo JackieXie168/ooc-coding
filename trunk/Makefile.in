@@ -187,7 +187,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = libs docs tools unit unit_mcc18
-EXTRA_DIST = ooc.sln config.h
+EXTRA_DIST = ooc.sln config.h examples
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 

@@ -51,7 +51,7 @@ taste_a_tonic( Tonic tonic )
 
 	else
 
-		printf( "This %s is not flavoured\n", tonic_name( tonic ) );
+		printf( "The %s is not flavoured\n", tonic_name( tonic ) );
 }
 
 int
@@ -59,9 +59,12 @@ main( int argc, char * argv[] )
 {
 	Vector tonics = NULL;
 
-	ooc_manage_object( tonics );
+	ooc_init_class( Exception );
+	ooc_init_class( Vector );
 
 	tonics = vector_new_type( 20, Tonic, OOC_MANAGE );
+
+	ooc_manage_object( tonics );
 
 	fill_array( tonics );
 

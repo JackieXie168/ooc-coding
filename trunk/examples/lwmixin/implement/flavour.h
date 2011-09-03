@@ -18,4 +18,7 @@ extern	void	Flavour_populate( Flavour );
 extern	void	Flavour_constructor( FlavourData, const char * flavour );
 extern	void	Flavour_destructor( FlavourData );
 
+
+#define FlavourData( pObject ) ( (FlavourData) & (pObject)->Flavour )
+
 #endif /* IMPL_FLAVOUR_H */
