@@ -80,8 +80,8 @@ Vector			vector_new( VectorIndex chunk_size, vector_item_destroyer destroyer );
  * @param	chunk_size	The chunk size of the Vector. This is used as the initial size of the 
  * 						vector, and as a size increment for each reallocation.
  * @param	pClass		The type of the items in the Vector. (Name of the class.)
- * @param	manage		@c TRUE is the Vector must manage the stored items (delete when destroying
- * 						the Vector), @c FALSE if you manage those other way.
+ * @param	manage		@c OOC_MANAGE is the Vector must manage the stored items (delete when destroying
+ * 						the Vector), @c !OOC_MANAGE if you manage those other way.
  * @return	The newly created Vector.
  * @note	This is a convenient macro for _vector_new_type().
  * @hideinitializer
@@ -94,8 +94,8 @@ Vector			vector_new( VectorIndex chunk_size, vector_item_destroyer destroyer );
  * @param	chunk_size	The chunk size of the Vector. This is used as the initial size of the 
  * 						vector, and as a size increment for each reallocation.
  * @param	type		The type of the items in the Vector. (Class Table pointer.)
- * @param	manage		@c TRUE is the Vector must manage the stored items (delete when destroying
- * 						the Vector), @c FALSE if you manage those other way.
+ * @param	manage		@c OOC_MANAGE is the Vector must manage the stored items (delete when destroying
+ * 						the Vector), @c !OOC_MANAGE if you manage those other way.
  * @return	The newly created Vector.
  * @see 	vector_new_type().
  */

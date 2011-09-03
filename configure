@@ -4565,7 +4565,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile libs/Makefile libs/ooc.pc docs/Makefile tools/Makefile unit/Makefile unit_mcc18/Makefile"
+ac_config_files="$ac_config_files Makefile libs/Makefile libs/ooc.pc docs/Makefile tools/Makefile unit/Makefile unit_mcc18/Makefile examples/lwmixin/Makefile"
 
 
 cat >confcache <<\_ACEOF
@@ -5295,6 +5295,7 @@ do
     "tools/Makefile") CONFIG_FILES="$CONFIG_FILES tools/Makefile" ;;
     "unit/Makefile") CONFIG_FILES="$CONFIG_FILES unit/Makefile" ;;
     "unit_mcc18/Makefile") CONFIG_FILES="$CONFIG_FILES unit_mcc18/Makefile" ;;
+    "examples/lwmixin/Makefile") CONFIG_FILES="$CONFIG_FILES examples/lwmixin/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5 ;;
   esac
