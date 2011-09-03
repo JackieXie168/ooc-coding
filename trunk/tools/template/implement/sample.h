@@ -7,7 +7,7 @@
 #endif
 
 
-!!! TODO !!! Remove this group if the class has Base parent!
+!!! TODO !!! Remove this group if the class has B_a_s_e parent!
 #ifndef NO_RELATIVE_INCLUDE
 #include "base.h"
 #else

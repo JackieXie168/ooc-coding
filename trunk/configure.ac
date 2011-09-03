@@ -40,6 +40,7 @@ AC_CONFIG_FILES([Makefile
                  docs/Makefile
                  tools/Makefile
                  unit/Makefile
-                 unit_mcc18/Makefile])
+                 unit_mcc18/Makefile
+		 examples/lwmixin/Makefile])
 
 AC_OUTPUT

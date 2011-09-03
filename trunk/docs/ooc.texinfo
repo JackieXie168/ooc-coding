@@ -1303,11 +1303,11 @@ Leave the @code{_get_data_()} method uninitialized, since this method must be in
 Implementing the @code{..._populate()} method is not mandatory, but recommended for convenience.
 @end table
 @sp 1
-The mixin implementation methods must follow an important rule! Since the mixin does not know where are its data located, it must retrieve first!@*
+The mixin implementation methods must follow an important rule! Since the mixin does not know where is its data located, it must retrieve first!@*
 The only thing that a mixin method knows is the enclosing @code{Object} (always the first parameter for an interface method!). Retrieving the mixin's data fields can be done in two steps:
 @itemize	
 @item
-@code{get_interface()} returns the interface, than
+@code{get_interface()} returns the interface, then
 @item
 @code{_get_data_()} returns the data fileds for the mixin.
 @end itemize
@@ -1330,7 +1330,72 @@ flavour_set( Object obj, /* obj is the enclosing Object! */
 
 @subsubsection Implementing a light-weight mixin
 
-The implementation of a light-weight mixin is the same as the implementation of an interface, with the following additional tasks.
+The implementation of a light-weight mixin is the same as the implementation of an interface, with few additional tasks.@*
+The steps to implement some @code{Flavour} for the @code{IceCream} class are:
+@itemize
+@item
+Create the @code{IceCream} class with @kbd{~$ ooc --new IceCream}.
+
+@item
+Add the @code{Interface( Flavour );} macro to the @code{IceCream} virtuals in @kbd{icecream.h}.
+
+@item
+Add the @code{FlavourFields Flavour;} data member to the @code{ClassMembers( IceCream, Base )} structure in @kbd{implement/icecream.h}.
+
+@item
+Create the Interface register for @code{IceCream} in @kbd{icecream.c}.
+@example
+InterfaceRegister( IceCream )
+@{
+    AddInterface( IceCream, Flavour )
+@};
+@end example
+
+@item
+Replace the @code{AllocateClass( IceCream, Base );} macro with @code{AllocateClassWithInterface( IceCream, Base );}  in @kbd{icecream.c}.
+
+@item
+Initialize the interface methods in the @code{IceCream} class's virtual table.@*
+First, the @code{IceCream} class must inform the @code{Flavour} mixin about its data location.@*
+Then the whole method table should be populated.
+@example
+static FlavourData icecream_flavourdata( Object self )
+@{
+    return & ((IceCream) self )->Flavour;
+@};
+
+static void IceCream_initialize( Class this )
+@{
+    IceCreamVtable vtab = (IceCreamVtable) this->vtable;
+
+    vtab->Flavour._get_data_ = icecream_flavourdata;
+    Flavour_populate( & vtab->Flavour );
+    ...
+@}
+@end example
+
+@item
+Override the necessary @code{Flavour} interface methods as needed in @code{IceCream_initialize()}.
+
+@item
+Construct the data fields of @code{Flavour} together with the construction of an @code{IceCream} object.
+@example
+static void IceCream_constructor( IceCream self, const void * params )
+@{
+    assert( ooc_isInitialized( Sample ) );
+    chain_constructor( Sample, self, NULL );
+
+    Flavour_constructor( &self->Flavour );
+    ...
+@}
+@end example
+
+@item
+Destroy the data fields of @code{Flavour} together with the destruction of an @code{IceCream} object
+calling @code{Flavour_destructor( &self->Flavour );} within @code{IceCream_destructor()}.
+
+@end itemize
+
 
 @subsection Fully functional mixins
 
