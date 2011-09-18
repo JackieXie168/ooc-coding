@@ -1303,7 +1303,7 @@ Leave the @code{_get_data_()} method uninitialized, since this method must be in
 Implementing the @code{..._populate()} method is not mandatory, but recommended for convenience.
 @end table
 @sp 1
-The mixin implementation methods must follow an important rule! Since the mixin does not know where is its data located, it must retrieve first!@*
+The mixin implementation methods must follow an important rule! Since the mixin does not know where its data is located, it must be retrieved first!@*
 The only thing that a mixin method knows is the enclosing @code{Object} (always the first parameter for an interface method!). Retrieving the mixin's data fields can be done in two steps:
 @itemize	
 @item
@@ -1395,6 +1395,11 @@ Destroy the data fields of @code{Flavour} together with the destruction of an @c
 calling @code{Flavour_destructor( &self->Flavour );} within @code{IceCream_destructor()}.
 
 @end itemize
+
+However, light weight mixins have some drawbacks! First, it exposes all mixin data memebers to the enclosing
+class: the enclosing class can acces the mixin's data directly, and it is up to the programmer's intelligence
+not to do bad thigs. :-( Second, all three mixin methods are publicly available for the whole porgram (possible name
+conflicts or accidentally invoking them.)
 
 
 @subsection Fully functional mixins
@@ -1549,7 +1554,7 @@ Normally the test cases do not print any message on the screen: they inform you 
 If some assertions fails, you will see a message similar to this one:
 @example
 ~$ ./listtest
-[4] ListTest.iterator()          
+[4] ListTest::iterator()          
         Failed:  [listtest.c : 325]
 Test case ListTest failed: 30/1 (methods run/failed)
 ~$
@@ -1559,7 +1564,7 @@ This could be an example, if our @code{ListTest::iterator()} method detected an 
 @item
 The number in angle brackets shows the sequence number of the method: the failed method was the fourth executed method in the test case.
 @item
-@code{ListTest.iterator()} informs about the name of the method. The part before the period shows the name of the class, the part after the period identifies the name of the failed test method.
+@code{ListTest::iterator()} informs about the name of the method. The part before the period shows the name of the class, the part after the period identifies the name of the failed test method.
 @item
 The next line says that an assertion in this method failed. If we used an @code{assertConditionMsg} assertion, the message would be displayed here.
 @item
@@ -1572,7 +1577,7 @@ In some cases your test method may throw an exception that is not caught by your
 
 @example
 ~$ ./listtest
-[4] ListTest.iterator()          
+[4] ListTest::iterator()          
         Unexpected exception: Exception, code: 1, user code: 0
 ~$
 @end example
@@ -1776,7 +1781,7 @@ The following templates are available:
 @table @kbd
 @item sample
 The default template. This generates a class with 'protected' data members and implementation header. This class can be subclassed.
-(This is the default if you do not specify a @kbd{--source}.)
+(This is the default if you do not specify a @kbd{--template} or @kbd{--source}.)
 
 @item private
 Class definition with private members only. This type of class can not be subclassed! (there is no implementation header)
