@@ -837,22 +837,3 @@ TESTCASE_MAIN
 	ooc_finalize_all();
 	return result;
 }
-
-/* #include <stdio.h>
-  
-extern void before_main( void );
-
- int
- main (void)
- { 
-before_main();
-  
-   printf ("Hello World 1!\r");
-   printf ("Hello World 2!\n");
-   printf ("Hello World 3!\n");
-   printf ("Hello World 4!\r");
-   
-   return 0;
-}
-
-*/

@@ -57,20 +57,21 @@ taste_a_tonic( Tonic tonic )
 int
 main( int argc, char * argv[] )
 {
-	Vector tonics = NULL;
+	Vector tonics;
 
 	ooc_init_class( Exception );
 	ooc_init_class( Vector );
 
 	tonics = vector_new_type( 20, Tonic, OOC_MANAGE );
+	{
+		ooc_manage_object( tonics );
 
-	ooc_manage_object( tonics );
+		fill_array( tonics );
 
-	fill_array( tonics );
+		vector_foreach( tonics, (vector_item_executor) taste_a_tonic, NULL );
 
-	vector_foreach( tonics, (vector_item_executor) taste_a_tonic, NULL );
-
-	ooc_delete( (Object) ooc_pass( tonics ) );
+		ooc_delete( (Object) ooc_pass( tonics ) );
+	}
 
 	return 0;
 }
