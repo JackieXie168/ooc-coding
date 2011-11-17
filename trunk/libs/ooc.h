@@ -800,13 +800,13 @@ InterfaceID_struct
  * EndOfClassMembers;
  * @endcode
  * @param	pInterface	The name of the interface to be implemented by the class.
- * @note	This macro puts the interface data into the Object struct as private! The enclosing
- * 			class can not access the members of the mixed in class with a simple pointer dereferencing.
+ * @note	This macro puts the interface data into the Object struct.
+ *			The enclosing class can access the members of the mixed in class. :-(
  * @hideinitializer
  */
 
 #define InterfaceData( pInterface )							\
-		char pInterface[ sizeof( pInterface ## DataFields )/sizeof(char) ];
+		pInterface ## DataFields	pInterface
 
 
 /**	Allocates the interface descriptor table.
