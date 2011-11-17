@@ -7,10 +7,10 @@
     <ROW Property="ARPNOMODIFY" MultiBuildValue="DefaultBuild:1"/>
     <ROW Property="ARPURLINFOABOUT" Value="http://ooc-coding.sourceforge.net/"/>
     <ROW Property="Manufacturer" Value="old_fashioned" ValueLocId="*"/>
-    <ROW Property="ProductCode" Value="1033:{F77C72EE-285E-4B2F-A5EC-4A69FAA7FC31} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{705D1384-2750-4E40-8578-C63ED66CD819} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="ooc" ValueLocId="*"/>
-    <ROW Property="ProductVersion" Value="1.2.1"/>
+    <ROW Property="ProductVersion" Value="1.3"/>
     <ROW Property="REBOOT" MultiBuildValue="DefaultBuild:ReallySuppress"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{CF565570-C73B-45C8-8B37-F8528F62C4E0}"/>
@@ -106,7 +106,7 @@
     <ROW File="Unit.vcproj" Component_="cdtproject" FileName="Unit~1.vcp|Unit.vcproj" Attributes="0" SourcePath="unit\Unit.vcproj" SelfReg="false" NextFile="vectortest.c"/>
     <ROW File="Unit_testing_support.html" Component_="Class_manipulation_tool.html" FileName="Unit-t~1.htm|Unit-testing-support.html" Attributes="0" SourcePath="docs\ooc.html\Unit-testing-support.html" SelfReg="false" NextFile="Using_Classes.html"/>
     <ROW File="Using_Classes.html" Component_="Class_manipulation_tool.html" FileName="Using-~1.htm|Using-Classes.html" Attributes="0" SourcePath="docs\ooc.html\Using-Classes.html" SelfReg="false" NextFile="Using_fake_objects.html"/>
-    <ROW File="Using_fake_objects.html" Component_="Class_manipulation_tool.html" FileName="Using-~2.htm|Using-fake-objects.html" Attributes="0" SourcePath="docs\ooc.html\Using-fake-objects.html" SelfReg="false"/>
+    <ROW File="Using_fake_objects.html" Component_="Class_manipulation_tool.html" FileName="Using-~2.htm|Using-fake-objects.html" Attributes="0" SourcePath="docs\ooc.html\Using-fake-objects.html" SelfReg="false" NextFile="interfacetest.c"/>
     <ROW File="all_5f.html" Component_="all_5f.html" FileName="all_5f~1.htm|all_5f.html" Attributes="0" SourcePath="docs\api\html\search\all_5f.html" SelfReg="false" NextFile="all_61.html"/>
     <ROW File="all_61.html" Component_="all_5f.html" FileName="all_61~1.htm|all_61.html" Attributes="0" SourcePath="docs\api\html\search\all_61.html" SelfReg="false" NextFile="all_62.html"/>
     <ROW File="all_62.html" Component_="all_5f.html" FileName="all_62~1.htm|all_62.html" Attributes="0" SourcePath="docs\api\html\search\all_62.html" SelfReg="false" NextFile="all_63.html"/>
@@ -254,6 +254,7 @@
     <ROW File="index.html" Component_="annotated.html" FileName="index~1.htm|index.html" Attributes="0" SourcePath="docs\api\html\index.html" SelfReg="false" NextFile="installdox"/>
     <ROW File="index.html_1" Component_="Class_manipulation_tool.html" FileName="index~1.htm|index.html" Attributes="0" SourcePath="docs\ooc.html\index.html" SelfReg="false" NextFile="Indices.html"/>
     <ROW File="installdox" Component_="annotated.html" FileName="instal~1|installdox" Attributes="0" SourcePath="docs\api\html\installdox" SelfReg="false" NextFile="jquery.js"/>
+    <ROW File="interfacetest.c" Component_="cdtproject" FileName="interf~1.c|interfacetest.c" Attributes="0" SourcePath="unit\interfacetest.c" SelfReg="false"/>
     <ROW File="intl.dll" Component_="intl.dll" FileName="intl.dll" Attributes="0" SourcePath="..\..\..\..\..\..\GTK\bin\intl.dll" SelfReg="false" NextFile="ooc_mcc18_d.lib"/>
     <ROW File="jquery.js" Component_="annotated.html" FileName="jquery.js" Attributes="0" SourcePath="docs\api\html\jquery.js" SelfReg="false" NextFile="list_8h.html"/>
     <ROW File="lgpl.html" Component_="lgpl.html" FileName="lgpl~1.htm|lgpl.html" Attributes="0" SourcePath="lgpl.html" SelfReg="false" NextFile="ooc.pdf"/>
@@ -450,7 +451,7 @@
     <ROW File="win32_check_all.bat_1" Component_="cdtproject" FileName="win32-~1.bat|win32-check-all.bat" Attributes="0" SourcePath="unit\win32-check-all.bat" SelfReg="false" NextFile="exceptiontest_mcc32.mcp"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
-    <ROW BuildKey="DefaultBuild" BuildName="DefaultBuild" BuildOrder="1" BuildType="0" PackageFolder="." PackageFileName="ooc_setup_1.2" Languages="en" InstallationType="4"/>
+    <ROW BuildKey="DefaultBuild" BuildName="DefaultBuild" BuildOrder="1" BuildType="0" PackageFolder="." PackageFileName="ooc_setup_1.3" Languages="en" InstallationType="4"/>
     <ATTRIBUTE name="CurrentBuild" value="DefaultBuild"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
@@ -505,7 +506,8 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiEnvComponent">
     <ROW Environment="INCLUDE" Name="+-INCLUDE" Value="[~];[APPDIR]" Component_="Makefile.am"/>
-    <ROW Environment="LIB" Name="=-*LIB" Value="[~];[APPDIR]\lib" Component_="Makefile.am"/>
+    <ROW Environment="LIB" Name="=-*LIB" Value="[~];[APPDIR]lib" Component_="Makefile.am"/>
+    <ROW Environment="OOC" Name="=-OOC" Value="[APPDIR]" Component_="Class_manipulation_tool.html"/>
     <ROW Environment="PATH" Name="+-*PATH" Value="[~];[APPDIR]" Component_="Makefile.am"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
