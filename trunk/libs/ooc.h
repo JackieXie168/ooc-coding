@@ -378,6 +378,18 @@ void * 		ooc_ptr_read_and_null( void ** ptr_ptr );
 
 /*@}*/
 
+/* Type identifiers
+ */
+
+enum ooc_TypeID { _OOC_TYPE_CLASS, _OOC_TYPE_INTERFACE, _OOC_TYPE_MIXIN };
+
+typedef struct
+{
+	enum ooc_TypeID		value;
+	ROM char *			name;				/* the name of the type (for information only) */
+}
+oocType;
+
 /* Interface definitions
  */
 
@@ -408,8 +420,8 @@ enum ooc_CopyMode { OOC_COPY_DEFAULT = 0, OOC_COPY_DONE, OOC_NO_COPY };
 
 struct ClassTable
 {
+	oocType				type;				/* Type identifier (always _OOC_TYPE_CLASS) */
 	const size_t		size;				/* size of the object */
-	ROM   char *		name;				/* the name of the class (for information only) */
 	ROM   Class		 	parent;				/* parent of the class */
 	Vtable			    vtable;				/* the pointer to the virtual function's table */
 	const size_t		vtab_size;			/* the size of the vtable */
@@ -591,8 +603,11 @@ extern ROM struct ClassTable BaseClass;
 															\
 	ROM_ALLOC												\
 	struct ClassTable pClass ## Class = {					\
+		{													\
+			_OOC_TYPE_CLASS,								\
+			(ROM char *) #pClass							\
+		},													\
 		sizeof( struct pClass ## Object ),					\
-		(ROM char *) #pClass,								\
 		& pParent ## Class,	                                \
 		(Vtable) & pClass ## VtableInstance,				\
 		sizeof( struct pClass ## Vtable_stru ),				\
@@ -629,8 +644,11 @@ extern ROM struct ClassTable BaseClass;
 															\
 	ROM_ALLOC												\
 	struct ClassTable pClass ## Class = {					\
+		{													\
+			_OOC_TYPE_CLASS,								\
+			(ROM char *) #pClass							\
+		},													\
 		sizeof( struct pClass ## Object ),					\
-		(ROM char *) #pClass,								\
 		& pParent ## Class,	                                \
 		(Vtable) & pClass ## VtableInstance,				\
 		sizeof( struct pClass ## Vtable_stru ),				\
@@ -658,8 +676,11 @@ extern ROM struct ClassTable BaseClass;
 															\
 	ROM_ALLOC												\
 	struct ClassTable pClass ## Class = {					\
+		{													\
+			_OOC_TYPE_CLASS,								\
+			(ROM char *) #pClass							\
+		},													\
 		sizeof( struct pClass ## Object ),					\
-		(ROM char *) #pClass,								\
 		& pParent ## Class,	                                \
 		(Vtable) & pClass ## VtableInstance,				\
 		sizeof( struct pClass ## Vtable_stru ),				\
@@ -684,8 +705,11 @@ extern ROM struct ClassTable BaseClass;
 															\
 	ROM_ALLOC												\
 	struct ClassTable pClass ## Class = {					\
+		{													\
+			_OOC_TYPE_CLASS,								\
+			(ROM char *) #pClass							\
+		},													\
 		sizeof( struct pClass ## Object ),					\
-		(ROM char *) #pClass,								\
 		& pParent ## Class,	                                \
 		(Vtable) & pClass ## VtableInstance,				\
 		sizeof( struct pClass ## Vtable_stru ),				\
@@ -738,7 +762,7 @@ extern ROM struct ClassTable BaseClass;
 struct
 InterfaceID_struct
 {
-	char dummy;					/* Just a space holder to ensure that all InterfaceID is unique */
+	oocType			type;			/* Type identifier */
 };
 
 /**	Declare an interface.
@@ -819,8 +843,12 @@ InterfaceID_struct
  * @hideinitializer
  */
 
-#define AllocateInterface( pInterface )						\
-	ROM_ALLOC struct InterfaceID_struct pInterface ## ID
+#define AllocateInterface( pInterface )							\
+	ROM_ALLOC struct InterfaceID_struct pInterface ## ID = {	\
+	{															\
+		_OOC_TYPE_INTERFACE,									\
+		(ROM char *) #pInterface								\
+	} }
 
 /**	Register for implemented interfaces of the class.
  * In the class implementation code you must define, which interfaces are implemented by the class.
