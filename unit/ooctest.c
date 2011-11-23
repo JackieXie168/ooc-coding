@@ -185,25 +185,25 @@ void
 test_class_table( void )
 {
 	assertTrue( FooClass.size == sizeof(struct FooObject)/sizeof(char) );
-	assertZero( strcmp( FooClass.name, "Foo" ) );
+	assertZero( strcmp( FooClass.type.name, "Foo" ) );
 	assertTrue( FooClass.parent == & BaseClass );
 	assertNotNull( FooClass.vtable );
 	assertTrue( FooClass.vtab_size == sizeof(struct FooVtable_stru)/sizeof(char) );
 
 	assertTrue( BarClass.size == sizeof(struct BarObject)/sizeof(char) );
-	assertZero( strcmp( BarClass.name, "Bar" ) );
+	assertZero( strcmp( BarClass.type.name, "Bar" ) );
 	assertTrue( BarClass.parent == & BaseClass );
 	assertNotNull( BarClass.vtable );
 	assertTrue( BarClass.vtab_size == sizeof(struct BarVtable_stru)/sizeof(char) );
 
 	assertTrue( BarSonClass.size == sizeof(struct BarSonObject)/sizeof(char) );
-	assertZero( strcmp( BarSonClass.name, "BarSon" ) );
+	assertZero( strcmp( BarSonClass.type.name, "BarSon" ) );
 	assertTrue( BarSonClass.parent == & BarClass );
 	assertNotNull( BarSonClass.vtable );
 	
 	assertTrue( BarBadGrandSonClass.vtab_size == sizeof(struct BarBadGrandSonVtable_stru)/sizeof(char) );
 	assertTrue( BarBadGrandSonClass.size == sizeof(struct BarBadGrandSonObject)/sizeof(char) );
-	assertZero( strcmp( BarBadGrandSonClass.name, "BarBadGrandSon" ) );
+	assertZero( strcmp( BarBadGrandSonClass.type.name, "BarBadGrandSon" ) );
 	assertTrue( BarBadGrandSonClass.parent == & BarSonClass );
 	assertTrue( BarBadGrandSonClass.vtable == (Vtable) & BarBadGrandSonVtableInstance);
 	assertTrue( BarBadGrandSonClass.vtab_size == sizeof(struct BarBadGrandSonVtable_stru)/sizeof(char) );
