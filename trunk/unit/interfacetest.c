@@ -16,6 +16,12 @@
  * @note	Run as: valgrind --leak-check=yes --quiet ./interfacetest
  */ 
 
+#ifdef OOC_NO_FINALIZE
+#define ooc_finalize_class( x )
+#define ooc_finalize_all( )
+#endif
+
+
 DeclareInterface( MyInterface )
 
 	void (* method1) ( Object );

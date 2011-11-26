@@ -575,8 +575,21 @@ extern ROM struct ClassTable BaseClass;
  */
 #define EndOfClassMembers	}
 
+/* Macros that differs in case of no class finalization
+ */
 
 #ifndef OOC_NO_FINALIZE
+
+#define _ooc_decl_finalize( pClass ) 	static void   pClass ## _finalize ( Class );
+#define _ooc_func_finalize( pClass ) 	pClass ## _finalize,
+
+#else
+
+#define _ooc_decl_finalize( pClass )
+#define _ooc_func_finalize( pClass )
+
+#endif
+
 
 /** Class allocation macro.
  * This macro should be put int the implementation file of the class.
@@ -592,7 +605,7 @@ extern ROM struct ClassTable BaseClass;
 #define AllocateClass( pClass, pParent )					\
 															\
 	static void   pClass ## _initialize ( Class );	        \
-	static void   pClass ## _finalize ( Class );	        \
+	_ooc_decl_finalize( pClass )	        				\
 	static void   pClass ## _constructor( pClass, const void * ); \
 	static void   pClass ## _destructor ( pClass, pClass ## Vtable ); \
 	static int	  pClass ## _copy ( pClass, const pClass );	\
@@ -614,7 +627,7 @@ extern ROM struct ClassTable BaseClass;
 		(Itable) NULL, 										\
 		(size_t) 0,											\
 												pClass ## _initialize,	\
-												pClass ## _finalize,	\
+												_ooc_func_finalize( pClass ) \
 		(void (*)( Object, const void *)) 		pClass ## _constructor,	\
 		(void (*)( Object, Vtable ))        	pClass ## _destructor,	\
 		(int  (*)( Object, const Object)) 		pClass ## _copy,        \
@@ -633,7 +646,7 @@ extern ROM struct ClassTable BaseClass;
 #define AllocateClassWithInterface( pClass, pParent )		\
 															\
 	static void   pClass ## _initialize ( Class );	        \
-	static void   pClass ## _finalize ( Class );	        \
+	_ooc_decl_finalize( pClass )	        				\
 	static void   pClass ## _constructor( pClass, const void * ); \
 	static void   pClass ## _destructor ( pClass, pClass ## Vtable ); \
 	static int	  pClass ## _copy ( pClass, const pClass );	\
@@ -655,73 +668,11 @@ extern ROM struct ClassTable BaseClass;
 		pClass ## Itable,									\
 		sizeof(pClass ## Itable)/sizeof(struct InterfaceOffsets_struct),\
 												pClass ## _initialize,	\
-												pClass ## _finalize,	\
+												_ooc_func_finalize( pClass ) \
 		(void (*)( Object, const void *)) 		pClass ## _constructor,	\
 		(void (*)( Object, Vtable ))        	pClass ## _destructor,	\
 		(int  (*)( Object, const Object)) 		pClass ## _copy,        \
 		}
-
-#else
-
-#define AllocateClass( pClass, pParent )					\
-															\
-	static void   pClass ## _initialize ( Class );	        \
-	static void   pClass ## _constructor( pClass, const void * ); \
-	static void   pClass ## _destructor ( pClass, pClass ## Vtable ); \
-	static int	  pClass ## _copy ( pClass, const pClass );	\
-															\
-	static struct pClass ## Vtable_stru pClass ## VtableInstance _OOC_VTAB_INITIALIZER; \
-															\
-	_define_vtab_access( pClass, pParent )					\
-															\
-	ROM_ALLOC												\
-	struct ClassTable pClass ## Class = {					\
-		{													\
-			_OOC_TYPE_CLASS,								\
-			(ROM char *) #pClass							\
-		},													\
-		sizeof( struct pClass ## Object ),					\
-		& pParent ## Class,	                                \
-		(Vtable) & pClass ## VtableInstance,				\
-		sizeof( struct pClass ## Vtable_stru ),				\
-		(Itable) NULL, 										\
-		(size_t) 0,											\
-											pClass ## _initialize,	\
-		(void (*)( Object, const void *)) 	pClass ## _constructor,	\
-		(void (*)( Object, Vtable ))        pClass ## _destructor,	\
-		(int  (*)( Object, const Object)) 	pClass ## _copy	        \
-		}
-
-#define AllocateClassWithInterface( pClass, pParent )		\
-															\
-	static void   pClass ## _initialize ( Class );	        \
-	static void   pClass ## _constructor( pClass, const void * ); \
-	static void   pClass ## _destructor ( pClass, pClass ## Vtable ); \
-	static int	  pClass ## _copy ( pClass, const pClass );	\
-															\
-	static struct pClass ## Vtable_stru pClass ## VtableInstance _OOC_VTAB_INITIALIZER; \
-															\
-	_define_vtab_access( pClass, pParent )					\
-															\
-	ROM_ALLOC												\
-	struct ClassTable pClass ## Class = {					\
-		{													\
-			_OOC_TYPE_CLASS,								\
-			(ROM char *) #pClass							\
-		},													\
-		sizeof( struct pClass ## Object ),					\
-		& pParent ## Class,	                                \
-		(Vtable) & pClass ## VtableInstance,				\
-		sizeof( struct pClass ## Vtable_stru ),				\
-		pClass ## Itable,									\
-		sizeof(pClass ## Itable)/sizeof(struct InterfaceOffsets_struct),\
-												pClass ## _initialize,	\
-		(void (*)( Object, const void *)) 		pClass ## _constructor,	\
-		(void (*)( Object, Vtable ))        	pClass ## _destructor,	\
-		(int  (*)( Object, const Object)) 		pClass ## _copy,        \
-		}
-
-#endif /* OOC_NO_FINALIZE */
 
 		
 /** Chain the parent constructor.

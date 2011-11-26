@@ -4,6 +4,12 @@
 
 #include <ooc/testcase.h>
 
+#ifdef OOC_NO_FINALIZE
+#define ooc_finalize_class( x )
+#define ooc_finalize_all( )
+#endif
+
+
 /** @class Sample
  *  @brief Sample class - brief description.
  * 	@see sample.h
@@ -66,6 +72,8 @@ Sample_initialize( Class this )
 /* Class finalizing
  */
 
+#ifndef OOC_NO_FINALIZE
+
 static
 void
 Sample_finalize( Class this )
@@ -73,6 +81,7 @@ Sample_finalize( Class this )
 	/* Release global resources! */
 }
 
+#endif
 
 /* Constructor
  */
