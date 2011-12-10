@@ -281,7 +281,7 @@ static
 void
 SignalTest_initialize( Class this )
 {
-	SignalTestVtable vtab = (SignalTestVtable) this->vtable;
+	SignalTestVtable vtab = & SignalTestVtableInstance;
 	
 	((TestCaseVtable)vtab)->before_class	= 	(test_method_type) signaltest_before_class;
 	((TestCaseVtable)vtab)->before			= 	(test_method_type) signaltest_before;

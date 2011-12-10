@@ -259,7 +259,7 @@ static
 void
 InterfaceTest_initialize( Class this )
 {
-	InterfaceTestVtable vtab = (InterfaceTestVtable) this->vtable;
+	InterfaceTestVtable vtab = & InterfaceTestVtableInstance;
 	
 	((TestCaseVtable)vtab)->before_class	= 	(test_method_type) interfacetest_before_class;
 	((TestCaseVtable)vtab)->before			= 	(test_method_type) interfacetest_before;
@@ -373,9 +373,9 @@ void
 check_classtable( InterfaceTest self )
 {
 	assertTrue( InterfaceTestItable[0].id == & MyInterfaceID );
-	assertNotZero( InterfaceTestItable[0].offset );
-	assertTrue( InterfaceTestItable[0].offset == offsetof( struct InterfaceTestVtable_stru, MyInterface ) );
-	assertTrue( ((char*) self->TestCase.Base._vtab) + InterfaceTestItable[0].offset
+	assertNotZero( InterfaceTestItable[0].vtab_offset );
+	assertTrue( InterfaceTestItable[0].vtab_offset == offsetof( struct InterfaceTestVtable_stru, MyInterface ) );
+	assertTrue( ((char*) self->TestCase.Base._vtab) + InterfaceTestItable[0].vtab_offset
 				== (char*) & InterfaceTestVirtual(self)->MyInterface );
 
 	assertTrue( self->TestCase.Base._vtab->_class->itable == (Itable) &InterfaceTestItable );

@@ -39,7 +39,7 @@ static
 void
 Foo_initialize( Class this )
 {
-	FooVtable vtab = (FooVtable) this->vtable;
+	FooVtable vtab = & FooVtableInstance;
 	
 	vtab->foo_virtual	= 	_foo_virtual;
 

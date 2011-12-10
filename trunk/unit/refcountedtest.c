@@ -57,7 +57,7 @@ static
 void
 RefCountedTest_initialize( Class this )
 {
-	RefCountedTestVtable vtab = (RefCountedTestVtable) this->vtable;
+	RefCountedTestVtable vtab = & RefCountedTestVtableInstance;
 	
 	((TestCaseVtable)vtab)->before_class	= 	(test_method_type) refcountedtest_before_class;
 	((TestCaseVtable)vtab)->before			= 	(test_method_type) refcountedtest_before;

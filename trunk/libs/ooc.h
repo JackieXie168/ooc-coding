@@ -71,6 +71,8 @@
 
 typedef ROM struct ClassTable * Class;
 
+typedef ROM struct _ClassCommonsTable * ClassCommons;
+
 /** ooc Object.
  */
  
@@ -403,8 +405,8 @@ typedef ROM struct InterfaceID_struct * InterfaceID;
 
 struct InterfaceOffsets_struct
 {
-	InterfaceID		id;			/* The interface ID of the implemented interface */
-	size_t			offset;		/* The offset of the interface in the class's virtual table */
+	InterfaceID		id;					/* The interface ID of the implemented interface */
+	size_t			vtab_offset;		/* The offset of the interface in the class's virtual table */
 };
 
 typedef ROM struct InterfaceOffsets_struct * Itable;
@@ -418,21 +420,43 @@ typedef              BaseVtable    Vtable;
 
 enum ooc_CopyMode { OOC_COPY_DEFAULT = 0, OOC_COPY_DONE, OOC_NO_COPY };
 
+typedef
+struct _ClassCommonsTable
+{
+	oocType				type;				/* Type identifier */
+
+#ifndef OOC_NO_FINALIZE
+	void				(* finz) ( Class this );	/* class finalizer */
+#endif
+
+	Vtable			    vtable;				/* the pointer to the virtual function's table */
+
+}	ClassCommonsTable;
+
+struct MixinTable
+{
+	ClassCommonsTable	c;
+
+	const size_t		size;											/* size of the mixin data */
+	void				(* init) ();        							/* class initializer */
+	void				(* populate) ( void (**)() );
+	void				(* ctor) (void * self);							/* constructor */
+	void				(* dtor) (void * self);							/* destructor */
+	int				  	(* copy) (void * self, const void * from); 		/* copy constructor */
+};
+
 struct ClassTable
 {
-	oocType				type;				/* Type identifier (always _OOC_TYPE_CLASS) */
+	ClassCommonsTable	c;
+
 	const size_t		size;				/* size of the object */
 	ROM   Class		 	parent;				/* parent of the class */
-	Vtable			    vtable;				/* the pointer to the virtual function's table */
 	const size_t		vtab_size;			/* the size of the vtable */
 	Itable				itable;				/* the implemented interfaces' Itable */
 	const size_t		itab_size;			/* the number of implemented Interfaces */
 	
 
 	void				(* init) ( Class this );        				/* class initializer */
-#ifndef OOC_NO_FINALIZE	
-	void				(* finz) ( Class this );						/* class finalizer */
-#endif
 	void				(* ctor) (Object self, const void * params );	/* constructor */
 	void				(* dtor) (Object self, Vtable vtab);			/* destructor */
 	int				  	(* copy) (Object self, const Object from); 		/* copy constructor */
@@ -442,8 +466,8 @@ struct BaseVtable_stru
 {
 	Class			_class;
 #ifndef OOC_NO_FINALIZE	
-	Class			_class_register_prev;
-	Class			_class_register_next; 
+	ClassCommons	_class_register_prev;
+	ClassCommons	_class_register_next;
 #endif
 	int   			(* _destroy_check )( Object );
 };
@@ -471,7 +495,7 @@ extern ROM struct ClassTable BaseClass;
 #define _parent_vtab_access_fn( pClass, pParent )								\
 			_parent_vtab_access_prototype( pClass, pParent )	{				\
 				assert ( ((struct BaseObject *) this )->_vtab->_class->parent != &BaseClass ); \
-				return ( pParent ## Vtable ) ( ((struct BaseObject *) this )->_vtab->_class->parent->vtable ); \
+				return ( pParent ## Vtable ) ( ((struct BaseObject *) this )->_vtab->_class->parent->c.vtable ); \
 				}
 
 #if !defined( NO_INLINE )	/* Compilers that support function inlining */
@@ -617,17 +641,19 @@ extern ROM struct ClassTable BaseClass;
 	ROM_ALLOC												\
 	struct ClassTable pClass ## Class = {					\
 		{													\
-			_OOC_TYPE_CLASS,								\
-			(ROM char *) #pClass							\
+			{												\
+				_OOC_TYPE_CLASS,							\
+				(ROM char *) #pClass						\
+			},												\
+			_ooc_func_finalize( pClass ) 					\
+			(Vtable) & pClass ## VtableInstance				\
 		},													\
 		sizeof( struct pClass ## Object ),					\
 		& pParent ## Class,	                                \
-		(Vtable) & pClass ## VtableInstance,				\
 		sizeof( struct pClass ## Vtable_stru ),				\
 		(Itable) NULL, 										\
 		(size_t) 0,											\
 												pClass ## _initialize,	\
-												_ooc_func_finalize( pClass ) \
 		(void (*)( Object, const void *)) 		pClass ## _constructor,	\
 		(void (*)( Object, Vtable ))        	pClass ## _destructor,	\
 		(int  (*)( Object, const Object)) 		pClass ## _copy,        \
@@ -658,17 +684,19 @@ extern ROM struct ClassTable BaseClass;
 	ROM_ALLOC												\
 	struct ClassTable pClass ## Class = {					\
 		{													\
-			_OOC_TYPE_CLASS,								\
-			(ROM char *) #pClass							\
+			{												\
+				_OOC_TYPE_CLASS,							\
+				(ROM char *) #pClass						\
+			},												\
+			_ooc_func_finalize( pClass ) 					\
+			(Vtable) & pClass ## VtableInstance				\
 		},													\
 		sizeof( struct pClass ## Object ),					\
 		& pParent ## Class,	                                \
-		(Vtable) & pClass ## VtableInstance,				\
 		sizeof( struct pClass ## Vtable_stru ),				\
 		pClass ## Itable,									\
 		sizeof(pClass ## Itable)/sizeof(struct InterfaceOffsets_struct),\
 												pClass ## _initialize,	\
-												_ooc_func_finalize( pClass ) \
 		(void (*)( Object, const void *)) 		pClass ## _constructor,	\
 		(void (*)( Object, Vtable ))        	pClass ## _destructor,	\
 		(int  (*)( Object, const Object)) 		pClass ## _copy,        \

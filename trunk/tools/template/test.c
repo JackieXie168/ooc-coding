@@ -55,7 +55,7 @@ static
 void
 Sample_initialize( Class this )
 {
-	SampleVtable vtab = (SampleVtable) this->vtable;
+	SampleVtable vtab = & SampleVtableInstance;
 	
 	((TestCaseVtable)vtab)->before_class	= 	(test_method_type) sample_before_class;
 	((TestCaseVtable)vtab)->before			= 	(test_method_type) sample_before;
