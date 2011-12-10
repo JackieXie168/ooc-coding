@@ -58,7 +58,7 @@ static
 void
 TestCaseTest_initialize( Class this )
 {
-	TestCaseTestVtable vtab = (TestCaseTestVtable) this->vtable;
+	TestCaseTestVtable vtab = & TestCaseTestVtableInstance;
 	
 	((TestCaseVtable)vtab)->before_class	= 	(test_method_type) testcasetest_before_class;
 	((TestCaseVtable)vtab)->before			= 	(test_method_type) testcasetest_before;
@@ -281,7 +281,7 @@ static
 void
 TestCaseTestChild_initialize( Class this )
 {
-	TestCaseVtable vtab = (TestCaseVtable) this->vtable;
+	TestCaseVtable vtab = (TestCaseVtable) this->c.vtable;
 	
 	((TestCaseVtable)vtab)->before_class	= 	(test_method_type) testcasetestchild_before_class;
 	((TestCaseVtable)vtab)->before			= 	(test_method_type) testcasetestchild_before;

@@ -74,9 +74,9 @@ void
 RefCounted_initialize( Class this )
 {
 	/* Overriding the destroy_check operator */
-	assert( this->vtable->_destroy_check == NULL );
+	assert( this->c.vtable->_destroy_check == NULL );
 
-	this->vtable->_destroy_check = (int (*)(Object)) RefCounted_destroy_check;
+	this->c.vtable->_destroy_check = (int (*)(Object)) RefCounted_destroy_check;
 }
 
 /* Class finalizing

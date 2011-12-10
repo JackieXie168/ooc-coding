@@ -78,7 +78,7 @@ static
 void
 TestCase_initialize( Class this )
 {
-	TestCaseVtable vtab = (TestCaseVtable) this->vtable;
+	TestCaseVtable vtab = & TestCaseVtableInstance;
 	
 	vtab->before_class	= 	_testcase_default_virtual;
 	vtab->before		= 	_testcase_default_virtual;
@@ -216,7 +216,7 @@ print_func_name( TestCase self, ROM char * func, ROM char * suffix )
 #ifndef OOC_NO_DYNAMIC_MEM
 		buffer_length = 1;
 		if( func != NULL )
-			buffer_length = 32 + strlen( func ) + 1 + strlen( ooc_get_type((Object)self)->type.name ) + 3;
+			buffer_length = 32 + strlen( func ) + 1 + strlen( ooc_get_type((Object)self)->c.type.name ) + 3;
 		if( suffix != NULL )
 			buffer_length += strlen( suffix ) + 1;
 
@@ -231,11 +231,11 @@ print_func_name( TestCase self, ROM char * func, ROM char * suffix )
 		if( func == NULL )
 			display_text[0] = '\0';
 		else if( func == before_class || func == after_class )
-			sprintf( display_text,  _FMT_Func_ss, ooc_get_type((Object)self)->type.name, func );
+			sprintf( display_text,  _FMT_Func_ss, ooc_get_type((Object)self)->c.type.name, func );
 		else if( suffix == NULL )
-			sprintf( display_text,  _FMT_Func_dss, self->run , ooc_get_type((Object)self)->type.name, func );
+			sprintf( display_text,  _FMT_Func_dss, self->run , ooc_get_type((Object)self)->c.type.name, func );
 		else 
-			sprintf( display_text,  _FMT_Func_dsss, self->run , ooc_get_type((Object)self)->type.name, func, suffix );
+			sprintf( display_text,  _FMT_Func_dsss, self->run , ooc_get_type((Object)self)->c.type.name, func, suffix );
 		
 		display_length = strlen( display_text );
 		if( display_length < previous_display_length ) {
@@ -260,7 +260,7 @@ static
 void
 testcase_run_before_class_recursive(TestCase self, Class type)
 {
-	TestCaseVtable vtab = (TestCaseVtable) type->vtable;
+	TestCaseVtable vtab = (TestCaseVtable) type->c.vtable;
 	
 	if( ooc_class_has_parent( type ) )
 		testcase_run_before_class_recursive( self, type->parent );
@@ -272,7 +272,7 @@ static
 void
 testcase_run_after_class_recursive(TestCase self, Class type)
 {
-	TestCaseVtable vtab = (TestCaseVtable) type->vtable;
+	TestCaseVtable vtab = (TestCaseVtable) type->c.vtable;
 	
 	vtab->after_class( self );
 	
@@ -284,7 +284,7 @@ static
 void
 testcase_run_before_recursive(TestCase self, Class type)
 {
-	TestCaseVtable vtab = (TestCaseVtable) type->vtable;
+	TestCaseVtable vtab = (TestCaseVtable) type->c.vtable;
 	
 	if( ooc_class_has_parent( type ) )
 		testcase_run_before_recursive( self, type->parent );
@@ -296,7 +296,7 @@ static
 void
 testcase_run_after_recursive(TestCase self, Class type)
 {
-	TestCaseVtable vtab = (TestCaseVtable) type->vtable;
+	TestCaseVtable vtab = (TestCaseVtable) type->c.vtable;
 	
 	vtab->after( self );
 	
@@ -330,7 +330,7 @@ testcase_run_methods(TestCase self)
 			if( ! current_test_failed )
 				printf("\n");
 			printf( _FMT_Exc_sdd,
-							ooc_get_type((Object)exception)->type.name,
+							ooc_get_type((Object)exception)->c.type.name,
 							exception_get_error_code(exception),
 							exception_get_user_code(exception));
 			current_test_failed = TRUE;
@@ -381,8 +381,8 @@ testcase_run( TestCase self)
 		self->failed++;
 		ooc_lock( printing );
 		printf( _FMT_Exc_ssdd,
-						ooc_get_type((Object)exception)->type.name,
-						ooc_get_type((Object)self)->type.name,
+						ooc_get_type((Object)exception)->c.type.name,
+						ooc_get_type((Object)self)->c.type.name,
 						exception_get_error_code(exception),
 						exception_get_user_code(exception));
 		ooc_unlock( printing );
@@ -391,7 +391,7 @@ testcase_run( TestCase self)
 	
 	if( self->failed != 0 ) {
 		ooc_lock( printing );
-		printf( _FMT_Failed_sdd, ooc_get_type((Object)self)->type.name, self->run, self->failed );
+		printf( _FMT_Failed_sdd, ooc_get_type((Object)self)->c.type.name, self->run, self->failed );
 		ooc_unlock( printing );
 	}
 	

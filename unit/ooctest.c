@@ -62,7 +62,7 @@ static
 void
 OocTest_initialize( Class this )
 {
-	OocTestVtable vtab = (OocTestVtable) this->vtable;
+	OocTestVtable vtab = & OocTestVtableInstance;
 	
 	((TestCaseVtable)vtab)->before_class	= 	(test_method_type) ooctest_before_class;
 	((TestCaseVtable)vtab)->before			= 	(test_method_type) ooctest_before;
@@ -185,31 +185,31 @@ void
 test_class_table( void )
 {
 	assertTrue( FooClass.size == sizeof(struct FooObject)/sizeof(char) );
-	assertZero( strcmp( FooClass.type.name, "Foo" ) );
+	assertZero( strcmp( FooClass.c.type.name, "Foo" ) );
 	assertTrue( FooClass.parent == & BaseClass );
-	assertNotNull( FooClass.vtable );
+	assertNotNull( FooClass.c.vtable );
 	assertTrue( FooClass.vtab_size == sizeof(struct FooVtable_stru)/sizeof(char) );
 
 	assertTrue( BarClass.size == sizeof(struct BarObject)/sizeof(char) );
-	assertZero( strcmp( BarClass.type.name, "Bar" ) );
+	assertZero( strcmp( BarClass.c.type.name, "Bar" ) );
 	assertTrue( BarClass.parent == & BaseClass );
-	assertNotNull( BarClass.vtable );
+	assertNotNull( BarClass.c.vtable );
 	assertTrue( BarClass.vtab_size == sizeof(struct BarVtable_stru)/sizeof(char) );
 
 	assertTrue( BarSonClass.size == sizeof(struct BarSonObject)/sizeof(char) );
-	assertZero( strcmp( BarSonClass.type.name, "BarSon" ) );
+	assertZero( strcmp( BarSonClass.c.type.name, "BarSon" ) );
 	assertTrue( BarSonClass.parent == & BarClass );
-	assertNotNull( BarSonClass.vtable );
+	assertNotNull( BarSonClass.c.vtable );
 	
 	assertTrue( BarBadGrandSonClass.vtab_size == sizeof(struct BarBadGrandSonVtable_stru)/sizeof(char) );
 	assertTrue( BarBadGrandSonClass.size == sizeof(struct BarBadGrandSonObject)/sizeof(char) );
-	assertZero( strcmp( BarBadGrandSonClass.type.name, "BarBadGrandSon" ) );
+	assertZero( strcmp( BarBadGrandSonClass.c.type.name, "BarBadGrandSon" ) );
 	assertTrue( BarBadGrandSonClass.parent == & BarSonClass );
-	assertTrue( BarBadGrandSonClass.vtable == (Vtable) & BarBadGrandSonVtableInstance);
+	assertTrue( BarBadGrandSonClass.c.vtable == (Vtable) & BarBadGrandSonVtableInstance);
 	assertTrue( BarBadGrandSonClass.vtab_size == sizeof(struct BarBadGrandSonVtable_stru)/sizeof(char) );
 	assertTrue( BarBadGrandSonClass.init == BarBadGrandSon_initialize );
 	#ifndef OOC_NO_FINALIZE
-	assertTrue( BarBadGrandSonClass.finz == BarBadGrandSon_finalize );
+	assertTrue( BarBadGrandSonClass.c.finz == BarBadGrandSon_finalize );
 	#endif
 	assertTrue( BarBadGrandSonClass.ctor == (void (*)( Object, const void *))	BarBadGrandSon_constructor );
 	assertTrue( BarBadGrandSonClass.dtor == (void (*)( Object, Vtable))			BarBadGrandSon_destructor );
@@ -230,27 +230,27 @@ test_init( void )
 	assertTrue( ooc_isInitialized( BarSon ) );
 	
 	/* Check if vtable has valid Class pointer */
-	assertTrue( ((BaseVtable)( FooClass.vtable ))->_class == & FooClass );
-	assertTrue( ((BaseVtable)( BarClass.vtable ))->_class == & BarClass );
-	assertTrue( ((BaseVtable)( BarSonClass.vtable ))->_class == & BarSonClass );
+	assertTrue( ((BaseVtable)( FooClass.c.vtable ))->_class == & FooClass );
+	assertTrue( ((BaseVtable)( BarClass.c.vtable ))->_class == & BarClass );
+	assertTrue( ((BaseVtable)( BarSonClass.c.vtable ))->_class == & BarSonClass );
 
 	/* Check if vtable has no destroy_check operator */
-	assertNull( ((BaseVtable)( FooClass.vtable ))->_destroy_check );
-	assertNull( ((BaseVtable)( BarClass.vtable ))->_destroy_check );
-	assertNull( ((BaseVtable)( BarSonClass.vtable ))->_destroy_check );
+	assertNull( ((BaseVtable)( FooClass.c.vtable ))->_destroy_check );
+	assertNull( ((BaseVtable)( BarClass.c.vtable ))->_destroy_check );
+	assertNull( ((BaseVtable)( BarSonClass.c.vtable ))->_destroy_check );
 	
 	/* Ckeck if the vtable is inherited */
-	assertTrue( ((BarVtable)( BarClass.vtable ))->bar_virtual ==
-				((BarSonVtable)( BarSonClass.vtable ))->Bar.bar_virtual	);
+	assertTrue( ((BarVtable)( BarClass.c.vtable ))->bar_virtual ==
+				((BarSonVtable)( BarSonClass.c.vtable ))->Bar.bar_virtual	);
 				
 	#ifndef OOC_NO_FINALIZE
 	/* Ckeck if class initialization chain is correct */
-	assertNotNull( ((BaseVtable)( FooClass.vtable ))->_class_register_prev );
-	assertTrue( ((BaseVtable)( FooClass.vtable ))->_class_register_next == & BarClass );
-	assertTrue( ((BaseVtable)( BarClass.vtable ))->_class_register_prev == & FooClass );
-	assertTrue( ((BaseVtable)( BarClass.vtable ))->_class_register_next == & BarSonClass );
-	assertTrue( ((BaseVtable)( BarSonClass.vtable ))->_class_register_prev == & BarClass );
-	assertNull( ((BaseVtable)( BarSonClass.vtable ))->_class_register_next );
+	assertNotNull( ((BaseVtable)( FooClass.c.vtable ))->_class_register_prev );
+	assertTrue( ((BaseVtable)( FooClass.c.vtable ))->_class_register_next == (ClassCommons) & BarClass );
+	assertTrue( ((BaseVtable)( BarClass.c.vtable ))->_class_register_prev == (ClassCommons) & FooClass );
+	assertTrue( ((BaseVtable)( BarClass.c.vtable ))->_class_register_next == (ClassCommons) & BarSonClass );
+	assertTrue( ((BaseVtable)( BarSonClass.c.vtable ))->_class_register_prev == (ClassCommons) & BarClass );
+	assertNull( ((BaseVtable)( BarSonClass.c.vtable ))->_class_register_next );
 				
 	ooc_finalize_class( BarSon );
 	ooc_finalize_class( Bar );
@@ -277,33 +277,33 @@ test_finalize( void )
 	assertTrue( ooc_isInitialized( BarSon ) );
 	
 	/* Ckeck if class initialization chain is correct */
-	assertNotNull( ((BaseVtable)( FooClass.vtable ))->_class_register_prev );
-	assertTrue( ((BaseVtable)( FooClass.vtable ))->_class_register_next == & BarClass );
-	assertTrue( ((BaseVtable)( BarClass.vtable ))->_class_register_prev == & FooClass );
-	assertTrue( ((BaseVtable)( BarClass.vtable ))->_class_register_next == & BarSonClass );
-	assertTrue( ((BaseVtable)( BarSonClass.vtable ))->_class_register_prev == & BarClass );
-	assertNull( ((BaseVtable)( BarSonClass.vtable ))->_class_register_next );
+	assertNotNull( ((BaseVtable)( FooClass.c.vtable ))->_class_register_prev );
+	assertTrue( ((BaseVtable)( FooClass.c.vtable ))->_class_register_next == (ClassCommons) & BarClass );
+	assertTrue( ((BaseVtable)( BarClass.c.vtable ))->_class_register_prev == (ClassCommons) & FooClass );
+	assertTrue( ((BaseVtable)( BarClass.c.vtable ))->_class_register_next == (ClassCommons) & BarSonClass );
+	assertTrue( ((BaseVtable)( BarSonClass.c.vtable ))->_class_register_prev == (ClassCommons) & BarClass );
+	assertNull( ((BaseVtable)( BarSonClass.c.vtable ))->_class_register_next );
 				
 	ooc_finalize_class( Bar );
 	
 	/* Ckeck if class initialization chain is correct */
-	assertNotNull( ((BaseVtable)( FooClass.vtable ))->_class_register_prev );
-	assertTrue( ((BaseVtable)( FooClass.vtable ))->_class_register_next == & BarSonClass );
-	assertNull( ((BaseVtable)( BarClass.vtable ))->_class_register_prev );
-	assertNull( ((BaseVtable)( BarClass.vtable ))->_class_register_next );
-	assertTrue( ((BaseVtable)( BarSonClass.vtable ))->_class_register_prev == & FooClass );
-	assertNull( ((BaseVtable)( BarSonClass.vtable ))->_class_register_next );
+	assertNotNull( ((BaseVtable)( FooClass.c.vtable ))->_class_register_prev );
+	assertTrue( ((BaseVtable)( FooClass.c.vtable ))->_class_register_next == (ClassCommons) & BarSonClass );
+	assertNull( ((BaseVtable)( BarClass.c.vtable ))->_class_register_prev );
+	assertNull( ((BaseVtable)( BarClass.c.vtable ))->_class_register_next );
+	assertTrue( ((BaseVtable)( BarSonClass.c.vtable ))->_class_register_prev == (ClassCommons) & FooClass );
+	assertNull( ((BaseVtable)( BarSonClass.c.vtable ))->_class_register_next );
 	
 	ooc_finalize_class( BarSon );
 	ooc_finalize_class( Foo );
 	
 	/* Ckeck if class initialization chain is correct */
-	assertNull( ((BaseVtable)( FooClass.vtable ))->_class_register_prev );
-	assertNull( ((BaseVtable)( FooClass.vtable ))->_class_register_next );
-	assertNull( ((BaseVtable)( BarClass.vtable ))->_class_register_prev );
-	assertNull( ((BaseVtable)( BarClass.vtable ))->_class_register_next );
-	assertNull( ((BaseVtable)( BarSonClass.vtable ))->_class_register_prev );
-	assertNull( ((BaseVtable)( BarSonClass.vtable ))->_class_register_next );
+	assertNull( ((BaseVtable)( FooClass.c.vtable ))->_class_register_prev );
+	assertNull( ((BaseVtable)( FooClass.c.vtable ))->_class_register_next );
+	assertNull( ((BaseVtable)( BarClass.c.vtable ))->_class_register_prev );
+	assertNull( ((BaseVtable)( BarClass.c.vtable ))->_class_register_next );
+	assertNull( ((BaseVtable)( BarSonClass.c.vtable ))->_class_register_prev );
+	assertNull( ((BaseVtable)( BarSonClass.c.vtable ))->_class_register_next );
 
 	assertFalse( ooc_isInitialized( Foo ) );
 	assertFalse( ooc_isInitialized( Bar ) );

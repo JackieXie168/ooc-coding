@@ -66,7 +66,7 @@ static
 void
 ListTest_initialize( Class this )
 {
-	ListTestVtable vtab = (ListTestVtable) this->vtable;
+	ListTestVtable vtab = & ListTestVtableInstance;
 	
 	((TestCaseVtable)vtab)->before_class	= 	(test_method_type) listtest_before_class;
 	((TestCaseVtable)vtab)->before			= 	(test_method_type) listtest_before;

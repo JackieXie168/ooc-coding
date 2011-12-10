@@ -40,7 +40,7 @@ static
 void
 Sample_initialize( Class this )
 {
-	SampleVtable vtab = (SampleVtable) this->vtable;
+	SampleVtable vtab = & SampleVtableInstance;
 	
 	vtab->sample_virtual	= 	_sample_virtual;
 

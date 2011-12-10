@@ -69,7 +69,7 @@ invalidate_vtable( const Class type )
 	if( type->vtab_size > virtual_function_alignment ) {
 
 		i = ( type->vtab_size - virtual_function_alignment ) / sizeof( void(*)() );
-		fnp = (void (**)(void)) ( ((char*) type->vtable) + virtual_function_alignment);
+		fnp = (void (**)(void)) ( ((char*) type->c.vtable) + virtual_function_alignment);
 
 		for( ; i ; i--,  fnp++ )
 			*fnp = invalid_virtual_function;
@@ -85,54 +85,90 @@ inherit_vtable_from_parent( const Class self )
 		assert( self->vtab_size >= self->parent->vtab_size );
 		
 		/* Inherit the overridden operators */
-		self->vtable->_destroy_check = self->parent->vtable->_destroy_check;
+		self->c.vtable->_destroy_check = self->parent->c.vtable->_destroy_check;
 
 		/* Inherit the virtual functions */
 		if( self->parent->vtab_size > virtual_function_alignment )
-		    memcpy( ((GEN_PTR) self->vtable)+ virtual_function_alignment,		/* destination */
-			    ((GEN_PTR) self->parent->vtable) + virtual_function_alignment,	/* source */
-			    self->parent->vtab_size - virtual_function_alignment );			/* bytes to copy */
+		    memcpy( ((GEN_PTR) self->c.vtable)+ virtual_function_alignment,			/* destination */
+			    ((GEN_PTR) self->parent->c.vtable) + virtual_function_alignment,	/* source */
+			    self->parent->vtab_size - virtual_function_alignment );				/* bytes to copy */
 		}
 }
 
 #ifndef OOC_NO_FINALIZE
 
-static Class 		class_register = NULL;		/* Points to the most recently initialized Class */
+static ClassCommons	class_register = NULL;		/* Points to the most recently initialized Class */
 
 #ifndef OOC_NO_THREADS
 static ooc_Mutex	class_register_change;
 #endif
 
+static
+void
+ooc_register_class( ClassCommons self )
+{
+	if( class_register == NULL )					/* Race condition, but however we declared _ooc_init_class() as non-thread-safe */
+		ooc_mutex_init( class_register_change );
+
+	ooc_lock( class_register_change );
+	if( class_register )
+		class_register->vtable->_class_register_next = self;
+	self->vtable->_class_register_prev = class_register;
+	self->vtable->_class_register_next = NULL;
+	class_register = self;
+	ooc_unlock( class_register_change );
+}
+
 #endif /* OOC_NO_FINALIZE */
+
+static
+void
+ooc_init_interfaces( const Class self )
+{
+	Itable	it;
+	size_t	in;
+
+	for( in = self->itab_size, it = self->itable; in--; it++ )
+	{
+		if( it->id->type.value == _OOC_TYPE_MIXIN )
+		{
+			struct MixinTable * mixin = (struct MixinTable *) it->id;
+
+			if( mixin->c.vtable->_class == NULL )
+			{
+				mixin->c.vtable->_class = (Class) mixin;
+				mixin->init();
+				#ifndef OOC_NO_FINALIZE
+				ooc_register_class( (ClassCommons) mixin );
+				#endif
+			}
+
+			mixin->populate( (void (**)() ) ( (char*) self->c.vtable + it->vtab_offset ) );
+		}
+	}
+}
 
 void
 _ooc_init_class( const Class self )
 {
-	if( self->vtable->_class == NULL ) {
+	if( self->c.vtable->_class == NULL ) {
 
 		if( ooc_class_has_parent( self ) )
 			_ooc_init_class( self->parent );
 
-		self->vtable->_class = self;
-		self->vtable->_destroy_check = NULL;
+		self->c.vtable->_class = self;
+		self->c.vtable->_destroy_check = NULL;
 
 		invalidate_vtable( self );
 
 		inherit_vtable_from_parent( self );
 
+		ooc_init_interfaces( self );
+
 		self->init( self );
 
 #ifndef OOC_NO_FINALIZE
-		if( class_register == NULL )					/* Race condition, but however we declared _ooc_init_class() as non-thread-safe */
-			ooc_mutex_init( class_register_change );
-			
-		ooc_lock( class_register_change );
-		if( class_register ) 
-			class_register->vtable->_class_register_next = self;
-		self->vtable->_class_register_prev = class_register;
-		self->vtable->_class_register_next = NULL;
-		class_register = self;
-		ooc_unlock( class_register_change );
+		ooc_register_class( (ClassCommons) self );
 #endif /* OOC_NO_FINALIZE */
 	}
 }
@@ -140,8 +176,10 @@ _ooc_init_class( const Class self )
 #ifndef OOC_NO_FINALIZE
 
 void
-_ooc_finalize_class( const Class self )
+_ooc_finalize_class( const Class _self )
 {
+	ClassCommonsTable * self = (ClassCommonsTable*) _self;
+
 	if( self->vtable->_class != NULL ) {
 
 		self->vtable->_class = NULL;		/* Class is marked uninitalized */
@@ -165,7 +203,7 @@ _ooc_finalize_class( const Class self )
 		else
 			ooc_unlock( class_register_change );
 			
-		self->finz( self );					/* Finalize the current class */
+		self->finz( _self );					/* Finalize the current class */
 	}	
 }
 
@@ -173,7 +211,7 @@ void
 ooc_finalize_all( void )
 {
 	while( class_register )
-		_ooc_finalize_class( class_register );
+		_ooc_finalize_class( (Class) class_register );
 }
 
 #endif /* OOC_NO_FINALIZE */
@@ -187,7 +225,7 @@ void
 ooc_build_object( Object object, const Class type, const void * params )
 {
 	/* Building the Object header */
-	object->_vtab = type->vtable;		/* Vtable pointer */
+	object->_vtab = type->c.vtable;		/* Vtable pointer */
 	
 		assert( sizeof( struct BaseObject ) == sizeof( struct BaseVtable * ) );
 		/* If struct BaseObject has been changed, additional initialization might be missing here! */
@@ -383,7 +421,7 @@ ooc_delete_and_null( Object * obj_ptr )
 int
 _ooc_isInitialized( const Class type )
 {
-	return type->vtable->_class == type ? TRUE : FALSE;
+	return type->c.vtable->_class == type ? TRUE : FALSE;
 }
 
 static
@@ -418,7 +456,7 @@ _ooc_isInstanceOf( const Object self, const Class base )
 	if( self->_vtab->_class == base )
 		return TRUE;
 
-	if( self->_vtab->_class->vtable != self->_vtab )
+	if( self->_vtab->_class->c.vtable != self->_vtab )
 		return FALSE;
 
 	return ooc_isClassChildOf( self->_vtab->_class, base );
@@ -587,7 +625,7 @@ _ooc_get_interface( const Object self, InterfaceID id )
 		{
 			for( i = type->itab_size; i; i--, itable++ )
 				if( itable->id == id )
-					return ( prev_interface = (char*) self->_vtab + itable->offset );
+					return ( prev_interface = (char*) self->_vtab + itable->vtab_offset );
 		}
 	} while( ooc_class_has_parent( type ) );
 
