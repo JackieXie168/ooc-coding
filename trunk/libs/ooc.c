@@ -132,7 +132,7 @@ ooc_init_interfaces( const Class self )
 	{
 		if( it->id->type.value == _OOC_TYPE_MIXIN )
 		{
-			struct MixinTable * mixin = (struct MixinTable *) it->id;
+			ROM struct MixinTable * mixin = (struct MixinTable *) it->id;
 
 			if( mixin->c.vtable->_class == NULL )
 			{
@@ -220,6 +220,28 @@ ooc_finalize_all( void )
 /*	Creating a new Object
  */
 
+static
+void
+ooc_build_mixins( Object carrier, Class type )
+{
+	if( ooc_class_has_parent( type ) )
+		ooc_build_mixins( carrier, type->parent );
+
+	if( type->itable != NULL )
+	{
+		Itable 		it;
+		size_t		itn;
+
+		for( it = type->itable, itn = type->itab_size; itn--; it++ )
+		{
+			if( it->id->type.value == _OOC_TYPE_MIXIN )
+				((ROM struct MixinTable *) it->id )->ctor(
+						(void (**)()) ((char*) type->c.vtable + it->vtab_offset),
+						(char*) carrier + it->data_offset );
+		}
+	}
+}
+
 STIN
 void
 ooc_build_object( Object object, const Class type, const void * params )
@@ -229,6 +251,8 @@ ooc_build_object( Object object, const Class type, const void * params )
 	
 		assert( sizeof( struct BaseObject ) == sizeof( struct BaseVtable * ) );
 		/* If struct BaseObject has been changed, additional initialization might be missing here! */
+
+	ooc_build_mixins( object, type );
 
 	/* Constructs the object instance, that may fail */
 	type->ctor( object, params );	
@@ -275,6 +299,47 @@ ooc_new_classptr( const Class type, const void * params )
  */
 
 static
+size_t
+ooc_copy_mixins( Object to_carrier, Object from_carrier, Class type )
+{
+	size_t max_object_length = type->size;
+
+	if( type->itable != NULL )
+	{
+		Itable 		it;
+		size_t		itn;
+
+		for( it = type->itable, itn = type->itab_size; itn--; it++ )
+		{
+			if( it->id->type.value == _OOC_TYPE_MIXIN )
+			{
+				if( max_object_length > it->data_offset )
+					max_object_length = it->data_offset;
+
+				switch( ((ROM struct MixinTable *) it->id )->copy(
+							(void (**)()) ((char*) type->c.vtable + it->vtab_offset),
+							(char*) to_carrier + it->data_offset,
+							(char*) from_carrier + it->data_offset ) )
+				{
+				case OOC_COPY_DONE:		break;
+
+				case OOC_COPY_DEFAULT:	if( ((ROM struct MixinTable *) it->id )->size != 0 )
+											memcpy( (GEN_PTR)((char*) to_carrier + it->data_offset),
+													(GEN_PTR)((char*) from_carrier + it->data_offset),
+													((ROM struct MixinTable *) it->id )->size );
+										break;
+
+				case OOC_NO_COPY:
+				default:				ooc_throw( exception_new( err_can_not_be_duplicated ) );
+										break;
+				}
+			}
+		}
+	}
+	return max_object_length;
+}
+
+static
 void
 copy_object_members( Object to, const Object from, const Class type )
 {
@@ -283,12 +348,14 @@ copy_object_members( Object to, const Object from, const Class type )
 	if( ooc_class_has_parent( type ) )
 		copy_object_members( to, from, type->parent );
 		
+	length = ooc_copy_mixins( to, from, type );
+
 	switch( type->copy( to, from ) ) {
 		
 		case OOC_COPY_DONE:		break;
 		
 		case OOC_COPY_DEFAULT:	offset = ooc_class_has_parent( type ) ?  type->parent->size : sizeof( struct BaseObject );
-								length = type->size - offset; 
+								length = length - offset;
 					
 								if( length )
 									memcpy( ((GEN_PTR)to)+offset, ((GEN_PTR)from)+offset, length );
@@ -353,11 +420,30 @@ ooc_copy( void * to, const Object from )
 /*	Deletes an object
  */
 
-STIN
+static
+void
+ooc_destroy_mixins( Class type, Object carrier )
+{
+	if( type->itable != NULL )
+	{
+		Itable 		it;
+		size_t		itn;
+
+		for( it = type->itable, itn = type->itab_size; itn--; it++ )
+		{
+			if( it->id->type.value == _OOC_TYPE_MIXIN )
+				((ROM struct MixinTable *) it->id )->dtor(
+						(void (**)()) ((char*) type->c.vtable + it->vtab_offset),
+						(char*) carrier + it->data_offset );
+		}
+	}
+}
+
+static
 void
 ooc_destroy_object( Object self )
 {
-	Class type;
+	Class type, next;
 	Vtable vtab;
 
 	assert( self != NULL );
@@ -367,16 +453,16 @@ ooc_destroy_object( Object self )
 	
 	if( vtab )
 	{
-		type = vtab->_class;
+		next = vtab->_class;
 		
-		/* destruct child first */
-		type->dtor( self, vtab );
-	
-		/* destruct the parents */
-		while( ooc_class_has_parent( type ) ) {
-			type = type->parent;
+		do {
+			type = next;
+
 			type->dtor( self, vtab );
-			}
+			ooc_destroy_mixins( type, self );
+	
+			next = type->parent;
+		} while( ooc_class_has_parent( type ) );
 	}
 }
 
