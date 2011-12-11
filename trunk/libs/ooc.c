@@ -203,7 +203,7 @@ _ooc_finalize_class( const Class _self )
 		else
 			ooc_unlock( class_register_change );
 			
-		self->finz( _self );					/* Finalize the current class */
+		self->finz( self );					/* Finalize the current class */
 	}	
 }
 
@@ -595,9 +595,9 @@ ooc_ptr_read_and_null( void ** ptr_ptr )
  *
  * ***********************************************************/
 
-TLS		void*			prev_interface	= NULL;		/* previously returned interface */
-TLS		Vtable			prev_vtab		= NULL;		/* previously checked Vtable */
-TLS		InterfaceID		prev_id			= NULL;		/* previously checked InterfaceID */
+TLS		Vtable									prev_vtab		= NULL;		/* previously checked Vtable */
+TLS		InterfaceID								prev_id			= NULL;		/* previously checked InterfaceID */
+TLS		ROM struct InterfaceOffsets_struct * 	prev_itab_entry = NULL;		/* previously found and returned itab entry */
 
 void *
 _ooc_get_interface( const Object self, InterfaceID id )
@@ -608,11 +608,11 @@ _ooc_get_interface( const Object self, InterfaceID id )
 
 	/* Add some cache functionality to accelerate subsequent calls. Will be useful in mixins. */
 	if( ( id == prev_id ) && ( self->_vtab == prev_vtab ) )
-		return prev_interface;
-	else {
-		prev_vtab	= self->_vtab;
-		prev_id		= id;
-		}
+		return ( prev_itab_entry != NULL ) ? (char*) self->_vtab + prev_itab_entry->vtab_offset : NULL;
+
+	prev_vtab	= self->_vtab;
+	prev_id		= id;
+	prev_itab_entry = NULL;
 
 	next_type	= self->_vtab->_class;
 
@@ -624,12 +624,14 @@ _ooc_get_interface( const Object self, InterfaceID id )
 		if( itable )
 		{
 			for( i = type->itab_size; i; i--, itable++ )
-				if( itable->id == id )
-					return ( prev_interface = (char*) self->_vtab + itable->vtab_offset );
+				if( itable->id == id ) {
+					prev_itab_entry = itable;
+					return (char*) self->_vtab + itable->vtab_offset;
+				}
 		}
 	} while( ooc_class_has_parent( type ) );
 
-	return ( prev_interface = NULL );
+	return NULL;
 }
 
 void *
@@ -641,4 +643,14 @@ _ooc_get_interface_must_have( const Object self, InterfaceID id )
 		ooc_throw( exception_new( err_interface_not_implemented ) );
 
 	return ifc;
+}
+
+void *
+_ooc_get_mixin_data( const Object carrier, InterfaceID id )
+{
+	/* Add some cache functionality to accelerate subsequent calls. Will be useful in mixins. */
+	if( ( id != prev_id ) || ( carrier->_vtab != prev_vtab ) )
+		_ooc_get_interface_must_have( carrier, id );
+
+	return (char*) carrier + prev_itab_entry->data_offset;
 }
