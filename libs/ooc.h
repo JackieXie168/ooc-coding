@@ -407,6 +407,7 @@ struct InterfaceOffsets_struct
 {
 	InterfaceID		id;					/* The interface ID of the implemented interface */
 	size_t			vtab_offset;		/* The offset of the interface in the class's virtual table */
+	size_t			data_offset;		/* The offset of the mixin data in the carrier object */
 };
 
 typedef ROM struct InterfaceOffsets_struct * Itable;
@@ -426,7 +427,7 @@ struct _ClassCommonsTable
 	oocType				type;				/* Type identifier */
 
 #ifndef OOC_NO_FINALIZE
-	void				(* finz) ( Class this );	/* class finalizer */
+	void				(* finz) ( ClassCommons this );	/* class finalizer */
 #endif
 
 	Vtable			    vtable;				/* the pointer to the virtual function's table */
@@ -439,10 +440,10 @@ struct MixinTable
 
 	const size_t		size;											/* size of the mixin data */
 	void				(* init) ();        							/* class initializer */
-	void				(* populate) ( void (**)() );
-	void				(* ctor) (void * self);							/* constructor */
-	void				(* dtor) (void * self);							/* destructor */
-	int				  	(* copy) (void * self, const void * from); 		/* copy constructor */
+	void				(* populate) ( void (** interface)() );			/* populate the interface methods */
+	void				(* ctor) (void (** interface)(), void * self);							/* constructor */
+	void				(* dtor) (void (** interface)(), void * self);							/* destructor */
+	int				  	(* copy) (void (** interface)(), void * self, const void * from); 		/* copy constructor */
 };
 
 struct ClassTable
@@ -604,12 +605,14 @@ extern ROM struct ClassTable BaseClass;
 
 #ifndef OOC_NO_FINALIZE
 
-#define _ooc_decl_finalize( pClass ) 	static void   pClass ## _finalize ( Class );
-#define _ooc_func_finalize( pClass ) 	pClass ## _finalize,
+#define _ooc_decl_finalize( pClass ) 		static void   pClass ## _finalize ( Class );
+#define _ooc_decl_finalize_nopar( pClass ) 	static void   pClass ## _finalize ();
+#define _ooc_func_finalize( pClass ) 		(void (*)(ClassCommons)) pClass ## _finalize,
 
 #else
 
 #define _ooc_decl_finalize( pClass )
+#define _ooc_decl_finalize_nopar( pClass )
 #define _ooc_func_finalize( pClass )
 
 #endif
@@ -793,23 +796,50 @@ InterfaceID_struct
 #define Interface( pInterface )								\
 	struct pInterface ## Methods pInterface
 
-/**	Place the interface data fields into the class members.
- * This macro places the interface data fields (in case of Mixins) into the object struct.
+/** Mixin data members declaration macro.
+ * This macro should be put int the implementation header of the mixin.
+ * Use:
+ * @code
+ * MixinMembers( MyMixin )
+ *     int   my_data;
+ * EndOfMixinMembers;
+ * @endcode
+ * @param	pMixin	The name of the mixin (must be identical with the corresponding interface name!).
+ * @see		EndOfClassMembers, DeclareInterface
+ * @hideinitializer
+ */
+
+#define MixinMembers( pMixin )							\
+	typedef struct pMixin ## Fields_ * pMixin ## Data;	\
+	struct pMixin ## Fields_ {							\
+
+/** End of mixin members definition.
+ * This macro terminates the @c MixinMembers block.
+ * @see		MixinMembers()
+ * @hideinitializer
+ */
+#define EndOfMixinMembers	}
+
+/**	Place the mixin data fields into the carrier class's members.
+ * This macro places the mixin data fields (in case of Mixins) into the object struct.
  * Use:
  * @code
  * ClassMembers( IceCream, Tonic )
  *		int			scoop;
- *		InterfaceData( Flavour );
+ *		MixinData(	Flavour );
  * EndOfClassMembers;
  * @endcode
- * @param	pInterface	The name of the interface to be implemented by the class.
- * @note	This macro puts the interface data into the Object struct.
+ * @param	pMixin		The name of the mixin (must be idenctical with the name of the corresponding interface)
+ * 						to be implemented by the carrier class.
+ * @note	This macro puts the mixin data into the Object struct.
  *			The enclosing class can access the members of the mixed in class. :-(
+ * @warning	Important! The MixinData() macros must always be the last elements of an Object! /n
+ * 			Never put any data member behind or among the MixinData() definitions!
  * @hideinitializer
  */
 
-#define InterfaceData( pInterface )							\
-		pInterface ## DataFields	pInterface
+#define MixinData( pMixin )							\
+		struct pMixin ## Fields_	pMixin
 
 
 /**	Allocates the interface descriptor table.
@@ -829,6 +859,41 @@ InterfaceID_struct
 		(ROM char *) #pInterface								\
 	} }
 
+/**	Allocates the mixin descriptor table.
+ * The mixin descriptor table is used to identify and describe a mixin.
+ * This macro allocates this table and must be placed in the mixin's implementation file.
+ * @param	pMixin		The name of the mixin to be allocated.
+ * @see 	DeclareInterface(), MixinMembers()
+ * @hideinitializer
+ */
+
+#define AllocateMixin( pMixin )														\
+	static void   pMixin ## _initialize ();	        								\
+	_ooc_decl_finalize_nopar()	        											\
+	static void   pMixin ## _constructor( pMixin, pMixin ## Data );					\
+	static void   pMixin ## _destructor ( pMixin, pMixin ## Data ); 				\
+	static int	  pMixin ## _copy ( pMixin, pMixin ## Data, pMixin ## Data );		\
+																					\
+	static struct BaseVtable_stru pMixin ## VtableInstance _OOC_VTAB_INITIALIZER;	\
+																					\
+	ROM_ALLOC struct MixinTable pMixin ## ID = {									\
+	{																				\
+		{																			\
+			_OOC_TYPE_MIXIN,														\
+			(ROM char *) #pMixin													\
+		},																			\
+		_ooc_func_finalize( pMixin ) 												\
+		(Vtable) & pMixin ## VtableInstance											\
+	},																				\
+	sizeof( struct pMixin ## Fields_ ),												\
+											pMixin ## _initialize,					\
+	(void (*)(void (**)())					pMixin ## _populate, 					\
+	(void (*)(void (**)(), void*))			pMixin ## _constructor,					\
+	(void (*)(void (**)(), void*))			pMixin ## _destructor,					\
+	(int  (*)(void (**)(), void*, void*)) 	pMixin ## _copy,        				\
+	}
+
+
 /**	Register for implemented interfaces of the class.
  * In the class implementation code you must define, which interfaces are implemented by the class.
  * These interfaces must be listed in the InterfaceRegister right before the AllocateClassWithInterface macro.
@@ -837,7 +902,8 @@ InterfaceID_struct
  * InterfaceRegister( MyClass )
  * {
  * 		AddInterface( MyClass, HasProperties ),
- * 		AddInterface( MyClass, Printable )
+ * 		AddInterface( MyClass, Printable ),
+ * 		AddMixin( MyClass, Flavour )
  * };
  *
  * AllocateClassWithInterface( MyClass, Base );
@@ -863,7 +929,17 @@ InterfaceID_struct
  */
 
 #define AddInterface( pClass, pInterface )					\
-	{ & pInterface ## ID, offsetof( struct pClass ## Vtable_stru, pInterface ) }
+	{ & pInterface ## ID, offsetof( struct pClass ## Vtable_stru, pInterface ), 0 }
+
+/**	Adds a mixin to the class's interface register.
+ * @param	pClass		The name of the class that implements the mixin (the carrier class).
+ * @param	pMixin		The name of the mixin to be implemented for the class.
+ * @see 	InterfaceRegister
+ * @hideinitializer
+ */
+
+#define AddMixin( pClass, pMixin )					\
+	{ (InterfaceID) & pMixin ## ID, offsetof( struct pClass ## Vtable_stru, pMixin ), offsetof( struct pClass ## Object, pMixin ) }
 
 /**	Retrieves an interface of the Object.
  * Returns the interface pointer for the given Object.
@@ -887,7 +963,7 @@ InterfaceID_struct
  */
 
 #define ooc_get_interface( pObject, pInterface )			\
-	( (pInterface) _ooc_get_interface( (Object) pObject, & pInterface ## ID ) )
+	( (pInterface) _ooc_get_interface( (Object) pObject, (InterfaceID) & pInterface ## ID ) )
 
 /**	Retrieves a mandatory interface of the Object.
  * Returns the interface pointer for the given Object.
@@ -903,13 +979,34 @@ InterfaceID_struct
  */
 
 #define ooc_get_interface_must_have( pObject, pInterface )			\
-	( (pInterface) _ooc_get_interface_must_have( (Object) pObject, & pInterface ## ID ) )
+	( (pInterface) _ooc_get_interface_must_have( (Object) pObject, (InterfaceID) & pInterface ## ID ) )
+
+/**	Retrieves the mixin data within the carrier object.
+ * Returns the pointer to the Mixin data for the given carrier Object.
+ * The Mixin must have been implemented for the given Object, otherwise
+ * @c err_interface_not_implemented Exception is thrown.
+ * @param	pObject		The Object of which's interface we are interested in.
+ * 						(The carrier Object.)
+ * @param	pMixin		The name of the mixin to be retrieved.
+ * @return	Pointer to the mixin's data fields in the carrier Object. Never returns NULL.
+ * 			Throws an Exception with error code of err_interface_not_implemented
+ * 			if the mixin is not implemented for this class.
+ * @note	This can be used only within a mixin implementation! \n
+ * 			This macro must be used for each mixin method to retrieve the mixin data fields.
+ * @see 	ooc_get_interface()
+ * @hideinitializer
+ */
+
+#define ooc_get_mixin_data( pObject, pMixin )			\
+	( (pMixin ## Data) _ooc_get_mixin_data( (Object) pObject, (InterfaceID) & pMixin ## ID ) )
 
 /*@}*/
 
 void * _ooc_get_interface( const Object, InterfaceID );
 
 void * _ooc_get_interface_must_have( const Object, InterfaceID );
+
+void * _ooc_get_mixin_data( const Object, InterfaceID );
 
 /*  Function marchaler types
  */

@@ -209,7 +209,7 @@ test_class_table( void )
 	assertTrue( BarBadGrandSonClass.vtab_size == sizeof(struct BarBadGrandSonVtable_stru)/sizeof(char) );
 	assertTrue( BarBadGrandSonClass.init == BarBadGrandSon_initialize );
 	#ifndef OOC_NO_FINALIZE
-	assertTrue( BarBadGrandSonClass.c.finz == BarBadGrandSon_finalize );
+	assertTrue( BarBadGrandSonClass.c.finz == (void (*)(ClassCommons)) BarBadGrandSon_finalize );
 	#endif
 	assertTrue( BarBadGrandSonClass.ctor == (void (*)( Object, const void *))	BarBadGrandSon_constructor );
 	assertTrue( BarBadGrandSonClass.dtor == (void (*)( Object, Vtable))			BarBadGrandSon_destructor );
