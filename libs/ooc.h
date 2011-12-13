@@ -440,10 +440,10 @@ struct MixinTable
 
 	const size_t		size;											/* size of the mixin data */
 	void				(* init) ();        							/* class initializer */
-	void				(* populate) ( void (** interface)() );			/* populate the interface methods */
-	void				(* ctor) (void (** interface)(), void * self);							/* constructor */
-	void				(* dtor) (void (** interface)(), void * self);							/* destructor */
-	int				  	(* copy) (void (** interface)(), void * self, const void * from); 		/* copy constructor */
+	void				(* populate) ( void (** methods)() );			/* populate the interface methods */
+	void				(* ctor) (void (** methods)(), void * self);							/* constructor */
+	void				(* dtor) (void (** methods)(), void * self);							/* destructor */
+	int				  	(* copy) (void (** methods)(), void * self, const void * from); 		/* copy constructor */
 };
 
 struct ClassTable
