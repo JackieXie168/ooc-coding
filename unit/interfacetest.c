@@ -21,7 +21,6 @@
 #define ooc_finalize_all( )
 #endif
 
-
 DeclareInterface( MyInterface )
 
 	void (* method1) ( Object );
@@ -41,14 +40,71 @@ AllocateInterface( OtherInterface );
 
 /*-------------------------------------------------------*/
 
+#define MIXIN1_ARRAY_SIZE 7
+
+DeclareInterface( MyMixin1 )
+
+	void	(* mixin1_method1 )( Object );
+	void	(* mixin1_method2 )( Object );
+
+EndOfInterface;
+
+MixinMembers( MyMixin1 )
+
+	int		mixin1_data[ MIXIN1_ARRAY_SIZE ];
+
+EndOfMixinMembers;
+
+AllocateMixin( MyMixin1 );
+
+static void	MyMixin1_initialize() {}
+static void	MyMixin1_finalize() {}
+
+static void	MyMixin1_constructor( MyMixin1 methods, MyMixin1Data self )
+{
+	size_t i;
+	for( i = 0; i < MIXIN1_ARRAY_SIZE; i++ )
+	{
+		self->mixin1_data[ i ] = 100 + i;
+	}
+}
+
+static int	MyMixin1_copy( MyMixin1 methods, MyMixin1Data self, MyMixin1Data from )
+{
+	return OOC_COPY_DEFAULT;
+}
+
+static void	MyMixin1_destructor( MyMixin1 methods, MyMixin1Data self )
+{
+	size_t i;
+	for( i = 0; i < MIXIN1_ARRAY_SIZE; i++ )
+	{
+		self->mixin1_data[ i ] = 99;
+	}
+}
+
+static void static_mixin1_method1( Object carrier )
+{
+	MyMixin1Data self = ooc_get_mixin_data( carrier, MyMixin1 );
+
+	self->mixin1_data[ 0 ]++;
+}
+
+static void MyMixin1_populate( MyMixin1 methods )
+{
+	methods->mixin1_method1 = static_mixin1_method1;
+}
+
+/*-------------------------------------------------------*/
+
 DeclareClass( Aclass, Base );
 
 ClassMembers( Aclass, Base )
 EndOfClassMembers;
 
 Virtuals( Aclass, Base )
-	Interface( MyInterface );
 	void (* dummy)( Aclass );
+	Interface( MyInterface );
 EndOfVirtuals;
 
 InterfaceRegister( Aclass )

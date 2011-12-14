@@ -868,11 +868,12 @@ InterfaceID_struct
  */
 
 #define AllocateMixin( pMixin )														\
-	static void   pMixin ## _initialize ();	        								\
-	_ooc_decl_finalize_nopar()	        											\
+	static void   pMixin ## _initialize();	        								\
+	static void   pMixin ## _populate( pMixin );									\
+	_ooc_decl_finalize_nopar( pMixin )												\
 	static void   pMixin ## _constructor( pMixin, pMixin ## Data );					\
 	static void   pMixin ## _destructor ( pMixin, pMixin ## Data ); 				\
-	static int	  pMixin ## _copy ( pMixin, pMixin ## Data, pMixin ## Data );		\
+	static int	  pMixin ## _copy ( pMixin, pMixin ## Data, const pMixin ## Data );	\
 																					\
 	static struct BaseVtable_stru pMixin ## VtableInstance _OOC_VTAB_INITIALIZER;	\
 																					\
@@ -887,12 +888,11 @@ InterfaceID_struct
 	},																				\
 	sizeof( struct pMixin ## Fields_ ),												\
 											pMixin ## _initialize,					\
-	(void (*)(void (**)())					pMixin ## _populate, 					\
+	(void (*)(void (**)()))					pMixin ## _populate, 					\
 	(void (*)(void (**)(), void*))			pMixin ## _constructor,					\
 	(void (*)(void (**)(), void*))			pMixin ## _destructor,					\
-	(int  (*)(void (**)(), void*, void*)) 	pMixin ## _copy,        				\
+	(int  (*)(void (**)(), void*, const void*)) 	pMixin ## _copy,        				\
 	}
-
 
 /**	Register for implemented interfaces of the class.
  * In the class implementation code you must define, which interfaces are implemented by the class.
