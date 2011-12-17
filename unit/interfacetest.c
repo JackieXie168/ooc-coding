@@ -82,7 +82,7 @@ static void	MyMixin1_constructor( MyMixin1 methods, MyMixin1Data self )
 
 static int mymixin1_copy_mode = OOC_COPY_DEFAULT;
 
-static int	MyMixin1_copy( MyMixin1 methods, MyMixin1Data self, MyMixin1Data from )
+static int	MyMixin1_copy( MyMixin1 methods, MyMixin1Data self, const MyMixin1Data from )
 {
 	if( mymixin1_copy_mode == OOC_COPY_DONE )
 	{
@@ -685,8 +685,9 @@ check_mixin_construction( InterfaceTest self )
 
 	f = ooc_new( Fclass, NULL );
 	assertTrue( f->Eclass.MyMixin1.mixin1_data == 1 );
-	ooc_delete( (Object) f );
+	ooc_release( (Object) f );
 	assertTrue( f->Eclass.MyMixin1.mixin1_data == 99 );
+	ooc_free( f );
 }
 
 static
@@ -723,14 +724,16 @@ check_mixin_copy_default( InterfaceTest self )
 
 	mymixin1_copy_mode = OOC_COPY_DEFAULT;
 	f1 = ooc_new( Fclass, NULL );
-	f1->Eclass.data = 200;
-	f1->Eclass.MyMixin1.mixin1_data = 300;
-	ooc_manage_object( f1 );
-	f2 = (Fclass) ooc_duplicate( (Object) f1 );
-	assertTrue( f2->Eclass.data == 200 );
-	assertTrue( f2->Eclass.MyMixin1.mixin1_data == 300 );
-	ooc_delete( (Object) f2 );
-	ooc_delete( ooc_pass( (Object) f1 ) );
+	{
+		ooc_manage_object( f1 );
+		f1->Eclass.data = 200;
+		f1->Eclass.MyMixin1.mixin1_data = 300;
+		f2 = (Fclass) ooc_duplicate( (Object) f1 );
+		assertTrue( f2->Eclass.data == 200 );
+		assertTrue( f2->Eclass.MyMixin1.mixin1_data == 300 );
+		ooc_delete( (Object) f2 );
+		ooc_delete( ooc_pass( (Object) f1 ) );
+	}
 }
 
 static
@@ -741,14 +744,16 @@ check_mixin_copy_done( InterfaceTest self )
 
 	mymixin1_copy_mode = OOC_COPY_DONE;
 	f1 = ooc_new( Fclass, NULL );
-	f1->Eclass.data = 200;
-	f1->Eclass.MyMixin1.mixin1_data = 300;
-	ooc_manage_object( f1 );
-	f2 = (Fclass) ooc_duplicate( (Object) f1 );
-	assertTrue( f2->Eclass.data == 200 );
-	assertTrue( f2->Eclass.MyMixin1.mixin1_data == 300 + 100 );
-	ooc_delete( (Object) f2 );
-	ooc_delete( ooc_pass( (Object) f1 ) );
+	{
+		ooc_manage_object( f1 );
+		f1->Eclass.data = 200;
+		f1->Eclass.MyMixin1.mixin1_data = 300;
+		f2 = (Fclass) ooc_duplicate( (Object) f1 );
+		assertTrue( f2->Eclass.data == 200 );
+		assertTrue( f2->Eclass.MyMixin1.mixin1_data == 300 + 100 );
+		ooc_delete( (Object) f2 );
+		ooc_delete( ooc_pass( (Object) f1 ) );
+	}
 }
 
 static
