@@ -17,9 +17,9 @@
 
 ClassMembers( IceCream, Tonic )
 
-	int					scoop;
+	int		scoop;
 
-	InterfaceData( Flavour );
+	MixinData( Flavour );
 
 EndOfClassMembers;
 

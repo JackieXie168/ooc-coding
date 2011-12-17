@@ -778,23 +778,6 @@ check_mixin_no_copy( InterfaceTest self )
 	end_try;
 }
 
-struct Itab
-{
-	int i;
-};
-
-struct Btab
-{
-	struct Itab * i;
-};
-
-static struct Itab itab;
-
-static struct Btab btab = { & itab };
-
-static struct Itab itab = { 3 };
-
-
 
 /** Test methods order table.
  * Put your test methods in this table in the order they should be executed

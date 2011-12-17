@@ -705,7 +705,6 @@ extern ROM struct ClassTable BaseClass;
 		(int  (*)( Object, const Object)) 		pClass ## _copy,        \
 		}
 
-		
 /** Chain the parent constructor.
  * This macro calls the constructor of the parent class.
  * Must be used soley in the constructor of the class, at the beginning of the constructor.
@@ -765,9 +764,16 @@ InterfaceID_struct
  */
 
 #define DeclareInterface( pInterface )						\
-	/* extern ROM struct InterfaceID_struct pInterface ## ID; */	\
+	extern ROM struct InterfaceID_struct pInterface ## ID; 	\
 	typedef struct pInterface ## Methods * pInterface;		\
 	struct pInterface ## Methods {
+
+#define DeclareMixin( pMixin )								\
+	extern ROM struct MixinTable pMixin ## ID; 				\
+	typedef struct pMixin ## Methods * pMixin;				\
+	struct pMixin ## Methods {
+
+#define EndOfMixin }
 
 /**	Terminates the interface declaration.
  * @see		DeclareInterface

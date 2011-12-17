@@ -1,5 +1,5 @@
 
-/* This is a Flavour interface (light-weight mixin) implementation file
+/* This is a Flavour mixin implementation file
  */
 
 #include "flavour.h"
@@ -8,49 +8,60 @@
 #include <ooc/exception.h>
 
 
-AllocateInterface( Flavour );
+AllocateMixin( Flavour );
 
 /* Construction, destruction
  */
 
+static
 void
-Flavour_constructor( FlavourData self, const char * flavour )
+Flavour_constructor( Flavour flavour, FlavourData self )
 {
-	self->flavour = flavour;
+	self->flavour = "flavourless";
 }
 
+static
 void
-Flavour_destructor( FlavourData self )
+Flavour_destructor( Flavour flavour, FlavourData self )
 {
-
 }
 
+static void	Flavour_initialize() { }
+static void	Flavour_finalize() { }
+
+static
+int
+Flavour_copy( Flavour methods, FlavourData self, const FlavourData from )
+{
+	return OOC_COPY_DEFAULT;
+}
 
 /* Method implementations
  */
 
 static
 void
-flavour_set( Object obj, const char * flavour )
+flavour_set( Object carrier, const char * flavour )
 {
-	FlavourData self = ooc_get_interface_must_have( obj, Flavour )->_get_data_( obj );
+	FlavourData self = ooc_get_mixin_data( carrier, Flavour );
 
 	self->flavour = flavour;
 }
 
 static
 const char *
-flavour_taste( Object obj )
+flavour_taste( Object carrier )
 {
-	FlavourData self = ooc_get_interface_must_have( obj, Flavour )->_get_data_( obj );
+	FlavourData self = ooc_get_mixin_data( carrier, Flavour );
 
-	return self->flavour ? self->flavour : "flavourless";
+	return self->flavour;
 }
 
 
 /* Populating the interface's virtual table
  */
 
+static
 void
 Flavour_populate( Flavour flavour )
 {

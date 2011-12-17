@@ -12,21 +12,10 @@
 
 InterfaceRegister( IceCream )
 {
-	AddInterface( IceCream, Flavour )
+	AddMixin( IceCream, Flavour )
 };
 
 AllocateClassWithInterface( IceCream, Tonic );
-
-/* Class virtual function prototypes
- */
-
-static
-FlavourData
-icecream_flavourdata( Object self )
-{
-	return FlavourData( (IceCream) self );
-}
-
 
 /* Class initializing
  */
@@ -35,10 +24,6 @@ static
 void
 IceCream_initialize( Class this )
 {
-	IceCreamVtable vtab = (IceCreamVtable) this->vtable;
-	
-	vtab->Flavour._get_data_ = icecream_flavourdata;
-	Flavour_populate( & vtab->Flavour );
 }
 
 /* Class finalizing
@@ -64,7 +49,8 @@ IceCream_constructor( IceCream self, const void * flavour )
 	
 	chain_constructor( IceCream, self, NULL );
 
-	Flavour_constructor( FlavourData( self ), (const char *) flavour );
+	if( flavour )
+		IceCreamVirtual( self )->Flavour.set( (Object) self, flavour );
 }
 
 /* Destructor
@@ -74,7 +60,6 @@ static
 void
 IceCream_destructor( IceCream self, IceCreamVtable vtab )
 {
-	Flavour_destructor( FlavourData( self ) );
 }
 
 /* Copy constuctor
