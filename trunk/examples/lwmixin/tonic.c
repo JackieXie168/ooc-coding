@@ -75,6 +75,6 @@ tonic_name( Tonic self )
 {
 	assert( ooc_isInstanceOf( self, Tonic ) );
 
-	return	ooc_get_type( (Object) self )->name;
+	return	ooc_get_type( (Object) self )->c.type.name;
 }
 

@@ -3,15 +3,11 @@
 
 #include <ooc/ooc.h>
 
-typedef struct _FlavourDataFields * FlavourData;
-
-DeclareInterface( Flavour )
-
-	FlavourData	(*_get_data_)	( Object );
+DeclareMixin( Flavour )
 
 	void 			(* set 			)( Object, const char * flavour );
 	const char * 	(* taste 		)( Object );
 
-EndOfInterface;
+EndOfMixin;
 
 #endif  /* FLAVOUR_H */
