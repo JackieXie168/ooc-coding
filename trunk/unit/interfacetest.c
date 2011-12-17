@@ -16,6 +16,20 @@
  * @note	Run as: valgrind --leak-check=yes --quiet ./interfacetest
  */ 
 
+/* Test class hierarchy:
+ *
+ *              +---> MyInterface      ------> OtherInterface             MyMixin1
+ *              |     ^         ^     /             ^                     ^
+ *              |     |           \  /              |                     |
+ *              |     Aclass       \/               |          Dclass     |
+ *              |     ^            /\               |          ^          |
+ *              |     |           /  \              |          |          |
+ *  TestCase    |     Bclass------    --------------Eclass-----+----------+
+ *  ^           |     ^                             ^
+ *  |           |     |                             |
+ *  InterfaceTest     Cclass                        Fclass
+ */
+
 #ifdef OOC_NO_FINALIZE
 #define ooc_finalize_class( x )
 #define ooc_finalize_all( )
@@ -40,8 +54,6 @@ AllocateInterface( OtherInterface );
 
 /*-------------------------------------------------------*/
 
-#define MIXIN1_ARRAY_SIZE 7
-
 DeclareInterface( MyMixin1 )
 
 	void	(* mixin1_method1 )( Object );
@@ -51,43 +63,44 @@ EndOfInterface;
 
 MixinMembers( MyMixin1 )
 
-	int		mixin1_data[ MIXIN1_ARRAY_SIZE ];
+	int		mixin1_data;
 
 EndOfMixinMembers;
 
 AllocateMixin( MyMixin1 );
 
-static void	MyMixin1_initialize() {}
-static void	MyMixin1_finalize() {}
+static	int	mymixin1_initialize_called = 0;
+static	int	mymixin1_finalize_called = 0;
+
+static void	MyMixin1_initialize() { mymixin1_initialize_called++; }
+static void	MyMixin1_finalize() { mymixin1_finalize_called++; }
 
 static void	MyMixin1_constructor( MyMixin1 methods, MyMixin1Data self )
 {
-	size_t i;
-	for( i = 0; i < MIXIN1_ARRAY_SIZE; i++ )
-	{
-		self->mixin1_data[ i ] = 100 + i;
-	}
+	self->mixin1_data = 1;
 }
+
+static int mymixin1_copy_mode = OOC_COPY_DEFAULT;
 
 static int	MyMixin1_copy( MyMixin1 methods, MyMixin1Data self, MyMixin1Data from )
 {
-	return OOC_COPY_DEFAULT;
+	if( mymixin1_copy_mode == OOC_COPY_DONE )
+	{
+		self->mixin1_data = from->mixin1_data + 100;
+	}
+	return mymixin1_copy_mode;
 }
 
 static void	MyMixin1_destructor( MyMixin1 methods, MyMixin1Data self )
 {
-	size_t i;
-	for( i = 0; i < MIXIN1_ARRAY_SIZE; i++ )
-	{
-		self->mixin1_data[ i ] = 99;
-	}
+	self->mixin1_data = 99;
 }
 
 static void static_mixin1_method1( Object carrier )
 {
 	MyMixin1Data self = ooc_get_mixin_data( carrier, MyMixin1 );
 
-	self->mixin1_data[ 0 ]++;
+	self->mixin1_data++;
 }
 
 static void MyMixin1_populate( MyMixin1 methods )
@@ -214,6 +227,10 @@ static	int		Dclass_copy( Dclass self, const Dclass from ) { return OOC_COPY_DEFA
 DeclareClass( Eclass, Dclass );
 
 ClassMembers( Eclass, Dclass )
+	int		data;
+	char	c;
+
+	MixinData( MyMixin1 );
 EndOfClassMembers;
 
 Virtuals( Eclass, Dclass )
@@ -222,11 +239,13 @@ Virtuals( Eclass, Dclass )
 	void (* dummy2)( Eclass );
 	Interface( OtherInterface );
 	void (* dummy3)( Eclass );
+	Interface( MyMixin1 );
 EndOfVirtuals;
 
 InterfaceRegister( Eclass )
 {
 	AddInterface( Eclass, MyInterface ),
+	AddMixin(     Eclass, MyMixin1 ),
 	AddInterface( Eclass, OtherInterface )
 };
 
@@ -527,11 +546,13 @@ check_get_interface_IV( InterfaceTest self )
 		{
 			MyInterface		myInterface;
 			OtherInterface	otherInterface;
+			MyMixin1		myMixin1;
 
 			d = ooc_new( Dclass, NULL );
 
 			assertNull( ooc_get_interface( d, MyInterface ) );
 			assertNull( ooc_get_interface( d, OtherInterface ) );
+			assertNull( ooc_get_interface( d, MyMixin1 ) );
 
 			e = ooc_new( Eclass, NULL );
 
@@ -539,6 +560,8 @@ check_get_interface_IV( InterfaceTest self )
 			assertTrue( & EclassVirtual(e)->MyInterface == myInterface );
 			otherInterface = ooc_get_interface( e, OtherInterface );
 			assertTrue( & EclassVirtual(e)->OtherInterface == otherInterface );
+			myMixin1 = ooc_get_interface( e, MyMixin1 );
+			assertTrue( & EclassVirtual(e)->MyMixin1 == myMixin1 );
 
 			f = ooc_new( Fclass, NULL );
 
@@ -546,6 +569,8 @@ check_get_interface_IV( InterfaceTest self )
 			assertTrue( & FclassVirtual(f)->Eclass.MyInterface == myInterface );
 			otherInterface = ooc_get_interface( f, OtherInterface );
 			assertTrue( & FclassVirtual(f)->Eclass.OtherInterface == otherInterface );
+			myMixin1 = ooc_get_interface( f, MyMixin1 );
+			assertTrue( & FclassVirtual(f)->Eclass.MyMixin1 == myMixin1 );
 		}
 	finally
 		{
@@ -568,6 +593,7 @@ check_get_interface_must_have( InterfaceTest self )
 		{
 			MyInterface		myInterface;
 			OtherInterface	otherInterface;
+			MyMixin1		myMixin1;
 
 			d = ooc_new( Dclass, NULL );
 
@@ -587,12 +613,22 @@ check_get_interface_must_have( InterfaceTest self )
 				assertTrue( exception_get_error_code( exception ) == err_interface_not_implemented );
 			end_try;
 
+			try {
+				ooc_get_interface_must_have( d, MyMixin1 );
+				fail();
+			}
+			catch_any
+				assertTrue( exception_get_error_code( exception ) == err_interface_not_implemented );
+			end_try;
+
 			e = ooc_new( Eclass, NULL );
 
 			myInterface = ooc_get_interface_must_have( e, MyInterface );
 			assertTrue( & EclassVirtual(e)->MyInterface == myInterface );
 			otherInterface = ooc_get_interface_must_have( e, OtherInterface );
 			assertTrue( & EclassVirtual(e)->OtherInterface == otherInterface );
+			myMixin1 = ooc_get_interface_must_have( e, MyMixin1 );
+			assertTrue( & EclassVirtual(e)->MyMixin1 == myMixin1 );
 
 			f = ooc_new( Fclass, NULL );
 
@@ -600,6 +636,8 @@ check_get_interface_must_have( InterfaceTest self )
 			assertTrue( & FclassVirtual(f)->Eclass.MyInterface == myInterface );
 			otherInterface = ooc_get_interface_must_have( f, OtherInterface );
 			assertTrue( & FclassVirtual(f)->Eclass.OtherInterface == otherInterface );
+			myMixin1 = ooc_get_interface_must_have( f, MyMixin1 );
+			assertTrue( & FclassVirtual(f)->Eclass.MyMixin1 == myMixin1 );
 		}
 	finally
 		{
@@ -609,6 +647,149 @@ check_get_interface_must_have( InterfaceTest self )
 		}
 	end_try;
 }
+
+static
+void
+check_mixin_initialization( InterfaceTest self )
+{
+	assertTrue( mymixin1_initialize_called == 1 );
+	assertTrue( EclassVtableInstance.MyMixin1.mixin1_method1 == & static_mixin1_method1 );
+	assertTrue( FclassVtableInstance.Eclass.MyMixin1.mixin1_method1 == & static_mixin1_method1 );
+
+	ooc_init_class( Fclass );
+	ooc_init_class( Eclass );
+	assertTrue( mymixin1_initialize_called == 1 );
+}
+
+static
+void
+check_mixin_finalization( InterfaceTest self )
+{
+	int finz_called;
+
+	assertTrue( mymixin1_finalize_called == 0 );
+	ooc_finalize_class( Eclass );
+	assertTrue( mymixin1_finalize_called == 0 );
+
+	ooc_finalize_all();
+	finz_called = mymixin1_finalize_called;
+	ooc_init_class( InterfaceTest );
+	assertTrue( finz_called == 1 );
+}
+
+static
+void
+check_mixin_construction( InterfaceTest self )
+{
+	Fclass f;
+
+	f = ooc_new( Fclass, NULL );
+	assertTrue( f->Eclass.MyMixin1.mixin1_data == 1 );
+	ooc_delete( (Object) f );
+	assertTrue( f->Eclass.MyMixin1.mixin1_data == 99 );
+}
+
+static
+void
+check_mixin_method( InterfaceTest self )
+{
+	Fclass volatile f = NULL;
+
+	try
+	{
+		MyMixin1 mixin;
+
+		f = ooc_new( Fclass, NULL );
+		assertTrue( f->Eclass.MyMixin1.mixin1_data == 1 );
+		mixin = ooc_get_interface_must_have( f, MyMixin1 );
+
+		mixin->mixin1_method1( (Object) f );
+		assertTrue( f->Eclass.MyMixin1.mixin1_data == 2 );
+		mixin->mixin1_method1( (Object) f );
+		assertTrue( f->Eclass.MyMixin1.mixin1_data == 3 );
+	}
+	finally
+	{
+		ooc_delete( (Object) f );
+	}
+	end_try;
+}
+
+static
+void
+check_mixin_copy_default( InterfaceTest self )
+{
+	Fclass	f1, f2;
+
+	mymixin1_copy_mode = OOC_COPY_DEFAULT;
+	f1 = ooc_new( Fclass, NULL );
+	f1->Eclass.data = 200;
+	f1->Eclass.MyMixin1.mixin1_data = 300;
+	ooc_manage_object( f1 );
+	f2 = (Fclass) ooc_duplicate( (Object) f1 );
+	assertTrue( f2->Eclass.data == 200 );
+	assertTrue( f2->Eclass.MyMixin1.mixin1_data == 300 );
+	ooc_delete( (Object) f2 );
+	ooc_delete( ooc_pass( (Object) f1 ) );
+}
+
+static
+void
+check_mixin_copy_done( InterfaceTest self )
+{
+	Fclass	f1, f2;
+
+	mymixin1_copy_mode = OOC_COPY_DONE;
+	f1 = ooc_new( Fclass, NULL );
+	f1->Eclass.data = 200;
+	f1->Eclass.MyMixin1.mixin1_data = 300;
+	ooc_manage_object( f1 );
+	f2 = (Fclass) ooc_duplicate( (Object) f1 );
+	assertTrue( f2->Eclass.data == 200 );
+	assertTrue( f2->Eclass.MyMixin1.mixin1_data == 300 + 100 );
+	ooc_delete( (Object) f2 );
+	ooc_delete( ooc_pass( (Object) f1 ) );
+}
+
+static
+void
+check_mixin_no_copy( InterfaceTest self )
+{
+	Fclass	volatile f1 = NULL;
+
+	mymixin1_copy_mode = OOC_NO_COPY;
+	f1 = ooc_new( Fclass, NULL );
+
+	try {
+		ooc_duplicate( (Object) f1 );
+		fail();
+	}
+	catch_any {
+		assertTrue( exception_get_error_code( exception ) == err_can_not_be_duplicated );
+	}
+	finally {
+		ooc_delete( (Object) f1 );
+	}
+	end_try;
+}
+
+struct Itab
+{
+	int i;
+};
+
+struct Btab
+{
+	struct Itab * i;
+};
+
+static struct Itab itab;
+
+static struct Btab btab = { & itab };
+
+static struct Itab itab = { 3 };
+
+
 
 /** Test methods order table.
  * Put your test methods in this table in the order they should be executed
@@ -626,6 +807,13 @@ static ROM_ALLOC struct TestCaseMethod methods[] =
 	TEST(check_get_interface_III),
 	TEST(check_get_interface_IV),
 	TEST(check_get_interface_must_have),
+	TEST(check_mixin_initialization),
+	TEST(check_mixin_finalization),
+	TEST(check_mixin_construction),
+	TEST(check_mixin_method),
+	TEST(check_mixin_copy_default),
+	TEST(check_mixin_copy_done),
+	TEST(check_mixin_no_copy),
 	
 	{NULL, NULL} /* Do NOT delete this line! */
 };

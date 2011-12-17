@@ -765,7 +765,7 @@ InterfaceID_struct
  */
 
 #define DeclareInterface( pInterface )						\
-	extern ROM struct InterfaceID_struct pInterface ## ID;	\
+	/* extern ROM struct InterfaceID_struct pInterface ## ID; */	\
 	typedef struct pInterface ## Methods * pInterface;		\
 	struct pInterface ## Methods {
 
