@@ -3,7 +3,7 @@ SOURCES = $(wildcard *.c)
 HEADERS = $(wildcard *.h) $(wildcard implement/*.h)
 OBJECTS = $(patsubst %.c, %.o, $(SOURCES))
 
-TARGET  = lwmixin
+TARGET  = mixin
 
 CC = gcc
 LL = gcc
