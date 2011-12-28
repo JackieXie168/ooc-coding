@@ -54,7 +54,7 @@ AllocateInterface( OtherInterface );
 
 /*-------------------------------------------------------*/
 
-DeclareInterface( MyMixin1 )
+DeclareMixinInterface( MyMixin1 )
 
 	void	(* mixin1_method1 )( Object );
 	void	(* mixin1_method2 )( Object );

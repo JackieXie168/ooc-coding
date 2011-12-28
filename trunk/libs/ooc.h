@@ -759,7 +759,7 @@ InterfaceID_struct
  * EndOfInterface;
  * @endcode
  * @param	pInterface	The name of the interface.
- * @see		EndOfInterface
+ * @see		EndOfInterface, DeclareMixinInterface()
  * @hideinitializer
  */
 
@@ -768,12 +768,18 @@ InterfaceID_struct
 	typedef struct pInterface ## Methods * pInterface;		\
 	struct pInterface ## Methods {
 
-#define DeclareMixin( pMixin )								\
+/** Declare an interface for a mixin.
+ * This is almost the same as the DeclareInterface() but is used to declare the interface
+ * methods of a mixin.
+ * @param	pMixin		The name of the mixin interface.
+ * @see		EndOfInterface, DeclareInterface()
+ * @hideinitializer
+ */
+
+#define DeclareMixinInterface( pMixin )						\
 	extern ROM struct MixinTable pMixin ## ID; 				\
 	typedef struct pMixin ## Methods * pMixin;				\
 	struct pMixin ## Methods {
-
-#define EndOfMixin }
 
 /**	Terminates the interface declaration.
  * @see		DeclareInterface
