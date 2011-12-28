@@ -3,11 +3,11 @@
 
 #include <ooc/ooc.h>
 
-DeclareMixin( Flavour )
+DeclareMixinInterface( Flavour )
 
 	void 			(* set 			)( Object, const char * flavour );
 	const char * 	(* taste 		)( Object );
 
-EndOfMixin;
+EndOfInterface;
 
 #endif  /* FLAVOUR_H */
