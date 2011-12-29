@@ -17,22 +17,49 @@
  * Sample is a .....
  */
 
-AllocateInterface( Sample );
+AllocateMixin( Sample );
+
+/* Initialization, finalization
+ */
+
+static
+void
+Sample_initialize()
+{
+}
+
+static
+void
+Sample_finalize()
+{
+}
+
 
 /* Construction, destruction
  */
 
+static
 void
-Sample_constructor( SampleData self )
+Sample_constructor( Sample sample, SampleData self )
 {
 	/* Build up your SampleDataFields.
-	 * This method is called ones for every Object, and every field is zeroed an entry.
+	 * This method is called ones for every Object, and every field is zeroed at entry.
 	 */
 	self->data = ?
 }
 
+static
+int
+Sample_copy( Sample sample, SampleData self, const SampleData from )
+{
+	return OOC_COPY_DEFAULT;
+	return OOC_COPY_DONE;
+	return OOC_NO_COPY;
+}
+
+static
 void
-Sample_destructor( SampleData self )
+Sample_destructor( Sample sample, SampleData self )
 {
 
 }
@@ -43,9 +70,9 @@ Sample_destructor( SampleData self )
 
 static
 void
-sample_my_method1( Object obj, ... )
+sample_my_method1( Object carrier, .. other params .. )
 {
-	SampleData self = ooc_get_interface_must_have( obj, Sample )->_get_data_( obj );
+	SampleData self = ooc_get_mixin_data( carrier, Sample );
 
 	self->data = ...
 }
@@ -55,10 +82,9 @@ sample_my_method1( Object obj, ... )
  */
 
 void
-Sample_populate( Sample sample )
+Sample_populate( Sample sample )s
 {
-	// Fill the Sample virtual table with the virtual methods.
-	// Do NOT assign any method to (*_get_data_)() !!!
+	// Fill the Sample methods table with the methods.
 
 	sample->my_method1	=	sample_my_method1;
 	...

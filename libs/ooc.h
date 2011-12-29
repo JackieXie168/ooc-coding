@@ -782,7 +782,7 @@ InterfaceID_struct
 	struct pMixin ## Methods {
 
 /**	Terminates the interface declaration.
- * @see		DeclareInterface
+ * @see		DeclareInterface(), DeclareMixinInterface()
  * @hideinitializer
  */
 
