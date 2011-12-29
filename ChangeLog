@@ -1,5 +1,6 @@
 1.3
 Introducing Interfaces, a Java style way of multiple inheritance.
+Introducing Mixins, a way of multiple inheritance.
 
 1.2a
 MPLAB C32 port, and unit tests.

@@ -66,7 +66,7 @@ Object Oriented C toolkit, or shortly @strong{ooc} has been created with the int
 @sp 1
 The other goal was keeping it lightweight, being able to port it onto small computers as well, like embedded systems.
 The implementation has a C++ like approach, using @emph{classes}, @emph{objects}, and @emph{exceptions}.
-The ooc also incorporates @emph{single inheritance}. 
+The ooc also incorporates @emph{single inheritance} and with the help of interfaces and mixins a kind of @emph{multiple inheritance}.
 @sp 1
 There are many similar kits out there, but I found most of them either too complicated for writing a fully controllable, really @emph{portable} code, or inconvenient to use it for writing readable programs. So I have started from scratch.
 @sp 1
@@ -104,7 +104,9 @@ There is always a Virtual table, even if the class does not have a virtual funct
 
 In ooc single inheritance is supported. The physical implementation of inheritance is embedding the parent class members into the beginning of the instantiated object.
 
-Multiple inheritances is not supported because of considering run time effectiveness on slower computers; plus trying to avoid complex inheritance problems that may occur in case of multiple inheritance, and a good solution for them would require more support from the compiler.
+Real multiple inheritance is not supported because of considering run time effectiveness on slower computers; plus trying to avoid complex inheritance problems that may occur in case of multiple inheritance, and a good solution for them would require more support from the compiler.
+
+However since version 1.3 @strong{ooc} supports the use of interfaces and mixins providing a kind of multiple inheritance.
 
 In every class definition macros we use two parameters:
 @itemize @bullet
@@ -810,9 +812,9 @@ static
 void
 Foo_constructor( Foo self, const void * params )
 @{
-    assert( ooc_isInitialized( Foo ) );       /* It is advisable checking if the class has
-                                                 been initialized before the first use */
-    chain_constructor( Foo, self, NULL );     /* Call parent's constructor first! */
+    assert( ooc_isInitialized( Foo ) );   /* It is advisable to check if the class has
+                                             been initialized before the first use */
+    chain_constructor( Foo, self, NULL ); /* Call parent's constructor first! */
 
     self->data = * ( (int*) params );
 @}
@@ -1020,7 +1022,7 @@ Never use the object inclusion for reference counted objects! The reference coun
 
 
 @node Interfaces
-@chapter Interfaces
+@chapter Interfaces and multiple inheritance
 
 Since version 1.3 @strong{ooc} introduces a kind of multiple inheritance with the help of interfaces. The idea behind is a bit a mix of the Java and C++ interfaces, but differs in the way of inheritance and the use.@*
 
@@ -1040,7 +1042,7 @@ struct DrawableInterafce
 
 This describes the behavior of a drawable @code{Object}. Any Object type that implements a @code{DrawableInterafce} can be asked for its dimensions and can be drawn and rotated.
 
-@subsection Interfaces an inheritance
+@subsection Interfaces and inheritance
 
 The use of interfaces provides a kind of multiple inheritance for @strong{ooc}. While the classes can be inherited in a single inheritance chain (each class can have only one superclass), every class can implement as many interfaces as nedded. Since interfaces can be implemented by unrelated classes, it is a kind of multiple inheritance, like in Java.@*
 In @strong{ooc} interfaces are simply added to the virtual table, so you can reference and use them as any other virtual function of the class! This is very similar to the C++ implementation of an interface.@*
@@ -1247,7 +1249,7 @@ A mixin does not know anything about the enclosing Object / Class!@*
 
 From the user point of view a mixin looks identical to an interface! @xref{Using an interface}.
 
-A mixin has it own data, but it can not be instantiated directly. It is always held by an Object (a carrier object).
+A mixin has its own data, but it can not be instantiated directly. It is always held by an Object (a carrier object).
 
 A mixin has the following features:
 @itemize @bullet
@@ -1261,7 +1263,7 @@ The default implementation of the interface methods can be overriden by the encl
 May have initializing and finalizing, thus can use global resources.
 @end itemize
 
-@subsubsection Creating a mixin
+@subsection Creating a mixin
 
 The mixin is nothing else than an interface impementation plus a data structure. But this data structure is handled like a class, with very similar methods: there are initialization, finalization, construction, destruction and copy methods like for a normal Class, and an additional one: the ..._populate() method.@*
 In this section we go through the steps creating a mixin.@*
@@ -1325,9 +1327,9 @@ flavour_set( Object carrier, const char * flavour_name )
 @}
 @end example
 
-@subsubsection Implementing a light-weight mixin
+@subsection Implementing a mixin by a carrier class
 
-The implementation of a light-weight mixin is the same as the implementation of an interface, with few additional tasks.@*
+The implementation of a mixin for a class is almost the same as the implementation of an interface, with few additional tasks.@*
 The steps to implement some @code{Flavour} for the @code{IceCream} class are:
 @itemize
 @item
@@ -1337,14 +1339,15 @@ Create the @code{IceCream} class with @kbd{~$ ooc --new IceCream}.
 Add the @code{Interface( Flavour );} macro to the @code{IceCream} virtuals in @kbd{icecream.h}.
 
 @item
-Add the @code{FlavourFields Flavour;} data member to the @code{ClassMembers( IceCream, Base )} structure in @kbd{implement/icecream.h}.
+Add the @code{MixinData( Flavour );} data member to the end of the @code{ClassMembers( IceCream, Base )} structure in @kbd{implement/icecream.h}.@*
+It is very important that no data members can follow the @code{MixinData()} macros in the @code{ClassMembers()} list, otherwise the copy constructor will not work correctly!
 
 @item
 Create the Interface register for @code{IceCream} in @kbd{icecream.c}.
 @example
 InterfaceRegister( IceCream )
 @{
-    AddInterface( IceCream, Flavour )
+    AddMixin( IceCream, Flavour )
 @};
 @end example
 
@@ -1352,52 +1355,53 @@ InterfaceRegister( IceCream )
 Replace the @code{AllocateClass( IceCream, Base );} macro with @code{AllocateClassWithInterface( IceCream, Base );}  in @kbd{icecream.c}.
 
 @item
-Initialize the interface methods in the @code{IceCream} class's virtual table.@*
-First, the @code{IceCream} class must inform the @code{Flavour} mixin about its data location.@*
-Then the whole method table should be populated.
-@example
-static FlavourData icecream_flavourdata( Object self )
-@{
-    return & ((IceCream) self )->Flavour;
-@};
-
-static void IceCream_initialize( Class this )
-@{
-    IceCreamVtable vtab = (IceCreamVtable) this->vtable;
-
-    vtab->Flavour._get_data_ = icecream_flavourdata;
-    Flavour_populate( & vtab->Flavour );
-    ...
-@}
-@end example
-
-@item
 Override the necessary @code{Flavour} interface methods as needed in @code{IceCream_initialize()}.
 
 @item
-Construct the data fields of @code{Flavour} together with the construction of an @code{IceCream} object.
+Set some initial vale for the @code{Flavour} mixin while constructig an @code{IceCream} object, if the default constructor is not sufficient for you.
 @example
 static void IceCream_constructor( IceCream self, const void * params )
 @{
-    assert( ooc_isInitialized( Sample ) );
-    chain_constructor( Sample, self, NULL );
+    assert( ooc_isInitialized( IceCream ) );
+    chain_constructor( IceCream, self, NULL );
 
-    Flavour_constructor( &self->Flavour );
+    IceCreamVirtuals( self )->Flavour.set( (Object) self, "vanilla" );
     ...
 @}
 @end example
 
-@item
-Destroy the data fields of @code{Flavour} together with the destruction of an @code{IceCream} object
-calling @code{Flavour_destructor( &self->Flavour );} within @code{IceCream_destructor()}.
-
 @end itemize
 
+@subsection How mixins work?
+
+Mixins work like a superclass for the enclosing class: you do not have to care with it, @strong{ooc} does everything automatically for you:
+@itemize
+@item
+The mixins are automatically initialized before initializing the enclosing class, just like a superclass.
+@item
+The mixin's interface methods in the enclosing class's virtual table are automatically populated with the default implementations before the initialization method of the enclosing class is called.@*
+(The mixin's @code{..._populate()} method is called.)
+@item
+The mixin's data members are automatically constructed before the constructor of the carrier object is called.@*
+Using the mixin in the carrier object's constructor is legal.
+@item
+The mixin's data members are automatically copied before the copy constructor of the carrier object is called.@*
+Using the mixin in the carrier object's copy constructor is legal.
+@item
+The mixin's data members are automatically destructed after the destructor of the carrier object is called.@*
+Using the mixin in the carrier object's destructor is legal.
+@item
+The mixins are automatically finalized when @code{ooc_finalize_all()} is called.
+@end itemize
+
+This is the same behavior of a superclass, you can treat the implemented mixin as a superclass of the enclosing class as well, except you can not cast the types (Mixins do not have type information at all.), and you must access it as an interface via its interface methods.
+
+@sp 1
 However, mixins have some drawbacks!@*
 First: it exposes all mixin data members to the enclosing (carrier)
 class: the enclosing class can acces the mixin's data directly, and it is up to the programmer's intelligence
 not to do bad thigs. :-(@*
-Second: using interafces and mixins frequently is a very elegant design, but be aware the in @strong{ooc} it is a bit expensive! Since a C compiler gives no support for such implementations, every lookup, check and conversion is done in run-time, thus much slower than in C++ for example.
+Second: using interafces and mixins frequently is a very elegant design, but be aware that in @strong{ooc} it is a bit expensive! Since a C compiler gives no support for such implementations, every lookup, check and conversion is done in run-time, thus much slower than in C++ for example.
 
 
 @node Memory handling
