@@ -77,6 +77,9 @@ ListTest_initialize( Class this )
 	
 	ooc_init_class( List );
 
+	ooc_init_class( Foo );
+	ooc_init_class( Bar );
+
 	/* Allocate global resources here */
 }
 

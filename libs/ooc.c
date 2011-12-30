@@ -178,7 +178,7 @@ _ooc_init_class( const Class self )
 void
 _ooc_finalize_class( const Class _self )
 {
-	ClassCommonsTable * self = (ClassCommonsTable*) _self;
+	ClassCommons self = (ClassCommons) _self;
 
 	if( self->vtable->_class != NULL ) {
 
