@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DOCUMENT Type="Advanced Installer" CreateVersion="8.1.1" version="8.1.1" Modules="freeware" RootPath="." Language="en">
+<DOCUMENT Type="Advanced Installer" CreateVersion="8.1.1" version="8.8.1" Modules="simple" RootPath="." Language="en" Id="{102DD6FD-F4BF-4C34-9DFC-0309AF73D79A}">
   <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
     <ROW Property="ALLUSERS" Value="2"/>
     <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
     <ROW Property="ARPHELPLINK" Value="http://sourceforge.net/projects/ooc-coding/forums/forum/1098079"/>
     <ROW Property="ARPNOMODIFY" MultiBuildValue="DefaultBuild:1"/>
     <ROW Property="ARPURLINFOABOUT" Value="http://ooc-coding.sourceforge.net/"/>
+    <ROW Property="CTRLS" Value="1"/>
     <ROW Property="Manufacturer" Value="old_fashioned" ValueLocId="*"/>
     <ROW Property="ProductCode" Value="1033:{705D1384-2750-4E40-8578-C63ED66CD819} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
@@ -14,6 +15,7 @@
     <ROW Property="REBOOT" MultiBuildValue="DefaultBuild:ReallySuppress"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{CF565570-C73B-45C8-8B37-F8528F62C4E0}"/>
+    <ROW Property="VIEWREADME" Value="1" Type="4"/>
     <ROW Property="WindowsType9X" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
     <ROW Property="WindowsType9XDisplay" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
     <ROW Property="WindowsTypeNT64" MultiBuildValue="DefaultBuild:Windows XP/Vista/Windows7 x64" ValueLocId="-"/>
@@ -499,16 +501,18 @@
     <ROW Action="AI_PREPARE_UPGRADE" Type="65" Source="aicustact.dll" Target="PrepareUpgrade"/>
     <ROW Action="AI_RESTORE_LOCATION" Type="65" Source="aicustact.dll" Target="RestoreLocation"/>
     <ROW Action="AI_ResolveKnownFolders" Type="1" Source="aicustact.dll" Target="AI_ResolveKnownFolders"/>
+    <ROW Action="AI_SHOW_LOG" Type="65" Source="aicustact.dll" Target="LaunchLogFile" WithoutSeq="true"/>
     <ROW Action="AI_STORE_LOCATION" Type="51" Source="ARPINSTALLLOCATION" Target="[APPDIR]"/>
+    <ROW Action="AI_ViewReadme" Type="1" Source="aicustact.dll" Target="[#index.html_1]"/>
     <ROW Action="SET_APPDIR" Type="307" Source="APPDIR" Target="[ProgramFilesFolder][Manufacturer]\[ProductName]" MultiBuildTarget="DefaultBuild:[ProgramFilesFolder]\[ProductName]"/>
     <ROW Action="SET_SHORTCUTDIR" Type="307" Source="SHORTCUTDIR" Target="[ProgramMenuFolder][ProductName]" MultiBuildTarget="DefaultBuild:[ProgramMenuFolder]\[ProductName]"/>
     <ROW Action="SET_TARGETDIR_TO_APPDIR" Type="51" Source="TARGETDIR" Target="[APPDIR]"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiEnvComponent">
-    <ROW Environment="INCLUDE" Name="+-INCLUDE" Value="[~];[APPDIR]" Component_="Makefile.am"/>
-    <ROW Environment="LIB" Name="=-*LIB" Value="[~];[APPDIR]lib" Component_="Makefile.am"/>
-    <ROW Environment="OOC" Name="=-OOC" Value="[APPDIR]" Component_="Class_manipulation_tool.html"/>
-    <ROW Environment="PATH" Name="+-*PATH" Value="[~];[APPDIR]" Component_="Makefile.am"/>
+    <ROW Environment="INCLUDE" Name="+-INCLUDE" Value="[~];[APPDIR]" Component_="libooc.lib"/>
+    <ROW Environment="LIB" Name="=-*LIB" Value="[~];[APPDIR]lib" Component_="libooc.lib"/>
+    <ROW Environment="OOC" Name="=-OOC" Value="[APPDIR]" Component_="libooc.lib"/>
+    <ROW Environment="PATH" Name="+-*Path" Value="[~];[APPDIR]" Component_="libooc.lib"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
     <ROW Action="AI_DOWNGRADE" Condition="AI_NEWERPRODUCTFOUND AND (UILevel &lt;&gt; 5)" Sequence="210"/>

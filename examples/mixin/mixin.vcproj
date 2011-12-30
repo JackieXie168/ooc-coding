@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="lwmixin"
+	Name="mixin"
 	ProjectGUID="{C1999704-AC4B-43F4-BD98-4AD1A018FEC5}"
-	RootNamespace="lwmixin"
+	RootNamespace="mixin"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="0"
 	>
@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(OOC)&quot;"
+				AdditionalIncludeDirectories="$(OOC)"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
