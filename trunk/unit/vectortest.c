@@ -71,6 +71,12 @@ VectorTest_initialize( Class this )
 
 	ooc_init_class( Exception );
 	ooc_init_class( Vector );
+
+	ooc_init_class( Foo );
+	ooc_init_class( Bar );
+	ooc_init_class( BarSon );
+	ooc_init_class( BarDaughter );
+
 	/* Allocate global resources here */
 }
 

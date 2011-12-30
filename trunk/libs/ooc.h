@@ -89,16 +89,18 @@ typedef		  struct BaseObject * Object;
 
 /** Initializes a class.
  * Initializes a class using the class name. This is a convenient macro.
- * @param pClass	Tha name of the class.
- * @see _ooc_init_class().
+ * @param	pClass	Tha name of the class.
+ * @see		_ooc_init_class().
+ * @warning	This method is not thread safe!
  */
  
 #define		ooc_init_class( pClass ) _ooc_init_class( & pClass ## Class )
 
 /** Initializes a class by class table pointer.
  * Initializes the class pointed by the parameter.
- * @param class_ptr	Pointer to the class description table.
- * @see ooc_init_class() for more convenient use.
+ * @param 	class_ptr	Pointer to the class description table.
+ * @see		ooc_init_class() for more convenient use.
+ * @warning	This method is not thread safe!
  */
 
 void		_ooc_init_class( const Class class_ptr );

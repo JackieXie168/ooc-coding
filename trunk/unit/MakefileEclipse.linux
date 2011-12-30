@@ -33,7 +33,7 @@ release : LDLIBS = -looc
 
 make_targets : $(TARGETS)
 
-$(TARGETS) : $(FAKEOBJECTS) $(TESTABLE_TARGETS)
+$(TARGETS) : $(FAKEOBJECTS) $(TESTABLE_TARGETS) ../libs/ooc.h
 
 %.o : %.c
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
