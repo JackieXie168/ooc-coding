@@ -256,7 +256,9 @@
     <ROW File="index.html" Component_="annotated.html" FileName="index~1.htm|index.html" Attributes="0" SourcePath="docs\api\html\index.html" SelfReg="false" NextFile="installdox"/>
     <ROW File="index.html_1" Component_="Class_manipulation_tool.html" FileName="index~1.htm|index.html" Attributes="0" SourcePath="docs\ooc.html\index.html" SelfReg="false" NextFile="Indices.html"/>
     <ROW File="installdox" Component_="annotated.html" FileName="instal~1|installdox" Attributes="0" SourcePath="docs\api\html\installdox" SelfReg="false" NextFile="jquery.js"/>
-    <ROW File="interfacetest.c" Component_="cdtproject" FileName="interf~1.c|interfacetest.c" Attributes="0" SourcePath="unit\interfacetest.c" SelfReg="false"/>
+    <ROW File="interface.c" Component_="minimal.c" FileName="interf~1.c|interface.c" Attributes="0" SourcePath="tools\template\interface.c" SelfReg="false" NextFile="interface.h"/>
+    <ROW File="interface.h" Component_="minimal.c" FileName="interf~1.h|interface.h" Attributes="0" SourcePath="tools\template\interface.h" SelfReg="false" NextFile="mixin.c"/>
+    <ROW File="interfacetest.c" Component_="cdtproject" FileName="interf~1.c|interfacetest.c" Attributes="0" SourcePath="unit\interfacetest.c" SelfReg="false" NextFile="mixin.h"/>
     <ROW File="intl.dll" Component_="intl.dll" FileName="intl.dll" Attributes="0" SourcePath="..\..\..\..\..\..\GTK\bin\intl.dll" SelfReg="false" NextFile="ooc_mcc18_d.lib"/>
     <ROW File="jquery.js" Component_="annotated.html" FileName="jquery.js" Attributes="0" SourcePath="docs\api\html\jquery.js" SelfReg="false" NextFile="list_8h.html"/>
     <ROW File="lgpl.html" Component_="lgpl.html" FileName="lgpl~1.htm|lgpl.html" Attributes="0" SourcePath="lgpl.html" SelfReg="false" NextFile="ooc.pdf"/>
@@ -297,6 +299,9 @@
     <ROW File="mcc32.h" Component_="anyc.h_1" FileName="mcc32.h" Attributes="0" SourcePath="libs\port\mcc32.h" SelfReg="false" NextFile="NMakefile.MPLAB"/>
     <ROW File="minimal.c" Component_="minimal.c" FileName="minimal.c" Attributes="0" SourcePath="tools\template\minimal.c" SelfReg="false" NextFile="private.c"/>
     <ROW File="minimal.c_1" Component_="minimal.c_1" FileName="minimal.c" Attributes="0" SourcePath="tools\template\minimal.c" SelfReg="false" NextFile="private.c_1"/>
+    <ROW File="mixin.c" Component_="minimal.c" FileName="mixin.c" Attributes="0" SourcePath="tools\template\mixin.c" SelfReg="false" NextFile="mixin.h_1"/>
+    <ROW File="mixin.h" Component_="sample.h" FileName="mixin.h" Attributes="0" SourcePath="tools\template\implement\mixin.h" SelfReg="false" NextFile="interface.c"/>
+    <ROW File="mixin.h_1" Component_="minimal.c" FileName="mixin.h" Attributes="0" SourcePath="tools\template\mixin.h" SelfReg="false"/>
     <ROW File="mplabSIMc32Ext.c" Component_="Makefile.am" FileName="mplabS~1.c|mplabSIMc32Ext.c" Attributes="0" SourcePath="tools\template\unit\mplabSIMc32Ext.c" SelfReg="false" NextFile="win32_check_all.bat"/>
     <ROW File="mplabSIMc32Ext.c_1" Component_="cdtproject" FileName="mplabS~1.c|mplabSIMc32Ext.c" Attributes="0" SourcePath="unit\mplabSIMc32Ext.c" SelfReg="false" NextFile="ooctest_mcc32.mcp"/>
     <ROW File="msvc.h" Component_="anyc.h" FileName="msvc.h" Attributes="0" SourcePath="libs\port\msvc.h" SelfReg="false" NextFile="vector.h_1"/>
@@ -503,7 +508,7 @@
     <ROW Action="AI_ResolveKnownFolders" Type="1" Source="aicustact.dll" Target="AI_ResolveKnownFolders"/>
     <ROW Action="AI_SHOW_LOG" Type="65" Source="aicustact.dll" Target="LaunchLogFile" WithoutSeq="true"/>
     <ROW Action="AI_STORE_LOCATION" Type="51" Source="ARPINSTALLLOCATION" Target="[APPDIR]"/>
-    <ROW Action="AI_ViewReadme" Type="1" Source="aicustact.dll" Target="[#index.html_1]"/>
+    <ROW Action="AI_ViewReadme" Type="1" Source="aicustact.dll" Target="[#ooc.pdf]"/>
     <ROW Action="SET_APPDIR" Type="307" Source="APPDIR" Target="[ProgramFilesFolder][Manufacturer]\[ProductName]" MultiBuildTarget="DefaultBuild:[ProgramFilesFolder]\[ProductName]"/>
     <ROW Action="SET_SHORTCUTDIR" Type="307" Source="SHORTCUTDIR" Target="[ProgramMenuFolder][ProductName]" MultiBuildTarget="DefaultBuild:[ProgramMenuFolder]\[ProductName]"/>
     <ROW Action="SET_TARGETDIR_TO_APPDIR" Type="51" Source="TARGETDIR" Target="[APPDIR]"/>
