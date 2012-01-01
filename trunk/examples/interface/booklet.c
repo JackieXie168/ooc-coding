@@ -115,7 +115,7 @@ booklet_new( void )
 	return ooc_new( Booklet, NULL );
 }
 
-/* Example for calling the same interface for children:
+/* Example for calling the same interface for children of known types:
 */
 
 static

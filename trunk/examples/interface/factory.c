@@ -1,8 +1,6 @@
 
 #include "factory.h"
 
-#include <stdlib.h>
-
 size_t
 rand_index( int upper_limit )
 {
@@ -55,4 +53,50 @@ get_a_color()
 
 	return colors[ rand_index( sizeof(colors)/sizeof(const char *) ) ];
 }
+
+
+/* Some unserializable classes
+ */
+
+ClassMembers( GlassOfWine, Base )
+EndOfClassMembers;
+
+Virtuals( GlassOfWine, Base )
+EndOfVirtuals;
+
+AllocateClass( GlassOfWine, Base );
+
+static	void	GlassOfWine_initialize( Class this ) {}
+static	void	GlassOfWine_finalize( Class this ) {}
+static	void	GlassOfWine_constructor( GlassOfWine self, const void * params ) {}
+static	void	GlassOfWine_destructor( GlassOfWine self, GlassOfWineVtable vtab ) {}
+static	int	GlassOfWine_copy( GlassOfWine self, const GlassOfWine from ) { return OOC_COPY_DEFAULT; }
+
+ClassMembers( Mouse, Base )
+EndOfClassMembers;
+
+Virtuals( Mouse, Base )
+EndOfVirtuals;
+
+AllocateClass( Mouse, Base );
+
+static	void	Mouse_initialize( Class this ) {}
+static	void	Mouse_finalize( Class this ) {}
+static	void	Mouse_constructor( Mouse self, const void * params ) {}
+static	void	Mouse_destructor( Mouse self, MouseVtable vtab ) {}
+static	int	Mouse_copy( Mouse self, const Mouse from ) { return OOC_COPY_DEFAULT; }
+
+ClassMembers( Keyboard, Base )
+EndOfClassMembers;
+
+Virtuals( Keyboard, Base )
+EndOfVirtuals;
+
+AllocateClass( Keyboard, Base );
+
+static	void	Keyboard_initialize( Class this ) {}
+static	void	Keyboard_finalize( Class this ) {}
+static	void	Keyboard_constructor( Keyboard self, const void * params ) {}
+static	void	Keyboard_destructor( Keyboard self, KeyboardVtable vtab ) {}
+static	int	Keyboard_copy( Keyboard self, const Keyboard from ) { return OOC_COPY_DEFAULT; }
 
