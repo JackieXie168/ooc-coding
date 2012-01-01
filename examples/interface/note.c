@@ -9,6 +9,8 @@
 
 #include <stdio.h>
 
+#include "factory.h"
+
 InterfaceRegister( Note )
 {
 	AddInterface( Note, Serializable )
@@ -56,6 +58,10 @@ Note_constructor( Note self, const void * params )
 	assert( ooc_isInitialized( Note ) );
 	
 	chain_constructor( Note, self, NULL );
+
+	self->owner =	get_an_owner();
+	self->date  =	get_a_date();
+	self->text  =	get_a_text();
 }
 
 /* Destructor
@@ -90,29 +96,6 @@ note_new( void )
 	return ooc_new( Note, NULL );
 }
 
-void
-note_set_owner( Note self, const char * owner )
-{
-	assert( ooc_isInstanceOf( self, Note ) );
-
-	self->owner = owner;
-}
-
-void
-note_set_date( Note self, const char * date )
-{
-	assert( ooc_isInstanceOf( self, Note ) );
-
-	self->date = date;
-}
-
-void
-note_set_text( Note self, const char * text )
-{
-	assert( ooc_isInstanceOf( self, Note ) );
-
-	self->text = text;
-}
 
 static
 void

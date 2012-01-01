@@ -177,6 +177,14 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\booklet.c"
+				>
+			</File>
+			<File
+				RelativePath=".\factory.c"
+				>
+			</File>
+			<File
 				RelativePath=".\interfaces.c"
 				>
 			</File>
@@ -199,6 +207,14 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\booklet.h"
+				>
+			</File>
+			<File
+				RelativePath=".\factory.h"
+				>
+			</File>
+			<File
 				RelativePath=".\note.h"
 				>
 			</File>
@@ -213,6 +229,10 @@
 			<Filter
 				Name="implement"
 				>
+				<File
+					RelativePath=".\implement\booklet.h"
+					>
+				</File>
 				<File
 					RelativePath=".\implement\note.h"
 					>
