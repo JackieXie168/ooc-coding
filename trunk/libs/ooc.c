@@ -387,17 +387,24 @@ Object
 ooc_duplicate( const Object from )
 {
 	Object	duplicate;
-	Class	type = from->_vtab->_class;
-
-	/* Allocates memory for the object instance */
-	duplicate = ooc_calloc( 1, type->size );
+	Class	type;
+	
+	if( from != NULL )
 	{
-	ooc_manage_object( duplicate );
+		type = from->_vtab->_class;
 
-	ooc_make_a_copy( duplicate, from, type );
+		/* Allocates memory for the object instance */
+		duplicate = ooc_calloc( 1, type->size );
+		{
+			ooc_manage_object( duplicate );
 
-	return ooc_pass( duplicate );
+			ooc_make_a_copy( duplicate, from, type );
+
+			return ooc_pass( duplicate );
+		}
 	}
+	else
+		return NULL;
 }
 
 #endif /* OOC_NO_DYNAMIC_MEM */

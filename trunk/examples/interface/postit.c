@@ -9,6 +9,8 @@
 
 #include <stdio.h>
 
+#include "factory.h"
+
 /* Allocating the class description table and the vtable
  */
 
@@ -53,6 +55,8 @@ PostIt_constructor( PostIt self, const void * params )
 	assert( ooc_isInitialized( PostIt ) );
 	
 	chain_constructor( PostIt, self, NULL );
+
+	self->color = get_a_color();
 }
 
 /* Destructor
@@ -83,14 +87,8 @@ postit_new( void )
 	return (PostIt) ooc_new( PostIt, NULL );
 }
 
-
-void
-postit_set_color( PostIt self, const char * color )
-{
-	assert( ooc_isInstanceOf( self, PostIt ) );
-
-	self->color = color;
-}
+/* Example for calling the parent class's interface:
+*/
 
 static
 void

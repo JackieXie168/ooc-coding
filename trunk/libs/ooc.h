@@ -182,9 +182,11 @@ Object		ooc_new_classptr( const Class class_ptr, const void * par_ptr );
 /**	Duplicates an Object.
  * Calling the copy constructor of the @c Object, creates a duplicate of it.
  * @param	object	The original Object.
- * @return	The newly created Object.
+ * @return	The newly created Object.\n
+ *			Returns @c NULL if the parameter is @c NULL. (Useful in copy constructors, you do not have to check if 
+ *          the member @c Object to be copied exists or not.)
  * @note	May throw an Exception.
- * @warning If in a multi-threaded application your @c Object needs to be in a consistent
+ * @warning In a multi-threaded application your @c Object needs to be in a consistent
  * state while copying, you must lock it yourself. @c ooc_duplicate() does not do any locking.
  */
 
