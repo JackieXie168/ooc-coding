@@ -181,6 +181,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\desktop.c"
+				>
+			</File>
+			<File
 				RelativePath=".\factory.c"
 				>
 			</File>
@@ -208,6 +212,10 @@
 			>
 			<File
 				RelativePath=".\booklet.h"
+				>
+			</File>
+			<File
+				RelativePath=".\desktop.h"
 				>
 			</File>
 			<File

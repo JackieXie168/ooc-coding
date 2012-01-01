@@ -1,41 +1,30 @@
 
 #include <ooc/exception.h>
 
-#include "note.h"
-#include "postit.h"
-#include "booklet.h"
+#include "desktop.h"
 
+#include <stdlib.h> /* for srand() */
+#include <time.h>	/* for time() */
 
 int
 main( int argc, char * argv[] )
 {
-	Note	volatile	note	= NULL;
-	PostIt	volatile	postit	= NULL;
-	Booklet	volatile	booklet	= NULL;
+	Desktop	desktop;
 
 	ooc_init_class( Exception );
 
-	try
+	srand ( time(NULL) ); /* initialize random seed: */
+
+	desktop = desktop_new();
 	{
-		note = note_new();
+		ooc_manage_object( desktop );
 
-		ooc_get_interface_must_have( note, Serializable )->serialize( (Object) note, 0 );
+		ooc_get_interface_must_have( desktop, Serializable )->serialize( (Object) desktop, 0 );
 
-		postit = postit_new();
-
-		ooc_get_interface_must_have( postit, Serializable )->serialize( (Object) postit, 0 );
-
-		booklet = booklet_new();
-
-		ooc_get_interface_must_have( booklet, Serializable )->serialize( (Object) booklet, 0 );
+		ooc_delete( (Object) ooc_pass( desktop ) );
 	}
-	finally
-	{
-		ooc_delete( (Object) note );
-		ooc_delete( (Object) postit );
-		ooc_delete( (Object) booklet );
-	}
-	end_try;
 
 	ooc_finalize_all();
+
+	return 0;
 }

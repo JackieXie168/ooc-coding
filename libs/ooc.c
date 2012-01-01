@@ -514,7 +514,7 @@ ooc_delete_and_null( Object * obj_ptr )
 int
 _ooc_isInitialized( const Class type )
 {
-	return type->c.vtable->_class == type ? TRUE : FALSE;
+	return ( type == & BaseClass || type->c.vtable->_class == type ) ? TRUE : FALSE;
 }
 
 static
