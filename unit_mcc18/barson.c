@@ -40,7 +40,7 @@ static
 void
 BarSon_initialize( Class this )
 {
-	BarSonVtable vtab = (BarSonVtable) this->vtable;
+	BarSonVtable vtab = (BarSonVtable) this->c.vtable;
 	
 	vtab->barson_virtual	= 	_barson_virtual;
 

@@ -40,7 +40,7 @@ static
 void
 Foo_initialize( Class this )
 {
-	FooVtable vtab = (FooVtable) this->vtable;
+	FooVtable vtab = (FooVtable) this->c.vtable;
 	
 	vtab->foo_virtual	= 	_foo_virtual;
 

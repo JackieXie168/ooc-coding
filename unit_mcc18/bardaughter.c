@@ -40,7 +40,7 @@ static
 void
 BarDaughter_initialize( Class this )
 {
-	BarDaughterVtable vtab = (BarDaughterVtable) this->vtable;
+	BarDaughterVtable vtab = (BarDaughterVtable) this->c.vtable;
 	
 	vtab->bardaughter_virtual	= 	_bardaughter_virtual;
 

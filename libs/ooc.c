@@ -132,7 +132,7 @@ ooc_init_interfaces( const Class self )
 	{
 		if( it->id->type.value == _OOC_TYPE_MIXIN )
 		{
-			ROM struct MixinTable * mixin = (struct MixinTable *) it->id;
+			ROM struct MixinTable * mixin = (ROM struct MixinTable *) it->id;
 
 			if( mixin->c.vtable->_class == NULL )
 			{
@@ -318,8 +318,8 @@ ooc_copy_mixins( Object to_carrier, Object from_carrier, Class type )
 
 				switch( ((ROM struct MixinTable *) it->id )->copy(
 							(void (**)()) ((char*) type->c.vtable + it->vtab_offset),
-							(char*) to_carrier + it->data_offset,
-							(char*) from_carrier + it->data_offset ) )
+							(GEN_PTR) ((char*) to_carrier + it->data_offset),
+							(GEN_PTR) ((char*) from_carrier + it->data_offset )) )
 				{
 				case OOC_COPY_DONE:		break;
 
