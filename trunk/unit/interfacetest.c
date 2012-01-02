@@ -70,11 +70,14 @@ EndOfMixinMembers;
 AllocateMixin( MyMixin1 );
 
 static	int	mymixin1_initialize_called = 0;
+#ifndef OOC_NO_FINALIZE
 static	int	mymixin1_finalize_called = 0;
+#endif
 
 static void	MyMixin1_initialize() { mymixin1_initialize_called++; }
+#ifndef OOC_NO_FINALIZE
 static void	MyMixin1_finalize() { mymixin1_finalize_called++; }
-
+#endif
 static void	MyMixin1_constructor( MyMixin1 methods, MyMixin1Data self )
 {
 	self->mixin1_data = 1;
@@ -128,8 +131,9 @@ InterfaceRegister( Aclass )
 AllocateClassWithInterface( Aclass, Base );
 
 static	void	Aclass_initialize( Class this ) {}
+#ifndef OOC_NO_FINALIZE
 static	void	Aclass_finalize( Class this ) {}
-
+#endif
 static	void	Aclass_constructor( Aclass self, const void * params )
 {
 	assert( ooc_isInitialized( Aclass ) );
@@ -160,8 +164,9 @@ InterfaceRegister( Bclass )
 AllocateClassWithInterface( Bclass, Aclass );
 
 static	void	Bclass_initialize( Class this ) {}
+#ifndef OOC_NO_FINALIZE
 static	void	Bclass_finalize( Class this ) {}
-
+#endif
 static	void	Bclass_constructor( Bclass self, const void * params )
 {
 	assert( ooc_isInitialized( Bclass ) );
@@ -185,8 +190,9 @@ EndOfVirtuals;
 AllocateClass( Cclass, Bclass );
 
 static	void	Cclass_initialize( Class this ) {}
+#ifndef OOC_NO_FINALIZE
 static	void	Cclass_finalize( Class this ) {}
-
+#endif
 static	void	Cclass_constructor( Cclass self, const void * params )
 {
 	assert( ooc_isInitialized( Cclass ) );
@@ -210,8 +216,9 @@ EndOfVirtuals;
 AllocateClass( Dclass, Base );
 
 static	void	Dclass_initialize( Class this ) {}
+#ifndef OOC_NO_FINALIZE
 static	void	Dclass_finalize( Class this ) {}
-
+#endif
 static	void	Dclass_constructor( Dclass self, const void * params )
 {
 	assert( ooc_isInitialized( Dclass ) );
@@ -252,7 +259,9 @@ InterfaceRegister( Eclass )
 AllocateClassWithInterface( Eclass, Dclass );
 
 static	void	Eclass_initialize( Class this ) {}
+#ifndef OOC_NO_FINALIZE
 static	void	Eclass_finalize( Class this ) {}
+#endif
 
 static	void	Eclass_constructor( Eclass self, const void * params )
 {
@@ -277,7 +286,9 @@ EndOfVirtuals;
 AllocateClass( Fclass, Eclass );
 
 static	void	Fclass_initialize( Class this ) {}
+#ifndef OOC_NO_FINALIZE
 static	void	Fclass_finalize( Class this ) {}
+#endif
 
 static	void	Fclass_constructor( Fclass self, const void * params )
 {
@@ -358,13 +369,14 @@ InterfaceTest_initialize( Class this )
 /* Class finalizing
  */
 
+#ifndef OOC_NO_FINALIZE
 static
 void
 InterfaceTest_finalize( Class this )
 {
 	/* Release global resources! */
 }
-
+#endif
 
 /* Constructor
  */
@@ -661,6 +673,7 @@ check_mixin_initialization( InterfaceTest self )
 	assertTrue( mymixin1_initialize_called == 1 );
 }
 
+#ifndef OOC_NO_FINALIZE
 static
 void
 check_mixin_finalization( InterfaceTest self )
@@ -676,6 +689,7 @@ check_mixin_finalization( InterfaceTest self )
 	ooc_init_class( InterfaceTest );
 	assertTrue( finz_called == 1 );
 }
+#endif
 
 static
 void
@@ -796,7 +810,9 @@ static ROM_ALLOC struct TestCaseMethod methods[] =
 	TEST(check_get_interface_IV),
 	TEST(check_get_interface_must_have),
 	TEST(check_mixin_initialization),
+#ifndef OOC_NO_FINALIZE
 	TEST(check_mixin_finalization),
+#endif
 	TEST(check_mixin_construction),
 	TEST(check_mixin_method),
 	TEST(check_mixin_copy_default),

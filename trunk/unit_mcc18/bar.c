@@ -40,7 +40,7 @@ static
 void
 Bar_initialize( Class this )
 {
-	BarVtable vtab = (BarVtable) this->vtable;
+	BarVtable vtab = (BarVtable) this->c.vtable;
 	
 	vtab->bar_virtual	= 	_bar_virtual;
 

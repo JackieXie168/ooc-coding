@@ -3,10 +3,9 @@
 # 
 # Makefile for Microsoft nmake
 #
-# use: > nmake [target] /f NMakefile.MPLAB [CONFIG=config]
+# use: > nmake [target] /f NMakefile.MPLAB
 #
 # target can be all or clean
-# config can be one of the followings: Debug, Release
 #
 ##################################################
 
