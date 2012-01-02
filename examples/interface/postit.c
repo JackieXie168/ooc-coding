@@ -87,7 +87,7 @@ postit_new( void )
 	return (PostIt) ooc_new( PostIt, NULL );
 }
 
-/* Example for calling the parent class's interface:
+/* Example for calling the parent class's interface method:
 */
 
 static
