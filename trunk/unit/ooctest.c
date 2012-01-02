@@ -576,6 +576,13 @@ test_ctor_use( void )
 
 static
 void
+test_copy_null( void )
+{
+	assertNull( ooc_duplicate( NULL ) );
+}
+
+static
+void
 test_copy( void )
 {
 	CtorCheckSon ccs, duplicate;
@@ -813,6 +820,7 @@ struct TestCaseMethod methods[] =
 	TEST(test_new),
 	TEST(test_ctor_new),
 	TEST(test_ctor_use),
+	TEST(test_copy_null),
 	TEST(test_copy),
 	TEST(test_delete_and_null),
 	TEST(test_delete_circular),

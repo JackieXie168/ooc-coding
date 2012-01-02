@@ -13,7 +13,7 @@ main( int argc, char * argv[] )
 
 	ooc_init_class( Exception );
 
-	srand ( time(NULL) ); /* initialize random seed: */
+	srand ( time(NULL) ); /* initialize random seed */
 
 	desktop = desktop_new();
 	{

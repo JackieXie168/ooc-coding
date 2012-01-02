@@ -122,15 +122,9 @@ static
 void
 booklet_put_notes( Note note, int * indent )
 {
-	static Serializable noteSerializable = NULL;
-
 	assert( ooc_isInstanceOf( note, Note ) );
 
-	/* cahcing the retrieved interface accelerates the execution */
-	if( noteSerializable == NULL )
-		noteSerializable = ooc_get_interface_must_have( note, Serializable );
-
-	noteSerializable->serialize( (Object) note, *indent+1 );
+	NoteVirtual( note )->Serializable.serialize( (Object) note, *indent+1 );
 }
 
 static
