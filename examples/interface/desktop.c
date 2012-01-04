@@ -146,7 +146,7 @@ desktop_serialize( Desktop self, int indent )
 
 	printf( "%*s<Desktop owner=\"%s\", things=%d>\n", indent, "", self->owner, vector_items( self->things ) );
 	
-	vector_foreach( self->things, desktop_put_thing, & indent );
+	vector_foreach( self->things, (vector_item_executor) desktop_put_thing, & indent );
 
 	printf( "%*s<\\Desktop>\n", indent, "" );
 }

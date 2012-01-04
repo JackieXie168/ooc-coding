@@ -135,7 +135,7 @@ booklet_serialize( Booklet self, int indent )
 
 	printf( "%*s<Booklet date=\"%s\", owner=\"%s\", pages=%d>\n", indent, "", self->date, self->owner, vector_items( self->notes ) );
 	
-	vector_foreach( self->notes, booklet_put_notes, & indent );
+	vector_foreach( self->notes, (vector_item_executor) booklet_put_notes, & indent );
 
 	printf( "%*s<\\Booklet>\n", indent, "" );
 }

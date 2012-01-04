@@ -16,4 +16,4 @@ DeclareClass( GlassOfWine, Base );
 DeclareClass( Mouse, Base );
 DeclareClass( Keyboard, Base );
 
-#endif FACTORY_H
+#endif /* FACTORY_H */
