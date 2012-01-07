@@ -29,6 +29,8 @@ supports it in developing GNU and promoting software freedom.''
 @titlepage
 @title Object Oriented C (ooc) toolkit
 @subtitle for version @value{VERSION}, @value{UPDATED}
+@sp 6
+@center @image {logo_big, 10cm}
 @author Tibor Miseta
 @page
 @vskip 0pt plus 1filll
