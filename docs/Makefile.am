@@ -2,6 +2,7 @@ info_TEXINFOS = ooc.texinfo
 
 html-local:
 	cp *.png $(HTMLS)
+	rm -f $(HTMLS)/logo_big.png
 	doxygen Doxyfile.linux
 
 clean-local:

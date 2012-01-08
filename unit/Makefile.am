@@ -13,5 +13,5 @@ TESTS = $(check_PROGRAMS) $(test_suites)
 
 nobase_noinst_HEADERS= *.h implement/*.h
 
-EXTRA_DIST = $(test_suites) *.bat Makefile.Windows MakefileEclipse.linux *.mcp win32-check-all.bat
+EXTRA_DIST = $(test_suites) *.bat Makefile.Windows MakefileEclipse.linux *.mcp win32-check-all.bat linux-check-all.sh
 
