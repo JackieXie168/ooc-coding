@@ -144,7 +144,7 @@ desktop_serialize( Desktop self, int indent )
 {
 	assert( ooc_isInstanceOf( self, Desktop ) );
 
-	printf( "%*s<Desktop owner=\"%s\", things=%d>\n", indent, "", self->owner, vector_items( self->things ) );
+	printf( "%*s<Desktop owner=\"%s\" things=\"%d\">\n", indent, "", self->owner, vector_items( self->things ) );
 	
 	vector_foreach( self->things, (vector_item_executor) desktop_put_thing, & indent );
 

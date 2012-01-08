@@ -96,7 +96,7 @@ postit_serialize( PostIt self, int indent )
 {
 	assert( ooc_isInstanceOf( self, PostIt ) );
 
-	printf( "%*s<PostIt color=\"%s\" >\n", indent, "", self->color );
+	printf( "%*s<PostIt color=\"%s\">\n", indent, "", self->color );
 
 	PostItParentVirtual( self )->Serializable.serialize( (Object) self, indent + 1 );
 

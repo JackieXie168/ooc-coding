@@ -133,7 +133,7 @@ booklet_serialize( Booklet self, int indent )
 {
 	assert( ooc_isInstanceOf( self, Booklet ) );
 
-	printf( "%*s<Booklet date=\"%s\", owner=\"%s\", pages=%d>\n", indent, "", self->date, self->owner, vector_items( self->notes ) );
+	printf( "%*s<Booklet date=\"%s\" owner=\"%s\" pages=\"%d\">\n", indent, "", self->date, self->owner, vector_items( self->notes ) );
 	
 	vector_foreach( self->notes, (vector_item_executor) booklet_put_notes, & indent );
 
