@@ -605,6 +605,7 @@ uninstall-am: uninstall-dvi-am uninstall-html-am uninstall-info-am \
 
 html-local:
 	cp *.png $(HTMLS)
+	rm -f $(HTMLS)/logo_big.png
 	doxygen Doxyfile.linux
 
 clean-local:

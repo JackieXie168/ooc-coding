@@ -37,12 +37,11 @@ supports it in developing GNU and promoting software freedom.''
 @insertcopying
 @end titlepage
 
-@contents
-
 @ifnottex
 @node Top
 @top Object Oriented C (ooc) toolkit
 @insertcopying
+@image{logo64px,,,,png}
 @end ifnottex
 
 @menu
@@ -60,6 +59,7 @@ supports it in developing GNU and promoting software freedom.''
 * Index : Indices
 @end menu
 
+@contents
 
 @node Introduction
 @chapter Introduction
