@@ -103,7 +103,7 @@ note_serialize( Note self, int indent )
 {
 	assert( ooc_isInstanceOf( self, Note ) );
 
-	printf( "%*s<Note date=\"%s\", owner=\"%s\">\n", indent, "", self->date, self->owner );
+	printf( "%*s<Note date=\"%s\" owner=\"%s\">\n", indent, "", self->date, self->owner );
 	printf( "%*s<Text>\n", indent+1, "" );
 	printf( "%*s%s\n", indent+2, "", self->text );
 	printf( "%*s<\\Text>\n", indent+1, "" );
