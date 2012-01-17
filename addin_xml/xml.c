@@ -32,6 +32,7 @@ enum XmlManagerState
 	STATE_BEGIN_ELEMENT,
 	STATE_ATTRIBUTES,
 	STATE_TEXT,
+	STATE_TEXT_NOINDENT,
 	STATE_END_ELEMENT
 };
 
@@ -98,7 +99,7 @@ XmlManager_constructor( XmlManager self, const void * direction )
 		ooc_throw( xmlexception_new( XML_ERROR_DIRECTION ) );
 
 	self->elements 	= list_new( NULL );
-	self->indent	= 1;
+	self->indent	= 2;
 }
 
 /* Destructor
@@ -264,7 +265,7 @@ xml_write_end_element( XmlManager self )
 		case STATE_TEXT :
 		case STATE_END_ELEMENT :		xml_indent_dec( self );
 										xml_write_nl( self );
-										xml_write( self, "</%s>", name );
+		case STATE_TEXT_NOINDENT :		xml_write( self, "</%s>", name );
 										break;
 		default :
 			ooc_throw( xmlexception_new( XML_ERROR_SEQUENCE ) );
@@ -311,6 +312,9 @@ xml_write_text( XmlManager self, const char * text )
 		case STATE_END_ELEMENT :		xml_write_nl( self );
 		case STATE_TEXT :				xml_write( self, "%s", text );
 										break;
+
+		case STATE_TEXT_NOINDENT :		xml_write( self, ">%s", text );
+										break;
 		default :
 			ooc_throw( xmlexception_new( XML_ERROR_SEQUENCE ) );
 	}
@@ -320,9 +324,11 @@ xml_write_text( XmlManager self, const char * text )
 void
 xml_write_element_text( XmlManager self, const char * name, const char * text )
 {
-	xml_write_begin_element( self, name );
-	xml_write_text( self, text );
-	xml_write_end_element( self );
+		xml_write_begin_element( self, name );
+		self->state = STATE_TEXT_NOINDENT;
+		xml_write_text( self, text );
+		self->state = STATE_TEXT_NOINDENT;
+		xml_write_end_element( self );
 }
 
 
