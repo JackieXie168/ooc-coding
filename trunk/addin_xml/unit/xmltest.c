@@ -158,11 +158,13 @@ xmltest_method1( XmlTest self )
 
 	xml_set_file( xmlm, stdout );
 
-	xml_set_indent( xmlm, -1 );
+	xml_set_indent( xmlm, 2 );
 
 	xml_write_begin_element( xmlm, "html" );
 
 		xml_write_begin_element( xmlm, "head" );
+		xml_write_begin_element( xmlm, "br" );
+		xml_write_end_element( xmlm );
 			xml_write_begin_element( xmlm, "script" );
 			xml_write_attribute( xmlm, "type", "text/javascript" );
 			xml_write_element_text( xmlm, "szöveg", "Ez egy kuvra hosszú text!" );

@@ -22,15 +22,14 @@ void		xml_set_indent( XmlManager, int );
 
 void		xml_write_begin_element( XmlManager, const char * name );
 void		xml_write_end_element( XmlManager );
-
 void		xml_write_attribute( XmlManager, const char * name, const char * value );
-
 void		xml_write_text( XmlManager, const char * text );
 void		xml_write_element_text( XmlManager, const char * name, const char * text );
 
 DeclareInterface( Xml )
 
-	void 	(* write )( Object, XmlManager );
+	void 	(* write_attributes )( Object, XmlManager );
+	void 	(* write_data )( Object, XmlManager );
 
 EndOfInterface;
 
