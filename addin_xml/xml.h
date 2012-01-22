@@ -20,6 +20,9 @@ XmlManager 	xml_manager_new( enum XmlDirection direction );
 void		xml_set_file( XmlManager, FILE * );
 void		xml_set_indent( XmlManager, int );
 
+FILE *		xml_get_file( XmlManager );
+int			xml_get_indent( XmlManager );
+
 void		xml_write_begin_element( XmlManager, const char * name );
 void		xml_write_end_element( XmlManager );
 void		xml_write_attribute( XmlManager, const char * name, const char * value );
@@ -28,8 +31,8 @@ void		xml_write_element_text( XmlManager, const char * name, const char * text )
 
 DeclareInterface( Xml )
 
-	void 	(* write_attributes )( Object, XmlManager );
-	void 	(* write_data )( Object, XmlManager );
+	void 	(* on_write_attributes )( Object, XmlManager );
+	void 	(* on_write_data )( Object, XmlManager );
 
 EndOfInterface;
 
