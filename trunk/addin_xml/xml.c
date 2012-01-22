@@ -99,7 +99,6 @@ XmlManager_constructor( XmlManager self, const void * direction )
 		ooc_throw( xmlexception_new( XML_ERROR_DIRECTION ) );
 
 	self->elements 	= list_new( NULL );
-	self->indent	= 2;
 }
 
 /* Destructor
@@ -147,6 +146,14 @@ xml_set_file( XmlManager self, FILE * file )
 	self->file = file;
 }
 
+FILE *
+xml_get_file( XmlManager self )
+{
+	ooc_cast( self, XmlManager );
+
+	return self->file;
+}
+
 void
 xml_set_indent( XmlManager self, int indent )
 {
@@ -161,9 +168,18 @@ xml_set_indent( XmlManager self, int indent )
 	self->indent = indent;
 }
 
+int
+xml_get_indent( XmlManager self )
+{
+	ooc_cast( self, XmlManager );
+
+	return self->indent;
+}
+
+
 static
 void
-xml_write( XmlManager self, const char * format, ... )
+xml_write_formatted( XmlManager self, const char * format, ... )
 {
 	va_list 	args;
 	int			ret_val;
@@ -189,9 +205,9 @@ xml_write_nl( XmlManager self )
 			self->indent_position = 0;
 
 		if( self->indent_position )
-			xml_write( self, "\n%*s", self->indent_position, "" );
+			xml_write_formatted( self, "\n%*s", self->indent_position, "" );
 		else
-			xml_write( self, "\n" );
+			xml_write_formatted( self, "\n" );
 	}
 }
 
@@ -215,13 +231,27 @@ xml_indent_dec( XmlManager self )
 	}
 }
 
+static
+void
+xml_write_prolog( XmlManager self )
+{
+	/* TODO: generating a proper XML prolog:
+	 * BOM, version, encoding, doctype ... */
+
+	xml_write_formatted(self, "%c%c%c", 0xEF, 0xBB, 0xBF ); /* Byte Order mark */
+
+	xml_write_formatted( self, "<?xml version='1.0' encoding='UTF-8' ?>");
+
+	self->state = STATE_PROLOG;
+}
+
 void
 xml_write_begin_element( XmlManager self, const char * name )
 {
 	ooc_cast( self, XmlManager );
 
 	if( self->state < STATE_PROLOG )
-		self->state = STATE_PROLOG; /* TODO: Handling self->state < STATE_PROLOG */
+		xml_write_prolog( self );
 
 	if( name == NULL )
 		ooc_throw( xmlexception_new( XML_ERROR_PARAMETER ) );
@@ -230,13 +260,12 @@ xml_write_begin_element( XmlManager self, const char * name )
 	{
 		case STATE_BEGIN_ELEMENT :
 		case STATE_ATTRIBUTES :
-										xml_write( self, ">");
+										xml_write_formatted( self, ">");
 										xml_indent_inc( self );
 		case STATE_TEXT :
 		case STATE_END_ELEMENT :
-										xml_write_nl( self );
-		case STATE_PROLOG :
-										xml_write( self, "<%s", name );
+		case STATE_PROLOG :				xml_write_nl( self );
+										xml_write_formatted( self, "<%s", name );
 										break;
 		default :
 			ooc_throw( xmlexception_new( XML_ERROR_SEQUENCE ) );
@@ -260,12 +289,12 @@ xml_write_end_element( XmlManager self )
 	switch( self->state )
 	{
 		case STATE_BEGIN_ELEMENT :
-		case STATE_ATTRIBUTES :			xml_write( self, "/>" );
+		case STATE_ATTRIBUTES :			xml_write_formatted( self, "/>" );
 										break;
 		case STATE_TEXT :
 		case STATE_END_ELEMENT :		xml_indent_dec( self );
 										xml_write_nl( self );
-		case STATE_TEXT_NOINDENT :		xml_write( self, "</%s>", name );
+		case STATE_TEXT_NOINDENT :		xml_write_formatted( self, "</%s>", name );
 										break;
 		default :
 			ooc_throw( xmlexception_new( XML_ERROR_SEQUENCE ) );
@@ -286,7 +315,7 @@ xml_write_attribute( XmlManager self, const char * name, const char * value )
 	switch( self->state )
 	{
 		case STATE_BEGIN_ELEMENT :
-		case STATE_ATTRIBUTES :			xml_write( self, " %s=\"%s\"", name, value );
+		case STATE_ATTRIBUTES :			xml_write_formatted( self, " %s=\"%s\"", name, value );
 										break;
 		default :
 			ooc_throw( xmlexception_new( XML_ERROR_SEQUENCE ) );
@@ -307,13 +336,13 @@ xml_write_text( XmlManager self, const char * text )
 	switch( self->state )
 	{
 		case STATE_BEGIN_ELEMENT :
-		case STATE_ATTRIBUTES :			xml_write( self, ">" );
+		case STATE_ATTRIBUTES :			xml_write_formatted( self, ">" );
 										xml_indent_inc( self );
 		case STATE_END_ELEMENT :		xml_write_nl( self );
-		case STATE_TEXT :				xml_write( self, "%s", text );
+		case STATE_TEXT :				xml_write_formatted( self, "%s", text );
 										break;
 
-		case STATE_TEXT_NOINDENT :		xml_write( self, ">%s", text );
+		case STATE_TEXT_NOINDENT :		xml_write_formatted( self, ">%s", text );
 										break;
 		default :
 			ooc_throw( xmlexception_new( XML_ERROR_SEQUENCE ) );
