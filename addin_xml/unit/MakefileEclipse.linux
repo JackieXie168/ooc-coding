@@ -47,7 +47,7 @@ release : LDLIBS = -lxml -looc
 
 make_targets : $(TARGETS)
 
-$(TARGETS) : $(FAKEOBJECTS) $(TESTABLE_TARGETS)
+$(TARGETS) : $(FAKEOBJECTS)
 
 %.o : %.c
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@

@@ -9,6 +9,7 @@
 #include <ooc/implement/exception.h>
 
 #include <stdarg.h>
+#include <string.h>
 
 static Exception xmlexception_new( enum XmlErrorCodes error );
 
@@ -33,7 +34,11 @@ enum XmlManagerState
 	STATE_ATTRIBUTES,
 	STATE_TEXT,
 	STATE_TEXT_NOINDENT,
-	STATE_END_ELEMENT
+	STATE_END_ELEMENT,
+	STATE_BEGIN_COMMENT,
+	STATE_COMMENT_TEXT,
+	STATE_COMMENT_NOINDENT,
+	STATE_END_COMMENT
 };
 
 ClassMembers( XmlManager, Base )
@@ -135,6 +140,15 @@ xml_manager_new( enum XmlDirection direction )
 	return ooc_new( XmlManager, & direction );
 }
 
+enum
+XmlDirection
+xml_get_direction( XmlManager self )
+{
+	ooc_cast( self, XmlManager );
+
+	return self->direction;
+}
+
 void
 xml_set_file( XmlManager self, FILE * file )
 {
@@ -176,6 +190,80 @@ xml_get_indent( XmlManager self )
 	return self->indent;
 }
 
+typedef
+struct
+EscapeBuffer
+{
+	char * 		converted;
+	int			must_free;
+} * EscapeBuffer;
+
+#define ESCAPED_LT		"&lt;"
+#define ESCAPED_GT		"&gt;"
+#define ESCAPED_AMP		"&amp;"
+#define ESCAPED_APOS	"&apos;"
+#define ESCAPED_QUOT	"&quot;"
+
+static
+void
+escape( EscapeBuffer buffer, const char * text )
+{
+	size_t text_len, escaped_len;
+	const char * tp;
+	char * ep;
+
+	for( text_len = escaped_len = 0, tp = text; *tp; tp++, text_len++ )
+		{
+			/* TODO: handling UTF-8 sequences here */
+			switch( *tp ) {
+				case '<' :		escaped_len += sizeof( ESCAPED_LT )-1; break;
+				case '>' :		escaped_len += sizeof( ESCAPED_GT )-1; break;
+				case '&' :		escaped_len += sizeof( ESCAPED_AMP )-1; break;
+				case '\'' :		escaped_len += sizeof( ESCAPED_APOS )-1; break;
+				case '\"' :		escaped_len += sizeof( ESCAPED_QUOT )-1; break;
+				default :		escaped_len++;
+			}
+		}
+	if( text_len == escaped_len ) {
+		buffer->converted = (char *) text;
+		buffer->must_free = FALSE;
+		}
+	else {
+		buffer->converted = ooc_malloc( escaped_len + 1 );
+		buffer->must_free = TRUE;
+		for( tp = text, ep = buffer->converted; *tp; tp++ )
+			{
+				/* TODO: handling UTF-8 sequences here */
+				switch( *tp ) {
+					case '<' :		strcpy( ep, ESCAPED_LT );
+									ep += sizeof( ESCAPED_LT )-1;
+									break;
+					case '>' :		strcpy( ep, ESCAPED_GT );
+									ep += sizeof( ESCAPED_GT )-1;
+									break;
+					case '&' :		strcpy( ep, ESCAPED_AMP );
+									ep += sizeof( ESCAPED_AMP )-1;
+									break;
+					case '\'' :		strcpy( ep, ESCAPED_APOS );
+									ep += sizeof( ESCAPED_APOS )-1;
+									break;
+					case '\"' :		strcpy( ep, ESCAPED_QUOT );
+									ep += sizeof( ESCAPED_QUOT )-1;
+									break;
+					default :		*ep++ = *tp;
+				}
+			}
+		*ep = '\0';
+		}
+}
+
+static
+void
+escapebuffer_release( EscapeBuffer buffer )
+{
+	if( buffer->must_free == TRUE )
+		ooc_free( buffer->converted );
+}
 
 static
 void
@@ -191,6 +279,7 @@ xml_write_formatted( XmlManager self, const char * format, ... )
 	ret_val = vfprintf( self->file, format, args );
 	va_end (args);
 
+	/* TODO: passing error information into the XmlException object */
 	if( ret_val < 0 )
 		ooc_throw( xmlexception_new( XML_ERROR_IO ) );
 }
@@ -263,6 +352,7 @@ xml_write_begin_element( XmlManager self, const char * name )
 										xml_write_formatted( self, ">");
 										xml_indent_inc( self );
 		case STATE_TEXT :
+		case STATE_END_COMMENT :
 		case STATE_END_ELEMENT :
 		case STATE_PROLOG :				xml_write_nl( self );
 										xml_write_formatted( self, "<%s", name );
@@ -292,6 +382,7 @@ xml_write_end_element( XmlManager self )
 		case STATE_ATTRIBUTES :			xml_write_formatted( self, "/>" );
 										break;
 		case STATE_TEXT :
+		case STATE_END_COMMENT :
 		case STATE_END_ELEMENT :		xml_indent_dec( self );
 										xml_write_nl( self );
 		case STATE_TEXT_NOINDENT :		xml_write_formatted( self, "</%s>", name );
@@ -305,6 +396,10 @@ xml_write_end_element( XmlManager self )
 void
 xml_write_attribute( XmlManager self, const char * name, const char * value )
 {
+	struct EscapeBuffer esc = { NULL, FALSE };
+
+	ooc_manage( &esc, (ooc_destroyer) escapebuffer_release );
+
 	ooc_cast( self, XmlManager );
 
 	/* TODO: handling the NULL value attribute. (could be necessary for HTML :-( ) */
@@ -315,17 +410,26 @@ xml_write_attribute( XmlManager self, const char * name, const char * value )
 	switch( self->state )
 	{
 		case STATE_BEGIN_ELEMENT :
-		case STATE_ATTRIBUTES :			xml_write_formatted( self, " %s=\"%s\"", name, value );
+		case STATE_ATTRIBUTES :			escape( &esc, value );
+										xml_write_formatted( self, " %s=\"%s\"", name, esc.converted );
 										break;
 		default :
 			ooc_throw( xmlexception_new( XML_ERROR_SEQUENCE ) );
 	}
 	self->state = STATE_ATTRIBUTES;
+
+	escapebuffer_release( ooc_pass( &esc ) );
 }
 
 void
 xml_write_text( XmlManager self, const char * text )
 {
+	enum XmlManagerState next_state = STATE_TEXT;
+
+	struct EscapeBuffer esc = { NULL, FALSE };
+
+	ooc_manage( &esc, (ooc_destroyer) escapebuffer_release );
+
 	ooc_cast( self, XmlManager );
 
 	/* TODO: handling the NULL text element. (could be necessary for HTML :-( ) */
@@ -338,26 +442,96 @@ xml_write_text( XmlManager self, const char * text )
 		case STATE_BEGIN_ELEMENT :
 		case STATE_ATTRIBUTES :			xml_write_formatted( self, ">" );
 										xml_indent_inc( self );
+		case STATE_END_COMMENT :
 		case STATE_END_ELEMENT :		xml_write_nl( self );
-		case STATE_TEXT :				xml_write_formatted( self, "%s", text );
+		case STATE_TEXT :				escape( &esc, text );
+										xml_write_formatted( self, "%s", esc.converted );
 										break;
 
-		case STATE_TEXT_NOINDENT :		xml_write_formatted( self, ">%s", text );
+		case STATE_TEXT_NOINDENT :		escape( &esc, text );
+										xml_write_formatted( self, ">%s", esc.converted );
+										break;
+
+		case STATE_BEGIN_COMMENT :		xml_indent_inc( self );
+		case STATE_COMMENT_TEXT :		xml_write_nl( self );
+		case STATE_COMMENT_NOINDENT :	xml_write_formatted( self, "%s", text );
+										next_state = STATE_COMMENT_TEXT;
 										break;
 		default :
 			ooc_throw( xmlexception_new( XML_ERROR_SEQUENCE ) );
 	}
-	self->state = STATE_TEXT;
+	self->state = next_state;
+
+	escapebuffer_release( ooc_pass( &esc ) );
 }
 
 void
 xml_write_element_text( XmlManager self, const char * name, const char * text )
 {
-		xml_write_begin_element( self, name );
-		self->state = STATE_TEXT_NOINDENT;
-		xml_write_text( self, text );
-		self->state = STATE_TEXT_NOINDENT;
-		xml_write_end_element( self );
+	xml_write_begin_element( self, name );
+	self->state = STATE_TEXT_NOINDENT;
+	xml_write_text( self, text );
+	self->state = STATE_TEXT_NOINDENT;
+	xml_write_end_element( self );
+}
+
+void
+xml_write_begin_comment( XmlManager self )
+{
+	ooc_cast( self, XmlManager );
+
+	if( self->state < STATE_PROLOG )
+		xml_write_prolog( self );
+
+	switch( self->state )
+	{
+		case STATE_BEGIN_ELEMENT :
+		case STATE_ATTRIBUTES :
+										xml_write_formatted( self, ">");
+										xml_indent_inc( self );
+		case STATE_TEXT :
+		case STATE_END_ELEMENT :
+		case STATE_END_COMMENT :
+		case STATE_PROLOG :				xml_write_nl( self );
+										xml_write_formatted( self, "<-- " );
+										break;
+		default :
+			ooc_throw( xmlexception_new( XML_ERROR_SEQUENCE ) );
+	}
+	self->state = STATE_BEGIN_COMMENT;
+}
+
+void
+xml_write_end_comment( XmlManager self )
+{
+	ooc_cast( self, XmlManager );
+
+	switch( self->state )
+	{
+		case STATE_BEGIN_COMMENT :
+		case STATE_COMMENT_NOINDENT :	xml_write_formatted( self, " -->" );
+										break;
+
+		case STATE_COMMENT_TEXT :		xml_indent_dec( self );
+										xml_write_nl( self );
+										xml_write_formatted( self, "-->" );
+										break;
+		default :
+			ooc_throw( xmlexception_new( XML_ERROR_SEQUENCE ) );
+	}
+	self->state = STATE_END_COMMENT;
+}
+
+void
+xml_write_comment( XmlManager self, const char * comment )
+{
+	ooc_cast( self, XmlManager );
+
+	xml_write_begin_comment( self );
+	self->state = STATE_COMMENT_NOINDENT;
+	xml_write_text( self, comment );
+	self->state = STATE_COMMENT_NOINDENT;
+	xml_write_end_comment( self );
 }
 
 
