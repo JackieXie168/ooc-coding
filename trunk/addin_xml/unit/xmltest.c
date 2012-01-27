@@ -223,36 +223,75 @@ xmltest_after_class( XmlTest self )
 	Test methods
  */
 
-void
 static
-xmltest_method1( XmlTest self )
+void
+xmltest_write_ref_1( XmlTest self )
 {
 	XmlManager xmlm = self->xmlm;
 
-	self->ref_file_name = "ide.xml";
-
-	xml_set_indent( xmlm, 2 );
-
-	xml_write_begin_element( xmlm, "html" );
+	xml_write_begin_element( xmlm, "first" );
 
 		xml_write_begin_element( xmlm, "head" );
-		xml_write_begin_element( xmlm, "br" );
+		xml_write_comment( xmlm, "This is a comment in the head." );
+		xml_write_begin_element( xmlm, "break" );
 		xml_write_end_element( xmlm );
 			xml_write_begin_element( xmlm, "script" );
 			xml_write_attribute( xmlm, "type", "text/javascript" );
-			xml_write_element_text( xmlm, "szöveg", "Ez egy kuvra hosszú text!" );
-			xml_write_text( xmlm, "Második text!" );
+			xml_write_element_text( xmlm, "text", "this is an escaped text: <>&\"\'" );
+			xml_write_text( xmlm, "this is a second text" );
 			xml_write_end_element( xmlm );
-			xml_write_element_text( xmlm, "epilog", "Befejező szövegrész" );
+			xml_write_element_text( xmlm, "epilog", "closing text" );
 		xml_write_end_element( xmlm );
-
 		xml_write_begin_element( xmlm, "body" );
-		xml_write_attribute( xmlm, "owner", "Joe" );
-		xml_write_attribute( xmlm, "date", "Today" );
+			xml_write_attribute( xmlm, "owner", "Joe" );
+			xml_write_attribute( xmlm, "date", "Today" );
+			xml_write_attribute( xmlm, "escaped", "<>&\"\'" );
+		xml_write_end_element( xmlm );
+		xml_write_begin_element( xmlm, "body2" );
+			xml_write_begin_comment( xmlm );
+				xml_write_text( xmlm, "This is a longer comment. <non-escaped> & ampersand character" );
+				xml_write_text( xmlm, "This is the second line of the longer comment with a \" quotation mark." );
+			xml_write_end_comment( xmlm );
 		xml_write_end_element( xmlm );
 
 	xml_write_end_element( xmlm );
+}
 
+void
+static
+xmltest_method_1_1( XmlTest self )
+{
+	XmlManager xmlm = self->xmlm;
+
+	self->ref_file_name = "ref_1_1.xml";
+
+	xml_set_indent( xmlm, -1 );
+
+	xmltest_write_ref_1( self );
+}
+
+void
+static
+xmltest_method_1_2( XmlTest self )
+{
+	XmlManager xmlm = self->xmlm;
+
+	self->ref_file_name = "ref_1_2.xml";
+
+	xmltest_write_ref_1( self );
+}
+
+void
+static
+xmltest_method_1_3( XmlTest self )
+{
+	XmlManager xmlm = self->xmlm;
+
+	self->ref_file_name = "ref_1_3.xml";
+
+	xml_set_indent( xmlm, 2 );
+
+	xmltest_write_ref_1( self );
 }
 
 /** Test methods order table.
@@ -264,7 +303,9 @@ xmltest_method1( XmlTest self )
 static ROM_ALLOC struct TestCaseMethod methods[] =
 {
 	
-	TEST(xmltest_method1),
+	TEST(xmltest_method_1_1),
+	TEST(xmltest_method_1_2),
+	TEST(xmltest_method_1_3),
 	
 	{NULL, NULL} /* Do NOT delete this line! */
 };
