@@ -493,7 +493,7 @@ xml_write_begin_comment( XmlManager self )
 		case STATE_END_ELEMENT :
 		case STATE_END_COMMENT :
 		case STATE_PROLOG :				xml_write_nl( self );
-										xml_write_formatted( self, "<-- " );
+										xml_write_formatted( self, "<!-- " );
 										break;
 		default :
 			ooc_throw( xmlexception_new( XML_ERROR_SEQUENCE ) );
