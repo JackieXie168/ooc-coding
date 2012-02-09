@@ -143,10 +143,7 @@ void
 XmlParser_destructor( XmlParser self, XmlParserVtable vtab )
 {
 	ooc_free_and_null( (void**) & self->vs );
-
-	/* TODO: if will be dynamic:
-	 * ooc_free_and_null( (void**) & self->buffer );
-	 */
+	ooc_free_and_null( (void**) & self->buffer );
 }
 
 static
@@ -162,11 +159,19 @@ XmlParser_copy( XmlParser self, const XmlParser from )
 
 
 XmlParser
-xmlparser_new( )
+xmlparser_new_str( char * str )
 {
+	XmlParser self;
+
 	ooc_init_class( XmlParser );
 		
-	return ooc_new( XmlParser, NULL );
+	self = ooc_new( XmlParser, NULL );
+
+	self->buffer = str;
+
+	self->next_pt = self->buffer;
+
+	return self;
 }
 
 #define p 		(self->next_pt)
