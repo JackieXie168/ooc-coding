@@ -2,17 +2,14 @@
 /* This is a XmlParser class implementation file
  */
 
-#include "xmlparser.h"
 
-#include "xml.h"
-
-#include <ooc/exception.h>
-
-#include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdarg.h>
 #include <ctype.h>
+
+#include "xml.h"
+#include "implement/xml.h"
 
 #define VALUE_STACK_SIZE 64
 
@@ -90,9 +87,7 @@ struct ValueStackItem
 }
 Value;
 
-ClassMembers( XmlParser, Base )
-
-	XmlManager			xmlm;
+ClassMembers( XmlParser, XmlBase )
 
 	char *				buffer;
 	char *				next_pt;
@@ -106,7 +101,10 @@ EndOfClassMembers;
 /* Allocating the class description table and the vtable
  */
 
-AllocateClass( XmlParser, Base );
+Virtuals( XmlParser, XmlBase )
+EndOfVirtuals;
+
+AllocateClass( XmlParser, XmlBase );
 
 static
 void
@@ -131,8 +129,6 @@ XmlParser_constructor( XmlParser self, const void * params )
 	assert( ooc_isInitialized( XmlParser ) );
 	
 	chain_constructor( XmlParser, self, NULL );
-
-	self->xmlm = ooc_cast( (void*) params, XmlManager );
 
 	self->vs = ooc_malloc( VALUE_STACK_SIZE * sizeof(Value) );
 	self->vsp = -1;
@@ -166,11 +162,11 @@ XmlParser_copy( XmlParser self, const XmlParser from )
 
 
 XmlParser
-xmlparser_new( XmlManager xmlm )
+xmlparser_new( )
 {
 	ooc_init_class( XmlParser );
 		
-	return ooc_new( XmlParser, xmlm );
+	return ooc_new( XmlParser, NULL );
 }
 
 #define p 		(self->next_pt)
@@ -205,6 +201,7 @@ vs_drop_top_n( XmlParser self, int n )
 
 #define vs_drop_top( self ) vs_drop_top_n( self, 1 )
 
+static
 void
 error( const char * msg, ... )
 {
@@ -287,6 +284,7 @@ check_comment( XmlParser self )
 	return true;
 }
 
+static
 void
 getsym( XmlParser self )
 {

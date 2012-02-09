@@ -7,36 +7,22 @@
 #include <ooc/ooc.h>
 #include <ooc/exception.h>
 
-enum XmlDirection
-{
-	XML_OUTPUT,
-	XML_INPUT
-};
+DeclareClass( XmlBase, Base );
 
-DeclareClass( XmlManager, Base );
-
-XmlManager 	xml_manager_new( enum XmlDirection direction );
-
-void		xml_set_file( XmlManager, FILE * );
-void		xml_set_indent( XmlManager, int );
-
-enum XmlDirection xml_get_direction( XmlManager );
-FILE *		xml_get_file( XmlManager );
-int			xml_get_indent( XmlManager );
-
-void		xml_write_begin_element( XmlManager, const char * name );
-void		xml_write_end_element( XmlManager );
-void		xml_write_attribute( XmlManager, const char * name, const char * value );
-void		xml_write_text( XmlManager, const char * text );
-void		xml_write_element_text( XmlManager, const char * name, const char * text );
-void		xml_write_begin_comment( XmlManager );
-void		xml_write_end_comment( XmlManager );
-void		xml_write_comment( XmlManager, const char * );
+#include "xmlwriter.h"
+#include "xmlparser.h"
 
 DeclareInterface( Xml )
 
-	void 	(* on_write_attributes )( Object, XmlManager );
-	void 	(* on_write_data )( Object, XmlManager );
+	/* XmlWriter callback methods */
+	void 	(* on_write_attributes )( Object, XmlWriter );
+	void 	(* on_write_data )		( Object, XmlWriter );
+
+	/* XmlParser callback methods */
+	void	(* on_read_comment )	( Object, const char * comment );
+	void	(* on_read_value )		( Object, const char * name, const char * value );
+	void	(* on_read_text )		( Object, const char * text );
+	void	(* on_read_child )		( Object, Object child );
 
 EndOfInterface;
 
