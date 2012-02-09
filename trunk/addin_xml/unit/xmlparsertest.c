@@ -6,6 +6,8 @@
 
 #include "../xmlparser.h"
 
+#include <string.h>
+
 #ifdef OOC_NO_FINALIZE
 #define ooc_finalize_class( x )
 #define ooc_finalize_all( )
@@ -66,7 +68,6 @@ XmlParserTest_initialize( Class this )
 
 	ooc_init_class( Exception );
 	
-	ooc_init_class( XmlManager );
 	ooc_init_class( XmlParser );
 }
 
@@ -157,24 +158,15 @@ void
 static
 xmlparsertest_method1( XmlParserTest self )
 {
-	Object xmlObject;
-
-	XmlManager xmlm = xml_manager_new( XML_INPUT );
-
-	ooc_manage_object( xmlm );
-
+	Object 		xmlObject = NULL;
+	XmlParser 	xmlp = xmlparser_new_str( strdup( "\t <?xml\tversion='1.0' encoding=\"UTF-8\" ?> <html><head/><body>body ez ám a javából</body><!-- \n  \rSome comment here \t   --></html>   " ) );
 	{
-		XmlParser xmlp = xmlparser_new( xmlm );
-
 		ooc_manage_object( xmlp );
 
 		xmlObject = xmlparser_parse( xmlp );
 
 		ooc_delete( (Object) ooc_pass( xmlp ) );
 	}
-
-	ooc_delete( (Object) ooc_pass( xmlm ) );
-
 	ooc_delete( xmlObject );
 }
 

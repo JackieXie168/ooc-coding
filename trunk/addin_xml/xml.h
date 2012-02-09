@@ -6,6 +6,7 @@
 
 #include <ooc/ooc.h>
 #include <ooc/exception.h>
+#include <ooc/list.h>
 
 DeclareClass( XmlBase, Base );
 
@@ -41,6 +42,17 @@ enum XmlErrorCodes
 
 DeclareClass( XmlException, Exception );
 
-#endif  /* OOC_XML_H */
+/* XmlNode
+ *
+ */
 
+DeclareClass( XmlNode, ListNode );
+
+XmlNode xmlnode_new( const char * name );
+
+Virtuals( XmlNode, ListNode )
+	Interface( Xml );
+EndOfVirtuals;
+
+#endif  /* OOC_XML_H */
 

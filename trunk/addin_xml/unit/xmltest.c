@@ -76,8 +76,9 @@ EndOfVirtuals;
 
 ClassMembers( XmlTest, TestCase )
 
-	XmlManager		xmlm;
+	XmlWriter		xmlw;
 	const char *	ref_file_name;
+	FILE *			ref_file;
 
 EndOfClassMembers;
 
@@ -172,32 +173,28 @@ static
 void
 xmltest_before( XmlTest self )
 {
-	FILE * output;
-
-	self->xmlm = xml_manager_new( XML_OUTPUT );
-
-	output = fopen( TMP_FILE_NAME, "w+" );
-	if( output == NULL )
+	self->ref_file = fopen( TMP_FILE_NAME, "w+" );
+	if( self->ref_file == NULL )
 		ooc_throw( xmltestexception_new( error_file_cant_open ) );
 
-	xml_set_file( self->xmlm, output );
+	self->xmlw = xmlwriter_new_file( self->ref_file );
 }
 
 static
 void
 xmltest_after( XmlTest self )
 {
-	if( self->xmlm )
+	if( self->xmlw )
 	{
-		FILE * output = xml_get_file( self->xmlm );
+		ooc_manage_object( self->xmlw );
 
-		if( output )
+		if( self->ref_file )
 		{
 			int comp_value;
 			static char command[256]; /* bad, but it is ok here ;-) */
 
-			fprintf( output, "\n" );
-			fclose( output );
+			fprintf( self->ref_file, "\n" );
+			fclose( ooc_ptr_read_and_null( (void**) & self->ref_file ) );
 
 			if( self->ref_file_name == NULL )
 				ooc_throw( xmltestexception_new( error_no_ref_file_given ) );
@@ -208,7 +205,8 @@ xmltest_after( XmlTest self )
 			assertZeroMsg( comp_value, "The generated file is not identical to the reference file" );
 		}
 
-		ooc_delete_and_null( (Object*) &self->xmlm );
+		ooc_pass( self->xmlw );
+		ooc_delete_and_null( (Object*) & self->xmlw );
 	}
 }
 
@@ -227,45 +225,45 @@ static
 void
 xmltest_write_ref_1( XmlTest self )
 {
-	XmlManager xmlm = self->xmlm;
+	XmlWriter xmlw = self->xmlw;
 
-	xml_write_begin_element( xmlm, "first" );
+	xml_write_begin_element( xmlw, "first" );
 
-		xml_write_begin_element( xmlm, "head" );
-		xml_write_comment( xmlm, "This is a comment in the head." );
-		xml_write_begin_element( xmlm, "break" );
-		xml_write_end_element( xmlm );
-			xml_write_begin_element( xmlm, "script" );
-			xml_write_attribute( xmlm, "type", "text/javascript" );
-			xml_write_element_text( xmlm, "text", "this is an escaped text: <>&\"\'" );
-			xml_write_text( xmlm, "this is a second text" );
-			xml_write_end_element( xmlm );
-			xml_write_element_text( xmlm, "epilog", "closing text" );
-		xml_write_end_element( xmlm );
-		xml_write_begin_element( xmlm, "body" );
-			xml_write_attribute( xmlm, "owner", "Joe" );
-			xml_write_attribute( xmlm, "date", "Today" );
-			xml_write_attribute( xmlm, "escaped", "<>&\"\'" );
-		xml_write_end_element( xmlm );
-		xml_write_begin_element( xmlm, "body2" );
-			xml_write_begin_comment( xmlm );
-				xml_write_text( xmlm, "This is a longer comment. <non-escaped> & ampersand character" );
-				xml_write_text( xmlm, "This is the second line of the longer comment with a \" quotation mark." );
-			xml_write_end_comment( xmlm );
-		xml_write_end_element( xmlm );
+		xml_write_begin_element( xmlw, "head" );
+		xml_write_comment( xmlw, "This is a comment in the head." );
+		xml_write_begin_element( xmlw, "break" );
+		xml_write_end_element( xmlw );
+			xml_write_begin_element( xmlw, "script" );
+			xml_write_attribute( xmlw, "type", "text/javascript" );
+			xml_write_element_text( xmlw, "text", "this is an escaped text: <>&\"\'" );
+			xml_write_text( xmlw, "this is a second text" );
+			xml_write_end_element( xmlw );
+			xml_write_element_text( xmlw, "epilog", "closing text" );
+		xml_write_end_element( xmlw );
+		xml_write_begin_element( xmlw, "body" );
+			xml_write_attribute( xmlw, "owner", "Joe" );
+			xml_write_attribute( xmlw, "date", "Today" );
+			xml_write_attribute( xmlw, "escaped", "<>&\"\'" );
+		xml_write_end_element( xmlw );
+		xml_write_begin_element( xmlw, "body2" );
+			xml_write_begin_comment( xmlw );
+				xml_write_text( xmlw, "This is a longer comment. <non-escaped> & ampersand character" );
+				xml_write_text( xmlw, "This is the second line of the longer comment with a \" quotation mark." );
+			xml_write_end_comment( xmlw );
+		xml_write_end_element( xmlw );
 
-	xml_write_end_element( xmlm );
+	xml_write_end_element( xmlw );
 }
 
 void
 static
 xmltest_method_1_1( XmlTest self )
 {
-	XmlManager xmlm = self->xmlm;
+	XmlWriter xmlw = self->xmlw;
 
 	self->ref_file_name = "ref_1_1.xml";
 
-	xml_set_indent( xmlm, -1 );
+	xml_set_indent( xmlw, -1 );
 
 	xmltest_write_ref_1( self );
 }
@@ -274,7 +272,7 @@ void
 static
 xmltest_method_1_2( XmlTest self )
 {
-	XmlManager xmlm = self->xmlm;
+	XmlWriter xmlw = self->xmlw;
 
 	self->ref_file_name = "ref_1_2.xml";
 
@@ -285,11 +283,11 @@ void
 static
 xmltest_method_1_3( XmlTest self )
 {
-	XmlManager xmlm = self->xmlm;
+	XmlWriter xmlw = self->xmlw;
 
 	self->ref_file_name = "ref_1_3.xml";
 
-	xml_set_indent( xmlm, 2 );
+	xml_set_indent( xmlw, 2 );
 
 	xmltest_write_ref_1( self );
 }

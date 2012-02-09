@@ -6,6 +6,8 @@
 #error Do #include "xml.h" right before doing #include "implement/xml.h"
 #endif
 
+#include <ooc/list.h>
+#include <ooc/implement/list.h>
 
 ClassMembers( XmlBase, Base )
 
@@ -30,5 +32,18 @@ Exception 		xmlexception_new( enum XmlErrorCodes error );
 #define ESCAPED_AMP		"&amp;"
 #define ESCAPED_APOS	"&apos;"
 #define ESCAPED_QUOT	"&quot;"
+
+/* XmlNode :
+ *
+ */
+
+ClassMembers( XmlNode, ListNode )
+
+	char *			name;
+	List			values;
+	List			children;
+	List			text;
+
+EndOfClassMembers;
 
 #endif /* IMPL_OOC_XML_H */
