@@ -46,4 +46,10 @@ ClassMembers( XmlNode, ListNode )
 
 EndOfClassMembers;
 
+/* XmlAttribs :
+ *
+ */
+
+XmlAttribs xmlattribs_new( void );
+
 #endif /* IMPL_OOC_XML_H */
