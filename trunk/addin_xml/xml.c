@@ -6,6 +6,7 @@
 #include "implement/xml.h"
 
 #include <ooc/implement/exception.h>
+#include <ooc/vector.h>
 
 #include <string.h>
 
@@ -77,127 +78,54 @@ xmlexception_new( enum XmlErrorCodes error )
 	return (Exception) ooc_new( XmlException, & error );
 }
 
-
-DeclareClass( _XmlNodeValue, ListNode );
-
-ClassMembers( _XmlNodeValue, ListNode )
-	char *		name;
-	char *		value;
-EndOfClassMembers;
-
-Virtuals( _XmlNodeValue, ListNode )
-EndOfVirtuals;
-
-AllocateClass( _XmlNodeValue, ListNode );
-
-static	void	_XmlNodeValue_initialize( Class this ) {}
-static	void	_XmlNodeValue_finalize( Class this ) {}
-
-struct _XmlNodeValueConstParam
-{
-	const char * name;
-	const char * value;
-};
-
-static	void	_XmlNodeValue_constructor( _XmlNodeValue self, const void * params )
-{
-	struct _XmlNodeValueConstParam * p = (struct _XmlNodeValueConstParam *) params;
-
-	assert( ooc_isInitialized( _XmlNodeValue ) );
-
-	chain_constructor( _XmlNodeValue, self, NULL );
-
-	self->name	= p->name ? strdup( p->name ) : NULL;
-	self->value = p->value ? strdup( p->value ) : NULL;
-}
-
-static	void	_XmlNodeValue_destructor( _XmlNodeValue self, _XmlNodeValueVtable vtab )
-{
-	ooc_free_and_null( (void**) & self->name );
-	ooc_free_and_null( (void**) & self->value );
-}
-
-static	int	_XmlNodeValue_copy( _XmlNodeValue self, const _XmlNodeValue from )
-{
-	self->name	= from->name ? strdup( from->name ) : from->name;
-	self->value = from->value ? strdup( from->value ) : from->value;
-	return OOC_COPY_DONE;
-}
-
-static
-_XmlNodeValue
-xmlnodevalue_new( const char * name, const char * value )
-{
-	struct _XmlNodeValueConstParam p;
-
-	p.name	= name;
-	p.value = value;
-
-	return ooc_new( _XmlNodeValue, & p );
-}
-
-/** @class XmlNode
- *  @brief XmlNode class - brief description.
+/** @class XmlAttribs
+ *  @brief XmlAttribs class - brief description.
  * 	@see xml.h
  */
 
-/** @file xmlnode.h 
- *  @brief XmlNode class - brief description.
- * XmlNode is a .....
+/** @brief XmlAttribs class - brief description.
+ * XmlAttribs is a .....
+ * @note	This class is a final class, can not be inherited.
  */ 
 
-/* Allocating the class description table and the vtable
+/* Declaring the members of the class. 
+ * They are all private.
  */
 
-InterfaceRegister( XmlNode )
-{
-	AddInterface( XmlNode, Xml )
-};
+Virtuals( XmlAttribs, Base )
+EndOfVirtuals;
 
-AllocateClassWithInterface( XmlNode, ListNode );
+ClassMembers( XmlAttribs, Base )
 
-static void XmlNode_populate( Xml xml );
+	int		data;
+
+EndOfClassMembers;
+
+AllocateClass( XmlAttribs, Base );
 
 static
 void
-XmlNode_initialize( Class this )
+XmlAttribs_initialize( Class this )
 {
-	XmlNodeVtable vtab = & XmlNodeVtableInstance;
+	XmlAttribsVtable vtab = & XmlAttribsVtableInstance;
 	
-	XmlNode_populate( & vtab->Xml );
-
-	ooc_init_class( List );
-	ooc_init_class( ListNode );
-	ooc_init_class( _XmlNodeValue );
+	ooc_init_class( Vector );
 }
 
-/* Class finalizing
- */
-
-#ifndef OOC_NO_FINALIZE
 static
 void
-XmlNode_finalize( Class this )
+XmlAttribs_finalize( Class this )
 {
 }
-#endif
-
-
-/* Constructor
- */
 
 static
 void
-XmlNode_constructor( XmlNode self, const void * params )
+XmlAttribs_constructor( XmlAttribs self, const void * params )
 {
-	assert( ooc_isInitialized( XmlNode ) );
+	assert( ooc_isInitialized( XmlAttribs ) );
 	
-	chain_constructor( XmlNode, self, NULL );
+	chain_constructor( XmlAttribs, self, NULL );
 
-	self->name = strdup( params );
-	self->children = list_new_type( XmlNode, OOC_MANAGE );
-	self->values = list_new_type( _XmlNodeValue, OOC_MANAGE );
-	self->text = list_new( ooc_free );
 }
 
 /* Destructor
@@ -205,77 +133,28 @@ XmlNode_constructor( XmlNode self, const void * params )
 
 static
 void
-XmlNode_destructor( XmlNode self, XmlNodeVtable vtab )
+XmlAttribs_destructor( XmlAttribs self, XmlAttribsVtable vtab )
 {
-	ooc_free_and_null( (void**) & self->name );
-	ooc_delete_and_null( (Object*) & self->children );
-	ooc_delete_and_null( (Object*) & self->values );
-	ooc_delete_and_null( (Object*) & self->text );
 }
-
-/* Copy constuctor
- */
 
 static
 int
-XmlNode_copy( XmlNode self, const XmlNode from )
+XmlAttribs_copy( XmlAttribs self, const XmlAttribs from )
 {
-	self->name		= strdup( from->name );
-	self->children	= (List) ooc_duplicate( (Object) from->children );
-	self->values	= (List) ooc_duplicate( (Object) from->values );
-	self->text		= (List) ooc_duplicate( (Object) from->text );
+	/* makes the default object copying (bit-by-bit) */
+	return OOC_COPY_DEFAULT;
+	
+	/* Copies data by hand */
+	self->data = from->data;
+	...
 	return OOC_COPY_DONE;
+	
+	/* Prevent object duplication */
+	return OOC_NO_COPY;
 }
 
-/*	=====================================================
-	Class member functions
- */
-
-
-XmlNode
-xmlnode_new( const char * name )
+XmlAttribs
+xmlattribs_new( void )
 {
-	ooc_init_class( XmlNode );
-
-	if( name == NULL )
-		ooc_throw( xmlexception_new( XML_ERROR_PARAMETER ) );
-
-	return ooc_new( XmlNode, name );
-}
-
-static
-void
-xmlnode_read_child( Object _self, Object child )
-{
-	XmlNode self = ooc_cast( _self, XmlNode );
-
-	list_append( self->children, child );
-}
-
-static
-void
-xmlnode_read_value( Object _self, const char * name, const char * value )
-{
-	XmlNode self = ooc_cast( _self, XmlNode );
-
-	list_append( self->values, xmlnodevalue_new( name, value ) );
-}
-
-static
-void
-xmlnode_read_text( Object _self, const char * text )
-{
-	XmlNode self = ooc_cast( _self, XmlNode );
-
-	list_append( self->text, strdup( text ) );
-}
-
-static
-void
-XmlNode_populate( Xml xml )
-{
-	xml->on_read_comment	= NULL;
-	xml->on_read_value		= xmlnode_read_value;
-	xml->on_read_text		= xmlnode_read_text;
-	xml->on_read_child		= xmlnode_read_child;
+	return ooc_new( XmlAttribs, NULL );
 }

@@ -47,7 +47,7 @@ enum _Symbol
 
 	/* Symbols that resulted from a reduction.
 	 * These symbols have a corresponding value on the value stack
-	 * and are status variables as well.
+	 * and may have status variables as well.
 	 */
 	tagName,	/*   */
 	tagObject,	/*   */
@@ -63,6 +63,7 @@ struct SymbolValueItem
 {
 	const char *	location;
 	int				length;
+	XmlReadState	state;
 }
 SymbolValue;
 
@@ -110,6 +111,7 @@ static
 void
 XmlParser_initialize( Class this )
 {
+	ooc_init_class( XmlAttribList );
 }
 
 static

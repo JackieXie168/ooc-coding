@@ -6,26 +6,65 @@
 
 #include <ooc/ooc.h>
 #include <ooc/exception.h>
-#include <ooc/list.h>
 
 DeclareClass( XmlBase, Base );
 
 #include "xmlwriter.h"
 #include "xmlparser.h"
 
+typedef int XmlReadState;
+DeclareClass( XmlAttribs, Base );
+
 DeclareInterface( Xml )
 
 	/* XmlWriter callback methods */
-	void 	(* on_write_attributes )( Object, XmlWriter );
-	void 	(* on_write_data )		( Object, XmlWriter );
+	const char *	(* on_write_name )		( Object, XmlWriter );
+	void 			(* on_write_attributes )( Object, XmlWriter );
+	void 			(* on_write_data )		( Object, XmlWriter );
 
 	/* XmlParser callback methods */
-	void	(* on_read_comment )	( Object, const char * comment );
-	void	(* on_read_value )		( Object, const char * name, const char * value );
-	void	(* on_read_text )		( Object, const char * text );
-	void	(* on_read_child )		( Object, Object child );
+
+	XmlReadState	(* on_read_beginElement)( Object, XmlParser, XmlReadState, const char * name, XmlAttribs );
+	void			(* on_read_endElement)	( Object, XmlParser, XmlReadState );
+	void			(* on_read_text )		( Object, XmlParser, XmlReadState, const char * text );
+	void			(* on_read_child )		( Object, XmlParser, XmlReadState, Object child );
+	void			(* on_read_comment )	( Object, XmlParser, XmlReadState, const char * comment );
+
+	/*
+	void		(* on_read_name )		( Object, const char * name );
+	void		(* on_read_value )		( Object, const char * name, const char * value );
+	void		(* on_read_text )		( Object, const char * text );
+	void		(* on_read_child )		( Object, Object child );
+	void		(* on_read_comment )	( Object, const char * comment );
+	*/
 
 EndOfInterface;
+
+/* Xml class registration
+ */
+
+struct _XmlClassRegisterItem
+{
+	const Class						class;
+	int								context;
+	ROM char *						name;
+	struct _XmlClassRegisterItem *	next;
+};
+
+void _xml_register_class( struct _XmlClassRegisterItem * );
+
+#define xml_register_class( pClass, pContext, pName )			\
+do { 															\
+	static struct _XmlClassRegisterItem xmlClass;				\
+	xmlClass.class = & pClass ## Class;							\
+	xmlClass.context = pContext;								\
+	xmlClass.name = pName;										\
+	xmlClass.next = NULL; 										\
+	_xml_register_class( &xmlClass ); 							\
+} while(0)
+
+/* XmlException
+*/
 
 enum XmlErrorCodes
 {
@@ -42,17 +81,9 @@ enum XmlErrorCodes
 
 DeclareClass( XmlException, Exception );
 
-/* XmlNode
- *
+/* usefull tools
  */
 
-DeclareClass( XmlNode, ListNode );
-
-XmlNode xmlnode_new( const char * name );
-
-Virtuals( XmlNode, ListNode )
-	Interface( Xml );
-EndOfVirtuals;
+# define ooc_strdup( x ) ( x ? strdup(x) : x )
 
 #endif  /* OOC_XML_H */
-
