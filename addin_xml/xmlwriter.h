@@ -6,6 +6,7 @@ DeclareClass( XmlWriter, XmlBase );
 
 XmlWriter	xmlwriter_new_file( FILE * );
 /* XmlWriter	xmlwriter_new_buffer( char *, size_t, handler ); */
+void		xmlwriter_write( XmlWriter, Object );
 
 void		xml_set_indent( XmlWriter, int );
 int			xml_get_indent( XmlWriter );

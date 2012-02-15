@@ -55,16 +55,6 @@
 
 #include <string.h>
 
-/* Private virtuals
- */
- 
-Virtuals( Vector, Base )
-
-EndOfVirtuals;
-
-/* Class virtual function prototypes
- */
-
 /* Allocating the class description table and the vtable
  */
 

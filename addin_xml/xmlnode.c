@@ -2,6 +2,8 @@
 /* This is a XmlNode class implementation file
  */
 
+#include <string.h>
+
 #include "xmlnode.h"
 
 #include <ooc/exception.h>
@@ -43,7 +45,7 @@ InterfaceRegister( XmlNode )
 	AddInterface( XmlNode, Xml )
 };
 
-AllocateClassWithInterface( XmlNode, Base );
+AllocateClassWithInterface( XmlNode, ListNode );
 
 static void XmlNode_populate( Xml );
 
@@ -81,7 +83,7 @@ XmlNode_constructor( XmlNode self, const void * params )
 	chain_constructor( XmlNode, self, NULL );
 
 	if( params )
-		self->parent = ooc_cast( params, XmlNode );
+		self->parent = ooc_cast( (void*) params, XmlNode );
 }
 
 static
@@ -104,7 +106,7 @@ XmlNode_copy( XmlNode self, const XmlNode from )
 	self->parent	= from->parent;
 	self->name		= ooc_strdup( from->name );
 	self->value		= ooc_strdup( from->value );
-	self->children	= ooc_duplicate( from->children );
+	self->children	= (Vector) ooc_duplicate( (Object) from->children );
 	
 	return OOC_COPY_DONE;
 }
@@ -128,7 +130,7 @@ xmlnode_set_name( XmlNode self, const char * name )
 {
 	assert( ooc_isInstanceOf( self, XmlNode ) );
 
-	if( name = NULL )
+	if( name == NULL )
 		ooc_throw( xmlexception_new( XML_ERROR_IMPLEMENTATION ) );
 	
 	self->name = strdup( name );
@@ -152,7 +154,7 @@ xmlnode_set_value( XmlNode self, const char * value )
 {
 	assert( ooc_isInstanceOf( self, XmlNode ) );
 
-	self->value = ooc_strdup( name );
+	self->value = ooc_strdup( value );
 }
 
 #define XML_NODE_CHILDREN_CHUNK_SIZE 8
@@ -216,25 +218,8 @@ xmlnode_read_comment( Object _self, XmlParser parser, XmlReadState state, const 
 }
 
 static
-const char *
-xmlnode_write_name( Object _self, XmlWriter xmlw )
-{
-	XmlNode self = ooc_cast( _self, XmlNode );
-
-	return self->name;
-}
-
-static
 void
-xmlnode_write_attributes( Object _self, XmlWriter xmlw )
-{
-	XmlNode self = ooc_cast( _self, XmlNode );
-
-}
-
-static
-void
-xmlnode_write_data( Object _self, XmlWriter xmlw )
+xmlnode_write_children( Object _self, XmlWriter xmlw )
 {
 	XmlNode self = ooc_cast( _self, XmlNode );
 
@@ -248,6 +233,32 @@ xmlnode_write_data( Object _self, XmlWriter xmlw )
 
 static
 void
+xmlnode_write( XmlNode self, XmlWriter xmlw )
+{
+	switch( self->type )
+	{
+		case XML_NODE_DOCUMENT	:	/* xml_write_prolog( xmlw ); */
+									xmlnode_write_children( self, xmlw );
+									/* xml_write_epilog( xmlw ); */
+									break;
+		case XML_NODE_ELEMENT	:	xml_write_begin_element( xmlw, self->name );
+									xmlnode_write_children( self, xmlw );
+									xml_write_end_element();
+									break;
+		case XML_NODE_ATTR		:	xml_write_attribute( xmlw, self->name, self->value );
+									break;
+		case XML_NODE_TEXT		:	xml_write_text( xmlw, self->value );
+									break;
+		case XML_NODE_CDATA		:	/* TODO: CDATA write implementation */
+									break;
+		case XML_NODE_COMMENT	:	xml_write_comment( xmlw, self->value );
+									break;
+		default : ooc_throw( xmlexception_new( XML_ERROR_IMPLEMENTATION ) );
+	}
+}
+
+static
+void
 XmlNode_populate( Xml xml )
 {
 	xml->on_read_beginElement	= xmlnode_read_beginElement;
@@ -257,25 +268,9 @@ XmlNode_populate( Xml xml )
 	xml->on_read_child			= NULL;
 	xml->on_read_endElement 	= NULL;
 
-	xml->on_write_name			= xmlnode_write_name;
-	xml->on_write_attributes	= xmlnode_write_attributes;
-	xml->on_write_data			= xmlnode_write_data;
+	xml->on_write_begin			= xmlnode_write;
+	xml->on_write_attributes	= NULL;
+	xml->on_write_data			= NULL;
+	xml->on_write_end			= NULL;
 }
 
-void
-xmlnode_write( XmlNode self, XmlWriter xmlw )
-{
-	switch( self->type )
-	{
-		case XML_NODE_DOCUMENT	:	xmlnode_write_data( self, xmlw );
-									break;
-		case XML_NODE_ELEMENT	:	xml_write_begin_element( xmlw, self->name );
-
-		case XML_NODE_ATTR		:
-		case XML_NODE_TEXT		:
-		case XML_NODE_CDATA		:
-		case XML_NODE_COMMENT	:	xml_write_comment( xmlw, self->value );
-									break;
-		default : ooc_throw( xmlexception_new( XML_ERROR_IMPLEMENTATION ) );
-	}
-}

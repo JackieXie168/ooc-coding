@@ -4,6 +4,8 @@
 
 #include <ooc/list.h>
 
+#include "xml.h"
+
 DeclareClass( XmlNode, ListNode );
 
 XmlNode xmlnode_new( XmlNode parent );

@@ -6,6 +6,7 @@
 
 #include <ooc/ooc.h>
 #include <ooc/exception.h>
+#include <ooc/vector.h>
 
 DeclareClass( XmlBase, Base );
 
@@ -13,14 +14,16 @@ DeclareClass( XmlBase, Base );
 #include "xmlparser.h"
 
 typedef int XmlReadState;
+
 DeclareClass( XmlAttribs, Base );
 
 DeclareInterface( Xml )
 
 	/* XmlWriter callback methods */
-	const char *	(* on_write_name )		( Object, XmlWriter );
+	const char *	(* on_write_begin )		( Object, XmlWriter );
 	void 			(* on_write_attributes )( Object, XmlWriter );
 	void 			(* on_write_data )		( Object, XmlWriter );
+	void 			(* on_write_end )		( Object, XmlWriter );
 
 	/* XmlParser callback methods */
 
@@ -29,14 +32,6 @@ DeclareInterface( Xml )
 	void			(* on_read_text )		( Object, XmlParser, XmlReadState, const char * text );
 	void			(* on_read_child )		( Object, XmlParser, XmlReadState, Object child );
 	void			(* on_read_comment )	( Object, XmlParser, XmlReadState, const char * comment );
-
-	/*
-	void		(* on_read_name )		( Object, const char * name );
-	void		(* on_read_value )		( Object, const char * name, const char * value );
-	void		(* on_read_text )		( Object, const char * text );
-	void		(* on_read_child )		( Object, Object child );
-	void		(* on_read_comment )	( Object, const char * comment );
-	*/
 
 EndOfInterface;
 

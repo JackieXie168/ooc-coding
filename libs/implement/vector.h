@@ -50,6 +50,15 @@ ClassMembers( Vector, Base )
 
 EndOfClassMembers;
 
+/* Protected virtuals
+ */
+
+Virtuals( Vector, Base )
+EndOfVirtuals;
+
+/* Constructor parameters
+ */
+
 struct
 VectorConstructorParams
 {
