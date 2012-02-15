@@ -6,7 +6,7 @@
 #include "implement/xml.h"
 
 #include <ooc/implement/exception.h>
-#include <ooc/vector.h>
+#include <ooc/implement/vector.h>
 
 #include <string.h>
 
@@ -88,28 +88,20 @@ xmlexception_new( enum XmlErrorCodes error )
  * @note	This class is a final class, can not be inherited.
  */ 
 
-/* Declaring the members of the class. 
- * They are all private.
- */
-
-Virtuals( XmlAttribs, Base )
-EndOfVirtuals;
-
-ClassMembers( XmlAttribs, Base )
-
-	int		data;
-
+ClassMembers( XmlAttribs, Vector )
+/* on even position are names,
+   on odd positions are values */
 EndOfClassMembers;
 
-AllocateClass( XmlAttribs, Base );
+Virtuals( XmlAttribs, Vector )
+EndOfVirtuals;
+
+AllocateClass( XmlAttribs, Vector );
 
 static
 void
 XmlAttribs_initialize( Class this )
 {
-	XmlAttribsVtable vtab = & XmlAttribsVtableInstance;
-	
-	ooc_init_class( Vector );
 }
 
 static
@@ -118,14 +110,21 @@ XmlAttribs_finalize( Class this )
 {
 }
 
+#define XML_ATTRIBS_CHUNK_SIZE 4
+
 static
 void
 XmlAttribs_constructor( XmlAttribs self, const void * params )
 {
+	struct	VectorConstructorParams vp;
+
 	assert( ooc_isInitialized( XmlAttribs ) );
 	
-	chain_constructor( XmlAttribs, self, NULL );
+	vp.destroy = ooc_free;
+	vp.size = XML_ATTRIBS_CHUNK_SIZE * 2;
+	vp.type = NULL;
 
+	chain_constructor( XmlAttribs, self, &vp );
 }
 
 /* Destructor
@@ -141,16 +140,7 @@ static
 int
 XmlAttribs_copy( XmlAttribs self, const XmlAttribs from )
 {
-	/* makes the default object copying (bit-by-bit) */
 	return OOC_COPY_DEFAULT;
-	
-	/* Copies data by hand */
-	self->data = from->data;
-	...
-	return OOC_COPY_DONE;
-	
-	/* Prevent object duplication */
-	return OOC_NO_COPY;
 }
 
 XmlAttribs

@@ -111,7 +111,7 @@ static
 void
 XmlParser_initialize( Class this )
 {
-	ooc_init_class( XmlAttribList );
+	ooc_init_class( XmlAttribs );
 }
 
 static
