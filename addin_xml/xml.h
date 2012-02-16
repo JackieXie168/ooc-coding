@@ -20,7 +20,7 @@ DeclareClass( XmlAttribs, Base );
 DeclareInterface( Xml )
 
 	/* XmlWriter callback methods */
-	const char *	(* on_write_begin )		( Object, XmlWriter );
+	void			(* on_write_begin )		( Object, XmlWriter );
 	void 			(* on_write_attributes )( Object, XmlWriter );
 	void 			(* on_write_data )		( Object, XmlWriter );
 	void 			(* on_write_end )		( Object, XmlWriter );
@@ -79,6 +79,6 @@ DeclareClass( XmlException, Exception );
 /* usefull tools
  */
 
-# define ooc_strdup( x ) ( x ? strdup(x) : x )
+# define ooc_strdup( x ) ( (x) ? strdup(x) : (x) )
 
 #endif  /* OOC_XML_H */

@@ -33,23 +33,11 @@ Exception 		xmlexception_new( enum XmlErrorCodes error );
 #define ESCAPED_APOS	"&apos;"
 #define ESCAPED_QUOT	"&quot;"
 
-/* XmlNode :
- *
- */
-
-ClassMembers( XmlNode, ListNode )
-
-	char *			name;
-	List			values;
-	List			children;
-	List			text;
-
-EndOfClassMembers;
-
 /* XmlAttribs :
  *
  */
 
-XmlAttribs xmlattribs_new( void );
+XmlAttribs 	xmlattribs_new( void );
+void		xmlattribs_append( XmlAttribs, const char * name, const char * value );
 
 #endif /* IMPL_OOC_XML_H */

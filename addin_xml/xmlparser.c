@@ -51,6 +51,7 @@ enum _Symbol
 	 */
 	tagName,	/*   */
 	tagObject,	/*   */
+	xmlAttribs, /*   */
 
 } Symbol;
 
@@ -84,6 +85,7 @@ struct ValueStackItem
 	{
 	SymbolValue		symbolValue;
 	ObjectValue		xmlObject;
+	XmlAttribs		attribs;
 	} v;
 }
 Value;

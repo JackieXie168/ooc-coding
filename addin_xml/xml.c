@@ -140,11 +140,28 @@ static
 int
 XmlAttribs_copy( XmlAttribs self, const XmlAttribs from )
 {
-	return OOC_COPY_DEFAULT;
+	VectorIndex i;
+
+	XmlAttribs_constructor( self, NULL );
+
+	for( i=0; i<vector_items( (Vector) from ); i++ )
+		vector_push_back( (Vector) self, vector_get_item( (Vector) from, i ) );
+
+	return OOC_COPY_DONE;
 }
 
 XmlAttribs
 xmlattribs_new( void )
 {
 	return ooc_new( XmlAttribs, NULL );
+}
+
+void
+xmlattribs_append( XmlAttribs self, const char * name, const char * value )
+{
+	assert( ooc_isInstanceOf( self, XmlAttribs ) );
+	assert( (vector_items( (Vector) self ) & 1) == 0 );
+
+	vector_push_back( (Vector) self, ooc_strdup( (char*) name ) );
+	vector_push_back( (Vector) self, ooc_strdup( (char*) value ) );
 }

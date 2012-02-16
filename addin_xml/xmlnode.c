@@ -5,10 +5,10 @@
 #include <string.h>
 
 #include "xmlnode.h"
+#include "implement/xml.h"
 
 #include <ooc/exception.h>
 #include <ooc/implement/list.h>
-
 
 
 /** @class XmlNode
@@ -154,7 +154,7 @@ xmlnode_set_value( XmlNode self, const char * value )
 {
 	assert( ooc_isInstanceOf( self, XmlNode ) );
 
-	self->value = ooc_strdup( value );
+	self->value = ooc_strdup( (char*) value );
 }
 
 #define XML_NODE_CHILDREN_CHUNK_SIZE 8
@@ -179,7 +179,7 @@ xmlnode_add_child( XmlNode self, XmlNode child )
 
 static
 XmlReadState
-xmlnode_read_beginElement( Object _self, XmlParser parser, XmlReadState state, const char * name, XmlAttribs )
+xmlnode_read_beginElement( Object _self, XmlParser parser, XmlReadState state, const char * name, XmlAttribs attribs )
 {
 	XmlNode self = ooc_cast( _self, XmlNode );
 
@@ -219,19 +219,16 @@ xmlnode_read_comment( Object _self, XmlParser parser, XmlReadState state, const 
 
 static
 void
-xmlnode_write_children( Object _self, XmlWriter xmlw )
+xmlnode_write_children( XmlNode self, XmlWriter xmlw )
 {
-	XmlNode self = ooc_cast( _self, XmlNode );
+	assert( ooc_isInstanceOf( self, XmlNode ) );
 
 	if( self->children )
-	{
 		vector_foreach( self->children, (vector_item_executor) xmlnode_write, xmlw );
-	}
 	else
 		xml_write_text( xmlw, self->value );
 }
 
-static
 void
 xmlnode_write( XmlNode self, XmlWriter xmlw )
 {
@@ -243,7 +240,7 @@ xmlnode_write( XmlNode self, XmlWriter xmlw )
 									break;
 		case XML_NODE_ELEMENT	:	xml_write_begin_element( xmlw, self->name );
 									xmlnode_write_children( self, xmlw );
-									xml_write_end_element();
+									xml_write_end_element( xmlw );
 									break;
 		case XML_NODE_ATTR		:	xml_write_attribute( xmlw, self->name, self->value );
 									break;
@@ -268,7 +265,7 @@ XmlNode_populate( Xml xml )
 	xml->on_read_child			= NULL;
 	xml->on_read_endElement 	= NULL;
 
-	xml->on_write_begin			= xmlnode_write;
+	xml->on_write_begin			= (void	(*)( Object, XmlWriter )) xmlnode_write;
 	xml->on_write_attributes	= NULL;
 	xml->on_write_data			= NULL;
 	xml->on_write_end			= NULL;
