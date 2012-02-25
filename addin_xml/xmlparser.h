@@ -6,12 +6,12 @@
 
 DeclareClass( XmlParser, XmlBase );
 
-XmlParser xmlparser_new_file( FILE * );
-XmlParser xmlparser_new_str( char * str );
+XmlParser	xmlparser_new_file( FILE * );
+XmlParser	xmlparser_new_str( char * str );
 
-Object xmlparser_parse( XmlParser self );
+Object 		xmlparser_parse( XmlParser self );
 
-/* Virtual function definitions
- */
+void		_xmlparser_set_type( XmlParser, Class );
+void		_xmlparser_set_root( XmlParser, Object );
 
 #endif  /* XMLPARSER_H */
