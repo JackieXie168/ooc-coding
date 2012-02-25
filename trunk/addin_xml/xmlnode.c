@@ -8,6 +8,7 @@
 #include "implement/xml.h"
 
 #include <ooc/exception.h>
+#include <ooc/list.h>
 #include <ooc/implement/list.h>
 
 
@@ -31,7 +32,7 @@ ClassMembers( XmlNode, ListNode )
 	XmlNodeTypes		type;
 	char *				name;
 	XmlNode				parent;
-	Vector				children;
+	List				children;
 	char *				value;
 
 EndOfClassMembers;
@@ -55,7 +56,7 @@ XmlNode_initialize( Class this )
 {
 	XmlNodeVtable vtab = & XmlNodeVtableInstance;
 	
-	ooc_init_class( Vector );
+	ooc_init_class( List );
 
 	XmlNode_populate( & vtab->Xml );
 }
@@ -81,9 +82,6 @@ XmlNode_constructor( XmlNode self, const void * params )
 	assert( ooc_isInitialized( XmlNode ) );
 	
 	chain_constructor( XmlNode, self, NULL );
-
-	if( params )
-		self->parent = ooc_cast( (void*) params, XmlNode );
 }
 
 static
@@ -106,7 +104,7 @@ XmlNode_copy( XmlNode self, const XmlNode from )
 	self->parent	= from->parent;
 	self->name		= ooc_strdup( from->name );
 	self->value		= ooc_strdup( from->value );
-	self->children	= (Vector) ooc_duplicate( (Object) from->children );
+	self->children	= (List) ooc_duplicate( (Object) from->children );
 	
 	return OOC_COPY_DONE;
 }
@@ -115,13 +113,10 @@ XmlNode_copy( XmlNode self, const XmlNode from )
 	Class member functions
  */
 
-
 XmlNode
-xmlnode_new( XmlNode parent )
+xmlnode_new( )
 {
-	ooc_init_class( XmlNode );
-		
-	return ooc_new( XmlNode, parent );
+	return ooc_new( XmlNode, NULL );
 }
 
 static
@@ -157,8 +152,6 @@ xmlnode_set_value( XmlNode self, const char * value )
 	self->value = ooc_strdup( (char*) value );
 }
 
-#define XML_NODE_CHILDREN_CHUNK_SIZE 8
-
 static
 void
 xmlnode_add_child( XmlNode self, XmlNode child )
@@ -169,9 +162,10 @@ xmlnode_add_child( XmlNode self, XmlNode child )
 	assert( ooc_isInstanceOf( child, XmlNode ) );
 
 	if( self->children == NULL )
-		self->children = vector_new_type( XML_NODE_CHILDREN_CHUNK_SIZE, XmlNode, OOC_MANAGE );
+		self->children = list_new_of_nodes( XmlNode, OOC_MANAGE );
 
-	vector_push_back( self->children, ooc_pass( child ) );
+	child->parent = self;
+	list_append( self->children, ooc_pass( child ) );
 }
 
 /* Xml interface callbacks
@@ -182,12 +176,24 @@ XmlReadState
 xmlnode_read_beginElement( Object _self, XmlParser parser, XmlReadState state, const char * name, XmlAttribs attribs )
 {
 	XmlNode self = ooc_cast( _self, XmlNode );
+	VectorIndex i;
 
-	assert( state == 0 );
+	assert( state == -1 );
 
+	xmlnode_set_type( self, XML_NODE_ELEMENT );
 	xmlnode_set_name( self, name );
-	/* TODO: adding all attributes */
 
+	for( i = 0; i < xmlattribs_items( attribs ); i++ )
+	{
+		XmlNode attr = xmlnode_new( self );
+		ooc_manage_object( attr );
+
+		xmlnode_set_type( attr, XML_NODE_ATTR );
+		xmlnode_set_name( attr, xmlattribs_get_name( attribs, i ) );
+		xmlnode_set_value( attr, xmlattribs_get_value( attribs, i ) );
+
+		xmlnode_add_child( self, ooc_pass( attr ) );
+	}
 	return 0;
 }
 
@@ -219,24 +225,58 @@ xmlnode_read_comment( Object _self, XmlParser parser, XmlReadState state, const 
 
 static
 void
+xmlnode_read_child( Object _self, XmlParser xmlp, XmlReadState state, Object child )
+{
+	ooc_manage_object( child );
+
+	XmlNode self = ooc_cast( _self, XmlNode );
+
+	assert( state == 0 );
+
+	xmlnode_add_child( self, ooc_pass( ooc_cast( child, XmlNode ) ) );
+}
+
+XmlNode
+xmlnode_parse( XmlParser xmlp )
+{
+	XmlNode document;
+
+	ooc_init_class( XmlNode );
+
+	document = xmlnode_new();
+	{
+		ooc_manage_object( document );
+
+		xmlnode_set_type( document, XML_NODE_DOCUMENT );
+		xmlnode_set_name( document, "#document" );
+		_xmlparser_set_type( xmlp, & XmlNodeClass );
+		_xmlparser_set_root( xmlp, (Object) ooc_pass( document ) );
+	}
+	return (XmlNode) xmlparser_parse( xmlp );
+}
+
+
+static
+void
 xmlnode_write_children( XmlNode self, XmlWriter xmlw )
 {
 	assert( ooc_isInstanceOf( self, XmlNode ) );
 
 	if( self->children )
-		vector_foreach( self->children, (vector_item_executor) xmlnode_write, xmlw );
-	else
+		list_foreach( self->children, (list_item_executor) xmlnode_write, xmlw );
+	else if( self->value )
 		xml_write_text( xmlw, self->value );
 }
 
 void
 xmlnode_write( XmlNode self, XmlWriter xmlw )
 {
+	assert( ooc_isInstanceOf( self, XmlNode ) );
+	assert( ooc_isInstanceOf( xmlw, XmlWriter ) );
+
 	switch( self->type )
 	{
-		case XML_NODE_DOCUMENT	:	/* xml_write_prolog( xmlw ); */
-									xmlnode_write_children( self, xmlw );
-									/* xml_write_epilog( xmlw ); */
+		case XML_NODE_DOCUMENT	:	xmlnode_write_children( self, xmlw );
 									break;
 		case XML_NODE_ELEMENT	:	xml_write_begin_element( xmlw, self->name );
 									xmlnode_write_children( self, xmlw );
@@ -261,8 +301,8 @@ XmlNode_populate( Xml xml )
 	xml->on_read_beginElement	= xmlnode_read_beginElement;
 	xml->on_read_comment		= xmlnode_read_comment;
 	xml->on_read_text			= xmlnode_read_text;
+	xml->on_read_child			= xmlnode_read_child;
 
-	xml->on_read_child			= NULL;
 	xml->on_read_endElement 	= NULL;
 
 	xml->on_write_begin			= (void	(*)( Object, XmlWriter )) xmlnode_write;

@@ -7,9 +7,11 @@
 #include <stddef.h>
 #include <stdarg.h>
 #include <ctype.h>
+#include <string.h>
 
 #include "xml.h"
 #include "implement/xml.h"
+#include "xmlnode.h"
 
 #define VALUE_STACK_SIZE 64
 
@@ -35,7 +37,6 @@ enum _Symbol
 	/* Unrecognized symbols that can be checked against a rule.
 	 * These symbols do NOT place a value onto the value stack.
 	 */
-	comment,
 
 	/* Unrecognized symbols that can be checked against a rule.
 	 * These symbols place a value onto the value stack.
@@ -44,6 +45,7 @@ enum _Symbol
 	xmlDeclXML,
 	name,
 	escapedLiteral,
+	comment,
 
 	/* Symbols that resulted from a reduction.
 	 * These symbols have a corresponding value on the value stack
@@ -62,9 +64,8 @@ typedef int boolean;
 typedef
 struct SymbolValueItem
 {
-	const char *	location;
+	char *			location;
 	int				length;
-	XmlReadState	state;
 }
 SymbolValue;
 
@@ -73,6 +74,7 @@ struct ObjectValueItem
 {
 	Object			object;
 	Xml				xml;
+	const char *	xmlName;
 }
 ObjectValue;
 
@@ -80,6 +82,7 @@ typedef
 struct ValueStackItem
 {
 	Symbol			symbol;
+	XmlReadState	state;
 
 	union
 	{
@@ -98,11 +101,9 @@ ClassMembers( XmlParser, XmlBase )
 	Symbol				string_delimiter;
 	Value *				vs;
 	int					vsp;
+	Class				object_type;
 
 EndOfClassMembers;
-
-/* Allocating the class description table and the vtable
- */
 
 Virtuals( XmlParser, XmlBase )
 EndOfVirtuals;
@@ -122,10 +123,6 @@ XmlParser_finalize( Class this )
 {
 }
 
-
-/* Constructor
- */
-
 static
 void
 XmlParser_constructor( XmlParser self, const void * params )
@@ -136,10 +133,6 @@ XmlParser_constructor( XmlParser self, const void * params )
 
 	self->vs = ooc_malloc( VALUE_STACK_SIZE * sizeof(Value) );
 	self->vsp = -1;
-
-	/* TODO: modifíy to be dynamic */
-	self->buffer = "\t <?xml\tversion='1.0' encoding=\"UTF-8\" ?> <html><head/><body>body ez ám a javából</body><!-- \n  \rSome comment here \t   --></html>   ";
-	self->next_pt = self->buffer;
 }
 
 static
@@ -178,6 +171,88 @@ xmlparser_new_str( char * str )
 	return self;
 }
 
+void
+_xmlparser_set_type( XmlParser self, Class type )
+{
+	assert( ooc_isInstanceOf( self, XmlParser ) );
+	assert( _ooc_isInitialized( type ) );
+
+	self->object_type = type;
+}
+
+void
+_xmlparser_set_root( XmlParser self, Object rootObject )
+{
+	ooc_manage_object( rootObject );
+
+	assert( self->vsp == -1 );
+
+	self->vs[0].symbol = tagObject;
+	self->vs[0].v.xmlObject.object = rootObject;
+	self->vs[0].v.xmlObject.xmlName = NULL;
+	self->vs[0].v.xmlObject.xml = ooc_get_interface_must_have( rootObject, Xml );
+	self->vs[0].state = 0;
+
+	self->vsp = 0;
+
+	ooc_pass( rootObject );
+}
+
+static
+struct _EscapeTab
+{
+	const char * 	escaped;
+	const char *	unescaped;
+	size_t			len;
+} EscapeTab[] =
+				{
+					{ ESCAPED_LT, "<", sizeof(ESCAPED_LT) },
+					{ ESCAPED_GT, ">", sizeof(ESCAPED_GT) },
+					{ ESCAPED_AMP, "&", sizeof(ESCAPED_AMP) },
+					{ ESCAPED_APOS, "'", sizeof(ESCAPED_APOS) },
+					{ ESCAPED_QUOT, "\"", sizeof(ESCAPED_QUOT) },
+				};
+
+#define ESCAPE_TAB_ITEMS (sizeof(EscapeTab)/sizeof(struct _EscapeTab))
+
+static
+const char *
+isEscaped( char ** rp )
+{
+	int i;
+
+	for( i=0; i<ESCAPE_TAB_ITEMS; i++)
+		if( strncmp( *rp, EscapeTab[i].escaped, EscapeTab[i].len ) == 0 )
+		{
+			(*rp) += EscapeTab[i].len - 1;
+			return EscapeTab[i].unescaped;
+		}
+	return NULL;
+}
+
+static
+char *
+unescape( char * const orig )
+{
+	char * r = orig;
+	char * w = orig;
+	const char * unescaped;
+
+	if( r )
+	{
+		while( *r )
+		{
+			if( *r == '&' && ( unescaped = isEscaped( &r ) ) )
+				while( *unescaped )
+					*w++ = *unescaped++;
+			else
+				*w++ = *r++;
+		}
+		*w = *r; /* copy the tailing zero */
+	}
+	return orig;
+}
+
 #define p 		(self->next_pt)
 #define	vs		(self->vs)
 #define vsp		(self->vsp)
@@ -185,7 +260,7 @@ xmlparser_new_str( char * str )
 
 static
 void
-vs_push_symbol( XmlParser self, Symbol s, const char * pos, int len )
+vs_push_symbol( XmlParser self, Symbol s, char * pos, int len )
 {
 	assert( vsp < VALUE_STACK_SIZE - 1 );
 	++vsp;
@@ -198,6 +273,55 @@ vs_push_symbol( XmlParser self, Symbol s, const char * pos, int len )
 
 static
 void
+vs_push_attribs( XmlParser self, XmlAttribs attrs )
+{
+	assert( vsp < VALUE_STACK_SIZE - 1 );
+	++vsp;
+	vs[ vsp ].symbol = xmlAttribs;
+	vs[ vsp ].v.attribs = attrs;
+}
+
+static
+void
+vs_push_object( XmlParser self, Object obj, const char * xmlName )
+{
+	assert( vsp < VALUE_STACK_SIZE - 1 );
+	++vsp;
+	vs[ vsp ].symbol = tagObject;
+	vs[ vsp ].v.xmlObject.object = obj;
+	vs[ vsp ].v.xmlObject.xmlName = xmlName;
+	vs[ vsp ].v.xmlObject.xml = ooc_get_interface_must_have( obj, Xml );
+}
+
+static
+const char *
+vs_get_symbol_value( XmlParser self, int offset )
+{
+	assert( offset >= -vsp && offset <= 0 );
+
+	*( vs[vsp + offset ].v.symbolValue.location + vs[vsp + offset ].v.symbolValue.length ) = '\0';
+	if( vs[vsp + offset ].symbol == escapedLiteral )
+		return unescape( vs[ vsp + offset ].v.symbolValue.location );
+	else
+		return vs[ vsp + offset ].v.symbolValue.location;
+}
+
+int
+vs_get_topmost_object(XmlParser self )
+{
+	int lastObject;
+
+	assert( vsp > 0 );
+	for( lastObject = vsp-1; lastObject >=0; lastObject-- )
+		if( ( vs[ lastObject ].symbol = tagObject ) )
+			break;
+
+	assert( lastObject >= 0 );
+	return lastObject;
+}
+
+static
+void
 vs_drop_top_n( XmlParser self, int n )
 {
 	assert( n >= 1 );
@@ -205,7 +329,7 @@ vs_drop_top_n( XmlParser self, int n )
 
 	vsp -= n;
 							/* Should Objects be deleted ?
-							 * No. They are passed to other Objects while reducing. */
+							 * No. They are passed to other Objects or freed while reducing. */
 }
 
 #define vs_drop_top( self ) vs_drop_top_n( self, 1 )
@@ -219,6 +343,8 @@ error( const char * msg, ... )
 	va_start( args, msg );
 	vprintf( msg, args );
 	va_end (args);
+
+	ooc_throw( xmlexception_new( XML_ERROR_SYNTAX ) );
 }
 
 
@@ -281,14 +407,15 @@ boolean
 check_comment( XmlParser self )
 {
 	char * c = p;
+	size_t	len = 0;
 
 	while( *c != '\0' && ( *c != '-' || *(c+1) != '-' || *(c+2) != '>' ) )
-		c++;
+		c++, len++;
 
 	while( c != p && ( *(c-1) == ' ' || *(c-1) == '\t' || *(c-1) == '\n' || *(c-1) == '\r' ) )
-		c--;
+		c--, len--;
 
-	p = c;
+	vs_push_symbol( self, comment, p, len );
 
 	return true;
 }
@@ -363,21 +490,20 @@ accept( XmlParser self, Symbol s )
 	if( sym == characters && s > characters )
 		retval = checksym( self, s );
 	else
-		if( sym != s )
-			return false;
+		retval = ( sym == s );
 
-	getsym( self );
+	if( retval )
+		getsym( self );
+
 	return retval;
 }
 
 static
-boolean
+void
 expect( XmlParser self, Symbol s )
 {
-	if( accept( self, s ) )
-		return true;
-	error( "symbol %d expected\n", s );
-	return false;
+	if( ! accept( self, s ) )
+		error( "symbol %d expected\n", s );
 }
 
 static
@@ -392,15 +518,81 @@ string( XmlParser self )
 
 static
 void
+reduceTagName( XmlParser self )
+{
+	/* The element tag name is on the top is the stack.
+	 * The object must be instantiated here.
+	 */
+	assert( vs[vsp].symbol == name );
+
+	if( self->object_type )
+	{
+		const char * name;
+
+		name = vs_get_symbol_value( self, 0 );
+		vs_drop_top( self ); /* name */
+		vs_push_object( self, ooc_new_classptr( self->object_type, NULL ), name );
+	}
+	else if( /* can be instantiated */ 0 )
+	{
+
+	}
+	else
+		vs[vsp].symbol = tagName;
+}
+
+static
+void
 reduceAttrib( XmlParser self )
 {
 	assert( vsp >= 2 );
 	assert( vs[vsp].symbol == escapedLiteral );
 	assert( vs[vsp-1].symbol == name );
-	assert( vs[vsp-2].symbol == xmlDeclXML || vs[vsp-2].symbol == tagObject || vs[vsp-2].symbol == tagName );
+	assert( vs[vsp-2].symbol == xmlDeclXML || vs[vsp-2].symbol == tagObject || vs[vsp-2].symbol == tagName || vs[vsp-2].symbol == xmlAttribs );
 
-	/* TODO: reduction here */
-	vs_drop_top_n( self, 2 );
+	if( vs[ vsp-2 ].symbol == xmlAttribs )
+	{
+		xmlattribs_append( vs[ vsp-2 ].v.attribs, vs_get_symbol_value( self, -1 ), vs_get_symbol_value( self, 0 ) );
+		vs_drop_top_n( self, 2 );
+	}
+	else
+	{
+		XmlAttribs attrs = xmlattribs_new();
+		ooc_manage_object( attrs );
+		xmlattribs_append( attrs, vs_get_symbol_value( self, -1 ), vs_get_symbol_value( self, 0 ) );
+		vs_drop_top_n( self, 2 );
+		vs_push_attribs( self, ooc_pass( attrs ) );
+	}
+}
+
+static
+void
+reduceBeginElement( XmlParser self )
+{
+	assert( vsp >= 1 );
+	assert( vs[vsp].symbol == xmlAttribs && ( vs[vsp-1].symbol == tagName || vs[vsp-1].symbol == tagObject ) );
+
+	if( vs[vsp-1].symbol == tagObject )
+	{
+		if( vs[vsp-1].v.xmlObject.xml->on_read_beginElement )
+			vs[vsp-1].state = \
+			vs[vsp-1].v.xmlObject.xml->on_read_beginElement( vs[vsp-1].v.xmlObject.object,
+															  self, -1,
+															  vs[vsp-1].v.xmlObject.xmlName,
+															  vs[vsp].v.attribs );
+	}
+	else /* tagName */
+	{
+		int topmostObject = vs_get_topmost_object( self );
+		if( vs[topmostObject].v.xmlObject.xml->on_read_beginElement )
+			vs[vsp-1].state = \
+			vs[topmostObject].v.xmlObject.xml->on_read_beginElement( vs[topmostObject].v.xmlObject.object,
+																	 self, vs[vsp-2].state,
+																	 vs_get_symbol_value( self, -1 ),
+																	 vs[vsp].v.attribs );
+	}
+	ooc_delete( (Object) vs[vsp].v.attribs );
+	vs_drop_top( self ); /* xmlAttribs */
 }
 
 static
@@ -412,34 +604,96 @@ reduceText( XmlParser self )
 	assert( vs[vsp-1].symbol == tagObject || vs[vsp-1].symbol == tagName );
 
 	if( vs[vsp-1].symbol == tagObject ) {
-		/* TODO: reduction here */
-		vs_drop_top( self );
+		if( vs[vsp-1].v.xmlObject.xml->on_read_text )
+			vs[vsp-1].v.xmlObject.xml->on_read_text( vs[vsp-1].v.xmlObject.object, self, vs[vsp-1].state, vs_get_symbol_value( self, 0 ) );
 	}
+	else if(  vs[vsp-1].symbol == tagName )
+	{
+		int lastObject = vs_get_topmost_object( self );
+		if( vs[lastObject].v.xmlObject.xml->on_read_text )
+			vs[lastObject].v.xmlObject.xml->on_read_text( vs[lastObject].v.xmlObject.object, self, vs[vsp-1].state, vs_get_symbol_value( self, 0 ) );
+	}
+	else
+		ooc_throw( xmlexception_new( XML_ERROR_IMPLEMENTATION ) );
+
+	vs_drop_top( self ); /* escapedLiteral */
 }
 
 static
 void
-reduceElement( XmlParser self )
+reduceComment( XmlParser self )
 {
 	assert( vsp >= 1 );
-	assert( vs[vsp].symbol == name );
-	assert( vs[vsp-1].symbol == tagObject || vs[vsp-1].symbol == tagName || vs[vsp-1].symbol == escapedLiteral );
+	assert( vs[vsp].symbol == comment );
+	assert( vs[vsp-1].symbol == tagObject || vs[vsp-1].symbol == tagName );
 
 	if( vs[vsp-1].symbol == tagObject ) {
-		/* TODO: reduction here */
-		vs_drop_top( self );
+		if( vs[vsp-1].v.xmlObject.xml->on_read_comment )
+			vs[vsp-1].v.xmlObject.xml->on_read_comment( vs[vsp-1].v.xmlObject.object, self, vs[vsp-1].state, vs_get_symbol_value( self, 0 ) );
 	}
+	else if(  vs[vsp-1].symbol == tagName )
+	{
+		int lastObject = vs_get_topmost_object( self );
+		if( vs[lastObject].v.xmlObject.xml->on_read_comment )
+			vs[lastObject].v.xmlObject.xml->on_read_comment( vs[lastObject].v.xmlObject.object, self, vs[vsp-1].state, vs_get_symbol_value( self, 0 ) );
+	}
+	else
+		ooc_throw( xmlexception_new( XML_ERROR_IMPLEMENTATION ) );
+
+	vs_drop_top( self ); /* escapedLiteral */
 }
+
 
 static
 void
-reduceEmptyElement( XmlParser self )
+reduceEmptyEndElement( XmlParser self )
 {
 	assert( vsp >= 0 );
 	assert( vs[vsp].symbol == tagObject || vs[vsp].symbol == tagName );
 
-	/* TODO: reduction here */
-	vs_drop_top( self );
+	if( vs[vsp].symbol == tagObject )
+	{
+		if( vs[vsp].v.xmlObject.xml->on_read_endElement )
+			vs[vsp].v.xmlObject.xml->on_read_endElement( vs[vsp].v.xmlObject.object, self, vs[vsp].state );
+		if( vsp >= 1 )
+		{
+			int topmostObject = vs_get_topmost_object( self );
+			if( vs[topmostObject].v.xmlObject.xml->on_read_child )
+				vs[topmostObject].v.xmlObject.xml->on_read_child( vs[topmostObject].v.xmlObject.object, self, vs[topmostObject].state, vs[vsp].v.xmlObject.object );
+		}
+	}
+	else /* tagName */
+	{
+		assert( vsp >= 1 );
+		int topmostObject = vs_get_topmost_object( self );
+		if( vs[topmostObject].v.xmlObject.xml->on_read_endElement )
+			vs[topmostObject].v.xmlObject.xml->on_read_endElement( vs[topmostObject].v.xmlObject.object, self, vs[vsp].state );
+	}
+	if( vsp > 0)
+		vs_drop_top( self );
+}
+
+static
+void
+reduceEndElement( XmlParser self )
+{
+	assert( vsp >= 1 );
+	assert( vs[vsp].symbol == name );
+	assert( vs[vsp-1].symbol == tagObject || vs[vsp-1].symbol == tagName );
+
+	if( vs[vsp-1].symbol == tagObject )
+	{
+		if( strcmp( vs[vsp-1].v.xmlObject.xmlName, vs_get_symbol_value( self, 0 ) ) != 0 )
+			ooc_throw( xmlexception_new( XML_ERROR_BAD_NESTING ) );
+	}
+	else /* tagName */
+	{
+		if( strcmp( vs_get_symbol_value( self, -1 ), vs_get_symbol_value( self, 0 ) ) != 0 )
+			ooc_throw( xmlexception_new( XML_ERROR_BAD_NESTING ) );
+	}
+	vs_drop_top( self ); /* name */
+
+	reduceEmptyEndElement( self );
 }
 
 static
@@ -447,12 +701,15 @@ void
 attribList( XmlParser self )
 {
 	accept( self, space );
-	while( accept( self, name ) ){
-		accept( self, space );
-		expect( self, eqSign ); accept( self, space );
-		string( self ); accept( self, space );
+	while( accept( self, name ) )
+	{
+									accept( self, space );
+		expect( self, eqSign ); 	accept( self, space );
+		string( self ); 			accept( self, space );
 		reduceAttrib( self );
 	}
+	if( vs[vsp].symbol != xmlAttribs )
+		vs_push_attribs( self, xmlattribs_new() );
 }
 
 static
@@ -465,8 +722,9 @@ xmlDecl( XmlParser self )
 		expect( self, xmlDeclStop );
 
 		/* TODO: reduction here */
-		assert( vs[vsp].symbol == xmlDeclXML );
-		vs_drop_top( self );
+		assert( vs[vsp-1].symbol == xmlDeclXML && vs[vsp].symbol == xmlAttribs );
+		ooc_delete( (Object) vs[vsp].v.attribs );
+		vs_drop_top_n( self, 2 );
 	}
 }
 
@@ -486,28 +744,29 @@ xmlElement( XmlParser self )
 	while( true ) {
 		accept( self, space );
 		if( accept( self, tagStart ) ) {
-			accept( self, space );
+									accept( self, space );
 			expect( self, name );
-			/* instantiate name */
-			vs[ vsp ].symbol = tagName; /* if can not be instantiated */
+			reduceTagName( self );
 			attribList( self );
+			reduceBeginElement( self );
 			if( accept( self, tagEmptyClose ) )
-				reduceEmptyElement( self );
+				reduceEmptyEndElement( self );
 			else {
 				expect( self, tagStop );
 			}
 		}
 		else if( accept( self, tagStartClose )) {
-			accept( self, space );
-			expect( self, name ); accept( self, space );
+									accept( self, space );
+			expect( self, name ); 	accept( self, space );
 			expect( self, tagStop );
-			reduceElement( self );
+			reduceEndElement( self );
 		}
 		else if( accept( self, commentStart ) ) {
 			accept( self, space );
 			expect( self, comment );
 			accept( self, space );
 			expect( self, commentStop );
+			reduceComment( self );
 		}
 		else if( accept( self, escapedLiteral ) ) {
 			reduceText( self );
@@ -532,6 +791,8 @@ Object
 xmlparser_parse( XmlParser self )
 {
 	xmlFile( self );
+
+	/* TODO: clean and free the value stack in case of an exception */
 
 	assert( vsp == 0 );
 	assert( vs[0].symbol == tagObject );

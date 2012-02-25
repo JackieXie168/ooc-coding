@@ -5,6 +5,8 @@
 #include <ooc/testcase.h>
 
 #include "../xmlparser.h"
+#include "../xmlwriter.h"
+#include "../xmlnode.h"
 
 #include <string.h>
 
@@ -158,16 +160,26 @@ void
 static
 xmlparsertest_method1( XmlParserTest self )
 {
-	Object 		xmlObject = NULL;
-	XmlParser 	xmlp = xmlparser_new_str( strdup( "\t <?xml\tversion='1.0' encoding=\"UTF-8\" ?> <html><head/><body>body ez ám a javából</body><!-- \n  \rSome comment here \t   --></html>   " ) );
+	XmlNode		xmlObject = NULL;
+	XmlParser 	xmlp = xmlparser_new_str( strdup( "\t <?xml\tversion='1.0' encoding=\"UTF-8\" ?> <html><head/><body elements='1' scraps=\"szar&amp;\" >body ez ám a javából</body><!-- \n  \rSome comment here \t   --></html>   " ) );
 	{
 		ooc_manage_object( xmlp );
 
-		xmlObject = xmlparser_parse( xmlp );
+		xmlObject = xmlnode_parse( xmlp );
+		{
+			ooc_manage_object( xmlObject );
+			XmlWriter xmlw = xmlwriter_new_file( stdout );
+			{
+				ooc_manage_object( xmlw );
 
+				xmlnode_write( xmlObject, xmlw );
+
+				ooc_delete( (Object) ooc_pass( xmlw ) );
+			}
+			ooc_delete( (Object) ooc_pass( xmlObject ) );
+		}
 		ooc_delete( (Object) ooc_pass( xmlp ) );
 	}
-	ooc_delete( xmlObject );
 }
 
 /** Test methods order table.

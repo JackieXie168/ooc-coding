@@ -17,6 +17,13 @@ typedef int XmlReadState;
 
 DeclareClass( XmlAttribs, Base );
 
+XmlAttribs		xmlattribs_new( void );
+void			xmlattribs_append( XmlAttribs, const char * name, const char * value );
+VectorIndex		xmlattribs_items( XmlAttribs );
+const char *	xmlattribs_get_name( XmlAttribs, VectorIndex );
+const char *	xmlattribs_get_value( XmlAttribs, VectorIndex );
+const char *	xmlattribs_get_value_by_name( XmlAttribs, const char * name );
+
 DeclareInterface( Xml )
 
 	/* XmlWriter callback methods */
@@ -26,9 +33,8 @@ DeclareInterface( Xml )
 	void 			(* on_write_end )		( Object, XmlWriter );
 
 	/* XmlParser callback methods */
-
 	XmlReadState	(* on_read_beginElement)( Object, XmlParser, XmlReadState, const char * name, XmlAttribs );
-	void			(* on_read_endElement)	( Object, XmlParser, XmlReadState );
+	void			(* on_read_endElement )	( Object, XmlParser, XmlReadState );
 	void			(* on_read_text )		( Object, XmlParser, XmlReadState, const char * text );
 	void			(* on_read_child )		( Object, XmlParser, XmlReadState, Object child );
 	void			(* on_read_comment )	( Object, XmlParser, XmlReadState, const char * comment );
@@ -70,6 +76,8 @@ enum XmlErrorCodes
 	XML_ERROR_PARAMETER,
 	XML_ERROR_SEQUENCE,
 	XML_ERROR_IO,
+	XML_ERROR_SYNTAX,
+	XML_ERROR_BAD_NESTING,
 
 	XML_ERROR_IMPLEMENTATION,
 };

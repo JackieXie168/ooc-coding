@@ -8,9 +8,11 @@
 
 DeclareClass( XmlNode, ListNode );
 
-XmlNode xmlnode_new( XmlNode parent );
+XmlNode		xmlnode_new( );
 
-void	xmlnode_write( XmlNode, XmlWriter );
+void		xmlnode_write( XmlNode, XmlWriter );
+XmlNode		xmlnode_parse( XmlParser );
+
 
 typedef
 enum _XmlNodeTypes

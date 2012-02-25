@@ -10,6 +10,8 @@
 
 #include <string.h>
 
+AllocateInterface( Xml );
+
 AllocateClass( XmlBase, Base );
 
 static void XmlBase_initialize( Class this ) {}
@@ -127,9 +129,6 @@ XmlAttribs_constructor( XmlAttribs self, const void * params )
 	chain_constructor( XmlAttribs, self, &vp );
 }
 
-/* Destructor
- */
-
 static
 void
 XmlAttribs_destructor( XmlAttribs self, XmlAttribsVtable vtab )
@@ -165,3 +164,48 @@ xmlattribs_append( XmlAttribs self, const char * name, const char * value )
 	vector_push_back( (Vector) self, ooc_strdup( (char*) name ) );
 	vector_push_back( (Vector) self, ooc_strdup( (char*) value ) );
 }
+
+VectorIndex
+xmlattribs_items( XmlAttribs self )
+{
+	assert( ooc_isInstanceOf( self, XmlAttribs ) );
+
+	return vector_items( (Vector) self ) / 2;
+}
+
+const char *
+xmlattribs_get_name( XmlAttribs self, VectorIndex i )
+{
+	assert( ooc_isInstanceOf( self, XmlAttribs ) );
+
+	return (const char *) vector_get_item( (Vector) self,  2*i );
+}
+
+const char *
+xmlattribs_get_value( XmlAttribs self, VectorIndex i )
+{
+	assert( ooc_isInstanceOf( self, XmlAttribs ) );
+
+	return (const char *) vector_get_item( (Vector) self,  2*i+1 );
+}
+
+const char *
+xmlattribs_get_value_by_name( XmlAttribs self, const char * name )
+{
+	VectorIndex i;
+
+	assert( ooc_isInstanceOf( self, XmlAttribs ) );
+
+	if( name )
+		for( i = 0; i < xmlattribs_items( self); i++ )
+		{
+			const char * i_name;
+
+			i_name = (const char *) vector_get_item( (Vector) self,  2*i );
+			if( i_name && name && strcmp( i_name, name ) )
+				return (const char *) vector_get_item( (Vector) self,  2*i+1 );
+		};
+	return NULL;
+}
+
+
