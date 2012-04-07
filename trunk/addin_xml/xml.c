@@ -139,6 +139,9 @@ static
 int
 XmlAttribs_copy( XmlAttribs self, const XmlAttribs from )
 {
+	/* TODO: will be never executed :-( because Vector_copy executes first, and throws
+	 * an exception, because of the untyped Vector (it is not copyable).
+	 */
 	VectorIndex i;
 
 	XmlAttribs_constructor( self, NULL );

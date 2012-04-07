@@ -14,6 +14,7 @@
 #include "xmlnode.h"
 
 #define VALUE_STACK_SIZE 64
+static void vs_clean( XmlParser self );
 
 typedef
 enum _Symbol
@@ -101,6 +102,7 @@ ClassMembers( XmlParser, XmlBase )
 	Symbol				string_delimiter;
 	Value *				vs;
 	int					vsp;
+	int					vs_topmost_object;
 	Class				object_type;
 
 EndOfClassMembers;
@@ -133,6 +135,7 @@ XmlParser_constructor( XmlParser self, const void * params )
 
 	self->vs = ooc_malloc( VALUE_STACK_SIZE * sizeof(Value) );
 	self->vsp = -1;
+	self->vs_topmost_object = self->vsp;
 }
 
 static
@@ -194,6 +197,7 @@ _xmlparser_set_root( XmlParser self, Object rootObject )
 	self->vs[0].state = 0;
 
 	self->vsp = 0;
+	self->vs_topmost_object = self->vsp;
 
 	ooc_pass( rootObject );
 }
@@ -235,20 +239,25 @@ char *
 unescape( char * const orig )
 {
 	char * r = orig;
-	char * w = orig;
+	char * w;
 	const char * unescaped;
 
 	if( r )
 	{
-		while( *r )
-		{
-			if( *r == '&' && ( unescaped = isEscaped( &r ) ) )
-				while( *unescaped )
-					*w++ = *unescaped++;
-			else
-				*w++ = *r++;
+		while( *r && *r != '&' )
+			r++;
+		if( *r ) {
+			w = r;
+			while( *r )
+			{
+				if( *r == '&' && ( unescaped = isEscaped( &r ) ) )
+					while( *unescaped )
+						*w++ = *unescaped++;
+				else
+					*w++ = *r++;
+			}
+			*w = *r; /* copy the tailing zero */
 		}
-		*w = *r; /* copy the tailing zero */
 	}
 	return orig;
 }
@@ -291,6 +300,8 @@ vs_push_object( XmlParser self, Object obj, const char * xmlName )
 	vs[ vsp ].v.xmlObject.object = obj;
 	vs[ vsp ].v.xmlObject.xmlName = xmlName;
 	vs[ vsp ].v.xmlObject.xml = ooc_get_interface_must_have( obj, Xml );
+
+	self->vs_topmost_object = vsp;
 }
 
 static
@@ -312,9 +323,14 @@ vs_get_topmost_object(XmlParser self )
 	int lastObject;
 
 	assert( vsp > 0 );
-	for( lastObject = vsp-1; lastObject >=0; lastObject-- )
-		if( ( vs[ lastObject ].symbol = tagObject ) )
-			break;
+	if( self->vs_topmost_object < 0 || self->vs_topmost_object >= vsp )
+	{
+		for( lastObject = vsp-1; lastObject >=0; lastObject-- )
+			if( ( vs[ lastObject ].symbol = tagObject ) )
+				break;
+	}
+	else
+		lastObject = self->vs_topmost_object;
 
 	assert( lastObject >= 0 );
 	return lastObject;
@@ -333,6 +349,25 @@ vs_drop_top_n( XmlParser self, int n )
 }
 
 #define vs_drop_top( self ) vs_drop_top_n( self, 1 )
+
+static
+void
+vs_clean( XmlParser self )
+{
+	while( vsp >=0 )
+	{
+		switch( vs[vsp].symbol )
+		{
+			case tagObject	:	ooc_delete( (Object) vs[vsp].v.xmlObject.object );
+								break;
+			case xmlAttribs :	ooc_delete( (Object) vs[vsp].v.attribs );
+								break;
+
+			default:			break;
+		}
+		vs_drop_top( self );
+	}
+}
 
 static
 void
@@ -741,6 +776,7 @@ static
 void
 xmlElement( XmlParser self )
 {
+	/* TODO: bad logic, accepts any text before a tag */
 	while( true ) {
 		accept( self, space );
 		if( accept( self, tagStart ) ) {
@@ -790,9 +826,16 @@ xmlFile( XmlParser self )
 Object
 xmlparser_parse( XmlParser self )
 {
-	xmlFile( self );
-
-	/* TODO: clean and free the value stack in case of an exception */
+	try
+	{
+		xmlFile( self );
+	}
+	catch_any
+	{
+		vs_clean( self );
+		ooc_rethrow();
+	}
+	end_try;
 
 	assert( vsp == 0 );
 	assert( vs[0].symbol == tagObject );
