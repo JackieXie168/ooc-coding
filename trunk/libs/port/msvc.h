@@ -102,10 +102,10 @@ typedef	CRITICAL_SECTION *		ooc_Mutex;
 /*	Helper: pointer read-out while nulling
  */
 
+#include <windows.h>
+
 #define OOC_IMPLEMENT_PTR_READ_AND_NULL				\
-			__asm	mov		EBX, ptr_ptr			\
-			__asm	mov		EAX, 0					\
-			__asm	xchg	[EBX], EAX
+	return InterlockedExchangePointer( ptr_ptr, NULL);
 
 #endif /* COMPILING_OOC_C */
 
