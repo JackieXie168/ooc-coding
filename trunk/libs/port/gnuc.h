@@ -105,19 +105,11 @@ typedef	pthread_mutex_t *		ooc_Mutex;
 
 #ifdef COMPILING_OOC_C
 
-/*	Helper: pointer read-out while nulling
+/*	Helper: pointer read-out while NULLing
  */
 
 #define OOC_IMPLEMENT_PTR_READ_AND_NULL			\
-	void * ret_val;								\
-	__asm__ (									\
-		  "movl		%1, %%ebx;"					\
-		  "movl		$0, %0;"					\
-		  "xchgl	%0, (%%ebx)"				\
-				: "=a" (ret_val)				\
-				: "m" (ptr_ptr)					\
-				: "ebx" );						\
-	return ret_val;
+	return __sync_fetch_and_and (ptr_ptr, 0);
 
 #endif /* COMPILING_OOC_C */
 

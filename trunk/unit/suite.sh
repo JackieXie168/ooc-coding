@@ -5,6 +5,8 @@ MYNAME=`basename $0`
 RETURN=0
 ARGS="$@"
 
+command -v valgrind >/dev/null 2>&1 || { echo "Valgrind is required for memory leak check, but it's not installed! Skipping memory leak check." >&2; exit 0; }
+
 for i in *; do
 
  [[ $i == $MYNAME ]] && continue

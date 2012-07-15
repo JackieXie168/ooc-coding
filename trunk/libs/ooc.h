@@ -364,14 +364,14 @@ void *		ooc_realloc( void *ptr, size_t size );		/**< Memory reallocation. Reallo
 void *		ooc_memdup( const void *ptr, size_t size );	/**< Memory duplication. Duplicates a memory block with a new alloc, throws an Exception on error */
 char *		ooc_strdup( const char * s );				/**< C string duplication. Duplicates a C string with a new alloc, throws an Exception on error */
 void 		ooc_free( void * mem );						/**< Memory free. Frees memory allocated by ooc_malloc(), ooc_calloc() or ooc_realloc() */
-void 		ooc_free_and_null( void ** mem );			/**< Memory free and nulling pointer. Frees memory via a pointer, and NULL the pointer thread safely */
+void 		ooc_free_and_null( void ** mem );			/**< Memory free and nulling pointer. Frees memory via a pointer, and NULLs the pointer thread safely */
 
 #endif
 
 /** Pointer read and null.
  * Reads a pointer via a pointer, and nulls thread safely.
  * Atomic operation in case of GNUC and MSVC on x86 platforms.
- * For other compilers this is equuivalent to the following code:
+ * For other compilers this is equivalent to the following code:
  * @code
  * void * tmp = * ptr_ptr;
  * *ptr_ptr = NULL;
@@ -1024,7 +1024,7 @@ void * _ooc_get_interface_must_have( const Object, InterfaceID );
 
 void * _ooc_get_mixin_data( const Object, InterfaceID );
 
-/*  Function marchaler types
+/*  Function marshaler types
  */
 
 typedef	 void (* void_fn_voidp )( void * );	
@@ -1042,7 +1042,7 @@ typedef void_fn_voidp ooc_destroyer;
  
 #define OOC_MANAGE TRUE
 
-/* Memmory handling macros
+/* Memory handling macros
  */
 
 #ifndef GEN_PTR
