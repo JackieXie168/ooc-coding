@@ -114,9 +114,13 @@ extern void _fassert( int, ROM char * );
 #define _FMT_Func_ss		"%HS::%HS()"
 #define _FMT_Func_dss		"[%d] %HS::%HS()"
 #define _FMT_Func_dsss		"[%d] %HS::%HS.%HS()"
+#define _FMT_Name_dss		"[%d] %HS::%s"
+#define _FMT_Name_dsss		"[%d] %HS::%s.%HS()"
 #define _FMT_Exc_sdd		"\tUnexpected exception: %HS, code: %d, user code: %d\n"
 #define _FMT_Exc_ssdd		"\n\tUnexpected exception %HS in %HS, code: %d, user code: %d\n"
 #define _FMT_Failed_sdd		"Test case %HS failed: %d/%d (methods run/failed)\n"
+
+#define strlenROM(x) strlenpgm(x)
 
 #define TESTCASE_MAIN		void main( void )
 

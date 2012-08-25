@@ -101,7 +101,6 @@ int
 XmlNode_copy( XmlNode self, const XmlNode from )
 {
 	self->type		= from->type;
-	self->parent	= from->parent;
 	self->name		= ooc_strdup( from->name );
 	self->value		= ooc_strdup( from->value );
 	self->children	= (List) ooc_duplicate( (Object) from->children );
@@ -137,7 +136,7 @@ xmlnode_set_type( XmlNode self, XmlNodeTypes type )
 {
 	assert( ooc_isInstanceOf( self, XmlNode ) );
 
-	if( type <= XML_NODE_UNDEFINED && type >= XML_NODE_TYPES_MAX )
+	if( type <= XML_NODE_UNDEFINED || type >= XML_NODE_TYPES_MAX )
 		ooc_throw( xmlexception_new( XML_ERROR_IMPLEMENTATION ) );
 
 	self->type = type;

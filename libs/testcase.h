@@ -103,8 +103,13 @@ EndOfVirtuals;
 /* Methods
  */
  
-void testcase_fail( ROM char * filename, int line, ROM char * message );
-int testcase_run( TestCase );
+void 	testcase_fail( ROM char * filename, int line, ROM char * message );
+
+int 	testcase_run( TestCase );
+
+int		testcase_run_before_class( TestCase );
+void 	testcase_run_test( TestCase, const char *, test_method_type );
+int		testcase_run_after_class( TestCase );
 
 /** @name TestCase assertions.
  * These macros can be used in the test methods and in @c before(), @c after(), @c before_class(), @c after_class() methods.
@@ -177,7 +182,8 @@ DeclareClass( SegmentationFault, Exception );
  * @hideinitializer
  */
 DeclareClass( ArithmeticFault, Exception );
-#endif
+
+#endif /* OOC_HAS_UNIX_SIGNALS */
 
 #ifdef OOC_NO_DYNAMIC_MEM
 #define PRINT_BUFFER_SIZE 64

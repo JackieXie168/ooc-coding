@@ -28,9 +28,14 @@
 
 #ifdef OOC_HAS_UNIX_SIGNALS
 #include <signal.h>
+static void signal_handler( int signum );
 #endif
 
 #include <string.h>
+
+#ifndef strlenROM
+#define strlenROM(x) strlen(x)
+#endif
 
 /** @class TestCase
  *  @brief TestCase class - base class for unit testing.
@@ -122,6 +127,12 @@ TestCase_constructor( TestCase self, const void * params )
 	chain_constructor( TestCase, self, NULL );
 
 	self->methods = (ROM struct TestCaseMethod *) params;
+
+#ifdef OOC_HAS_UNIX_SIGNALS
+	signal( SIGSEGV, signal_handler );
+	signal( SIGFPE, signal_handler );
+#endif
+	setbuf(stdout, NULL); /* Unbufferered stdout displays better */
 }
 
 /* Destructor
@@ -161,6 +172,8 @@ static void signal_handler( int signum );
 #define _FMT_Func_ss		"%s::%s()"
 #define _FMT_Func_dss		"[%d] %s::%s()"
 #define _FMT_Func_dsss		"[%d] %s::%s.%s()"
+#define _FMT_Name_dss		"[%d] %s::%s"
+#define _FMT_Name_dsss		_FMT_Func_dsss
 #define _FMT_Exc_sdd		"\tUnexpected exception: %s, code: %d, user code: %d\n"
 #define _FMT_Exc_ssdd		"\n\tUnexpected exception %s in %s, code: %d, user code: %d\n"
 #define _FMT_Failed_sdd		"Test case %s failed: %d/%d (methods run/failed)\n"
@@ -199,9 +212,10 @@ static ROM_ALLOC char after_class[] = "after_class";
 char print_buffer[PRINT_BUFFER_SIZE];
 #endif
 
+
 static
 void
-print_func_name( TestCase self, ROM char * func, ROM char * suffix )
+print_func_name( TestCase self, ROM char * func, const char * name, ROM char * suffix )
 {
 #ifndef OOC_NO_DYNAMIC_MEM
 	int			buffer_length;
@@ -210,15 +224,24 @@ print_func_name( TestCase self, ROM char * func, ROM char * suffix )
 	static int	previous_display_length = 0;
 	char *	volatile display_text = NULL;
 	
+	/* print_func_name() parameters are distinguished, because of some architectures make difference:
+	 * 		func	a name that is stored in ROM
+	 * 		name	a name that is stored in RAM
+	 * The two parameters are mutually exclusive, at least one of them must be NULL!
+	 */
+	assert( ! ((func != NULL) && (name != NULL)) );
+
 	try {
 		ooc_lock( printing );
 		
 #ifndef OOC_NO_DYNAMIC_MEM
-		buffer_length = 1;
+		buffer_length = 32 /*digit*/ + 1 /*point*/ + strlenROM( ooc_get_type((Object)self)->c.type.name ) + 3 /*double colon */ + 1 /*closing zero*/;
 		if( func != NULL )
-			buffer_length = 32 + strlen( func ) + 1 + strlen( ooc_get_type((Object)self)->c.type.name ) + 3;
+			buffer_length += strlenROM( func );
+		if( name != NULL )
+			buffer_length += strlen( name );
 		if( suffix != NULL )
-			buffer_length += strlen( suffix ) + 1;
+			buffer_length += strlenROM( suffix ) + 1;
 
 		if( buffer_length < previous_display_length + 1 )
 			buffer_length = previous_display_length + 1;
@@ -228,14 +251,18 @@ print_func_name( TestCase self, ROM char * func, ROM char * suffix )
 		display_text = print_buffer;
 #endif
 		
-		if( func == NULL )
+		if( func == NULL && name == NULL )
 			display_text[0] = '\0';
 		else if( func == before_class || func == after_class )
 			sprintf( display_text,  _FMT_Func_ss, ooc_get_type((Object)self)->c.type.name, func );
-		else if( suffix == NULL )
+		else if( func != NULL && suffix == NULL )
 			sprintf( display_text,  _FMT_Func_dss, self->run , ooc_get_type((Object)self)->c.type.name, func );
-		else 
+		else if( func != NULL && suffix != NULL )
 			sprintf( display_text,  _FMT_Func_dsss, self->run , ooc_get_type((Object)self)->c.type.name, func, suffix );
+		else if( name != NULL && suffix == NULL )
+			sprintf( display_text,  _FMT_Name_dss, self->run , ooc_get_type((Object)self)->c.type.name, name );
+		else /* if( name != NULL && suffix != NULL ) */
+			sprintf( display_text,  _FMT_Name_dsss, self->run , ooc_get_type((Object)self)->c.type.name, name, suffix );
 		
 		display_length = strlen( display_text );
 		if( display_length < previous_display_length ) {
@@ -304,78 +331,40 @@ testcase_run_after_recursive(TestCase self, Class type)
 		testcase_run_after_recursive( self, type->parent );
 }
 
-static
-void
-testcase_run_methods(TestCase self)
+static void
+testcase_run_selected( TestCase self, ROM char * ROMname, const char * RAMname, test_method_type method )
 {
-	ROM struct TestCaseMethod * method = self->methods;
-	
-	while(method->method)
-	{
-		current_test_failed = FALSE;
-		++self->run;
-		current_method_fail_count = 0;
-
-		try
-		{
-			print_func_name( self, method->name, "before" );
-			testcase_run_before_recursive( self, ooc_get_type( (Object) self ) );
-		
-			print_func_name( self, method->name, NULL );
-			method->method(self);
-		}
-		catch_any {
-			ooc_lock( printing );
-			
-			if( ! current_test_failed )
-				printf("\n");
-			printf( _FMT_Exc_sdd,
-							ooc_get_type((Object)exception)->c.type.name,
-							exception_get_error_code(exception),
-							exception_get_user_code(exception));
-			current_test_failed = TRUE;
-			ooc_unlock( printing );
-		}
-		finally {
-			print_func_name( self, method->name, "after" );
-			testcase_run_after_recursive( self, ooc_get_type( (Object) self ) );
-		}
-		end_try;
-		
-		if( current_test_failed )
-			self->failed++;
-		
-		method++;
-	}	
-}
-
-/** Run the TestCase.
- * 
- */
-
-int
-testcase_run( TestCase self)
-{
-#ifdef OOC_HAS_UNIX_SIGNALS
-	signal( SIGSEGV, signal_handler );
-	signal( SIGFPE, signal_handler );
-#endif
+	current_test_failed = FALSE;
+	++self->run;
+	current_method_fail_count = 0;
 
 	try {
-		if( ! ooc_isInstanceOf(self, TestCase) )
-			ooc_throw( exception_new(err_bad_cast) );
-			
-		setbuf(stdout, NULL); /* Unbufferered stdout displays better the current operation */
-			
-		print_func_name( self, before_class, "" );
-		testcase_run_before_class_recursive( self, ooc_get_type( (Object) self ) );
+		print_func_name( self, ROMname, RAMname, "before" );
+		testcase_run_before_recursive( self, ooc_get_type( (Object) self ) );
 
-		testcase_run_methods(self);
-				
-		print_func_name( self, after_class, "" );
-		testcase_run_after_class_recursive( self, ooc_get_type( (Object) self ) );
-		
-		print_func_name( self, NULL, NULL ); /* following a succesfull run cleans the last function name */
+		print_func_name( self, ROMname, RAMname, NULL );
+		method(self);
+	}
+	catch_any {
+		ooc_lock( printing );
+
+		if( ! current_test_failed )
+			printf("\n");
+		printf( _FMT_Exc_sdd,
+						ooc_get_type((Object)exception)->c.type.name,
+						exception_get_error_code(exception),
+						exception_get_user_code(exception));
+		current_test_failed = TRUE;
+		ooc_unlock( printing );
+	}
+	end_try;
+
+	if( current_test_failed )
+		self->failed++;
+
+	try {
+		print_func_name( self, ROMname, RAMname, "after" );
+		testcase_run_after_recursive( self, ooc_get_type( (Object) self ) );
 	}
 	catch_any {
 		self->failed++;
@@ -388,14 +377,137 @@ testcase_run( TestCase self)
 		ooc_unlock( printing );
 	}
 	end_try;
-	
+}
+
+/** Start the execution of a test series.
+ * Prepares the TestCase for subsequent tests.\n
+ * Actually calls the before_class() virtua methods recursively.
+ * @param	self	The TestCase
+ * @return 	0 if successful, non-zero if failed.
+ * @note	Do not use, if test method table is used!
+ */
+
+int
+testcase_run_before_class( TestCase self )
+{
+
+	if( ! ooc_isInstanceOf(self, TestCase) )
+		ooc_throw( exception_new(err_bad_cast) );
+
+	try {
+		print_func_name( self, before_class, NULL, "" );
+		testcase_run_before_class_recursive( self, ooc_get_type( (Object) self ) );
+	}
+	catch_any {
+		self->failed++;
+		ooc_lock( printing );
+		printf( _FMT_Exc_ssdd,
+						ooc_get_type((Object)exception)->c.type.name,
+						ooc_get_type((Object)self)->c.type.name,
+						exception_get_error_code(exception),
+						exception_get_user_code(exception));
+		ooc_unlock( printing );
+	}
+	end_try;
+
+	return 	(self->failed == 0 ) ? 0 : 1;
+}
+
+/** Finishes the execution of a test series.
+ * Close the TestCase for subsequent tests.\n
+ * Actually calls the after_class() virtual methods recursively.
+ * @param	self	The TestCase
+ * @return 	0 if the whole test series was successful, non-zero if failed.
+ * @note	Do not use, if test method table is used!
+ */
+
+int
+testcase_run_after_class( TestCase self )
+{
+	if( ! ooc_isInstanceOf(self, TestCase) )
+		ooc_throw( exception_new(err_bad_cast) );
+
+	try {
+		print_func_name( self, after_class, NULL, "" );
+		testcase_run_after_class_recursive( self, ooc_get_type( (Object) self ) );
+
+		print_func_name( self, NULL, NULL, NULL ); /* cleans the last function name */
+	}
+	catch_any {
+		self->failed++;
+		ooc_lock( printing );
+		printf( _FMT_Exc_ssdd,
+						ooc_get_type((Object)exception)->c.type.name,
+						ooc_get_type((Object)self)->c.type.name,
+						exception_get_error_code(exception),
+						exception_get_user_code(exception));
+		ooc_unlock( printing );
+	}
+	end_try;
+
 	if( self->failed != 0 ) {
 		ooc_lock( printing );
 		printf( _FMT_Failed_sdd, ooc_get_type((Object)self)->c.type.name, self->run, self->failed );
 		ooc_unlock( printing );
 	}
-	
+
 	return 	(self->failed == 0 ) ? 0 : 1;
+}
+
+/** Run the whole TestCase.
+ * If the testcase was constructed with a method order table then this function runs all methods defined in the table.\n
+ * It also runs the before_class() end after_class() methods.\n
+ * This is the convenient way of running test methods and suites for the most cases.\n
+ * This is equvivalent with the following pseudo code:\n
+@verbatim
+		if( testcase_run_before_class(self) == 0)
+			testcase_run_all_methods(self);
+		return testcase_run_after_class(self);
+@endverbatim
+ * @param	self	The TestCase to be run. The method order table must exist!
+ * @return			0 if the was no error, 1 if any error occurs
+ */
+
+int
+testcase_run( TestCase self )
+{
+	if( ! ooc_isInstanceOf(self, TestCase) )
+		ooc_throw( exception_new(err_bad_cast) );
+
+	if( testcase_run_before_class(self) == 0)
+	{
+		ROM struct TestCaseMethod * method_table = self->methods;
+
+		if( method_table != NULL )
+			while( method_table->method )
+			{
+				testcase_run_selected( self, method_table->name, NULL, method_table->method );
+				method_table++;
+			};
+	}
+	return testcase_run_after_class(self);
+}
+
+/** Run a single test.
+ * Runs a single test method with the given display name.
+ * The testcase_run_before_class() function must be called before, and testcase_run_after_class() must be called
+ * at the end.\n
+ * The testcase_run_test() can be called any times between testcase_run_before_class() and testcase_run_after_class().\n
+ * The before() and after() methods are called automatically.
+ * @param	self	The test case
+ * @param	name	The display name of the test
+ * @param	method	The test function to invoke
+ * @return			Nothing
+ * @note	Do not use, if test method table is used!
+ */
+
+void
+testcase_run_test( TestCase self, const char * name, test_method_type method )
+{
+	if( ! ooc_isInstanceOf(self, TestCase) )
+		ooc_throw( exception_new(err_bad_cast) );
+
+	testcase_run_selected( self, NULL, name, method );
 }
 
 #ifdef OOC_HAS_UNIX_SIGNALS

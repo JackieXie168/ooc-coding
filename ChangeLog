@@ -1,6 +1,7 @@
 1.3a
 Portable to 64 bit Linux versions (source can be compiled, still no 64bit libraries distributed)
 Valgrind check is skipped in make check, if Valgrind is not installed.
+New functions in TestCase: testcase_run_test().
 
 1.3
 Introducing Interfaces, a Java style way of multiple inheritance.
