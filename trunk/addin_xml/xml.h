@@ -87,6 +87,6 @@ DeclareClass( XmlException, Exception );
 /* usefull tools
  */
 
-# define ooc_strdup( x ) ( (x) ? strdup(x) : (x) )
+# define ooc_strdup( x ) ( (x != NULL) ? strdup(x) : (x) )
 
 #endif  /* OOC_XML_H */
