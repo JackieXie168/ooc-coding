@@ -32,15 +32,15 @@ LL = gcc
 debug : make_targets
 debug : TESTABLE_TARGETS = ../Debug/libxml.a
 debug : CPPFLAGS =
-debug : CFLAGS = -O0 -g3 -fopenmp
-debug : LDFLAGS = -L../Debug -L/usr/local/lib/ooc -fopenmp
+debug : CFLAGS = -O0 -g3 -fopenmp `pkg-config --cflags glib-2.0`
+debug : LDFLAGS = -L../Debug -L/usr/local/lib/ooc -fopenmp `pkg-config --libs glib-2.0`
 debug : LDLIBS = -lxml -looc_d
 
 release : make_targets
 release : TESTABLE_TARGETS = ../Release/libxml.a
 release : CPPFLAGS =
-release : CFLAGS = -O2 -fopenmp
-release : LDFLAGS = -L../Release -fopenmp
+release : CFLAGS = -O2 -fopenmp `pkg-config --cflags glib-2.0`
+release : LDFLAGS = -L../Release -fopenmp `pkg-config --libs glib-2.0`
 release : LDLIBS = -lxml -looc
 
 # Building the targets

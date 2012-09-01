@@ -118,7 +118,6 @@ xmlnode_new( )
 	return ooc_new( XmlNode, NULL );
 }
 
-static
 void
 xmlnode_set_name( XmlNode self, const char * name )
 {
@@ -127,10 +126,16 @@ xmlnode_set_name( XmlNode self, const char * name )
 	if( name == NULL )
 		ooc_throw( xmlexception_new( XML_ERROR_IMPLEMENTATION ) );
 	
-	self->name = strdup( name );
+	ooc_free( self->name );
+	self->name = ooc_strdup( (char*) name );
 }
 
-static
+const char *
+xmlnode_get_name( XmlNode self )
+{
+	return self->name;
+}
+
 void
 xmlnode_set_type( XmlNode self, XmlNodeTypes type )
 {
@@ -142,16 +147,27 @@ xmlnode_set_type( XmlNode self, XmlNodeTypes type )
 	self->type = type;
 }
 
-static
+XmlNodeTypes
+xmlnode_get_type( XmlNode self )
+{
+	return self->type;
+}
+
 void
 xmlnode_set_value( XmlNode self, const char * value )
 {
 	assert( ooc_isInstanceOf( self, XmlNode ) );
 
+	ooc_free( self->value );
 	self->value = ooc_strdup( (char*) value );
 }
 
-static
+const char *
+xmlnode_get_value( XmlNode self )
+{
+	return self->value;
+}
+
 void
 xmlnode_add_child( XmlNode self, XmlNode child )
 {
@@ -165,6 +181,25 @@ xmlnode_add_child( XmlNode self, XmlNode child )
 
 	child->parent = self;
 	list_append( self->children, ooc_pass( child ) );
+}
+
+void
+xmlnode_set_children( XmlNode self, List children )
+{
+	ooc_manage_object( children );
+
+	assert( ooc_isInstanceOf( self, XmlNode ) );
+	assert( ooc_isInstanceOf( children, List ) );
+	assert( _ooc_isClassOf( list_get_type( children), & XmlNodeClass) );
+
+	ooc_delete_and_null( (Object*) & self->children );
+	self->children = ooc_pass( children );
+}
+
+List
+xmlnode_get_children( XmlNode self )
+{
+	return self->children;
 }
 
 /* Xml interface callbacks
