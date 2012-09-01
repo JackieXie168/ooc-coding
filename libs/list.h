@@ -358,4 +358,22 @@ ListIterator	list_find_item( List list, ListIterator position,  list_item_checke
  
 ListIterator	list_find_item_reverse( List list, ListIterator position,  list_item_checker criteria, void * param);
 
+/** Get the type of the list.
+ * Returns the type of the list in case of a typed list.
+ * @param	list		The list.
+ * @return	The Class pointer in case of a typed list, otherwise NULL;
+ * @see 	list_new_type(), list_new_of_nodes().
+ */
+
+Class			list_get_type( List list );
+
+/** Check if the list is managed.
+ * Check is the items in the list are managed by the list.
+ * @param	list		The list.
+ * @return	OOC_MANAGE if managed list, !OOC_MANAGE if not.
+ * @see		list_new(), list_new_type(), list_new_of_nodes().
+ */
+
+int 			list_get_managed( List list );
+
 #endif /* LIST_H_ */

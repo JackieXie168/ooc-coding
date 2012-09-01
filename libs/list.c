@@ -837,3 +837,19 @@ list_find_item_reverse(  List self, ListIterator from, list_item_checker fn_matc
 			
 	return p;
 }
+
+Class
+list_get_type( List self )
+{
+	assert( ooc_isInstanceOf( self, List ) );
+
+	return self->type;
+}
+
+int
+list_get_managed( List self )
+{
+	assert( ooc_isInstanceOf( self, List ) );
+
+	return self->destroy != NULL;
+}

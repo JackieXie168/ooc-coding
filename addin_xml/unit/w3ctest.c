@@ -6,6 +6,7 @@
 
 #include "../xmlnode.h"
 
+#include <glib.h>
 
 #ifdef OOC_NO_FINALIZE
 #define ooc_finalize_class( x )
@@ -45,7 +46,7 @@ ClassMembers( W3Ctest, TestCase )
 
 	/* Individual tests */
 	char *		testFileName;
-	FILE *		testFile;
+	char *		testable;
 	XmlNode		parsedXml;
 
 EndOfClassMembers;
@@ -173,14 +174,43 @@ static
 void
 w3ctest_before( W3Ctest self )
 {
-	return;
+	FILE *				testFile;
+	unsigned long int 	fileSize;
+	size_t				bytes_read;
+
+
+	testFile = fopen( self->testFileName, "rb" );
+
+	assertNotNullMsg( testFile, "Can not open w3c XML test file.");
+	if( testFile != NULL )
+	{
+		ooc_manage( testFile, (ooc_destroyer) fclose );
+
+		fseek( testFile, 0L, SEEK_END );
+		fileSize = ftell( testFile );
+		rewind( testFile );
+
+		assertTrueMsg( fileSize <= BIGGEST_W3C_FILESIZE, "w3c test file is too big!" );
+		assertTrueMsg( fileSize > 0, "w3c test file is empty!" );
+		if( fileSize <= BIGGEST_W3C_FILESIZE && fileSize > 0 )
+		{
+			self->testable = ooc_malloc( fileSize + 1 );
+			bytes_read = fread( self->testable, 1, fileSize, testFile );
+			self->testable[bytes_read] = '\0';
+
+		}
+
+		fclose( ooc_pass( testFile ) );
+	}
 }
 
 static
 void
 w3ctest_after( W3Ctest self )
 {
-	return;
+	ooc_free_and_null( (void**) & self->testable );
+	ooc_free_and_null( (void**) & self->testFileName );
+	ooc_delete_and_null( (Object*) & self->parsedXml );
 }
 
 static
@@ -208,8 +238,28 @@ w3ctest_testcycle( W3Ctest self )
 
 static
 void
+w3ctest_run_child( XmlNode currentNode, W3Ctest testCase )
+{
+	if( xmlnode_get_type( currentNode ) == XML_NODE_ELEMENT )
+	{
+		if( strcmp( xmlnode_get_name( currentNode ), "TEST" ) == 0 )
+		{
+
+		}
+		else
+			list_foreach( xmlnode_get_children( currentNode ), (list_item_executor) w3ctest_run_child, testCase );
+	}
+}
+
+static
+void
 w3ctest_run_all( W3Ctest self )
 {
+	List	children;
+
+	children = xmlnode_get_children( self->testCaseXml );
+
+	list_foreach( children, (list_item_executor) w3ctest_run_child, self );
 	/* testcase_run_test( (TestCase) self, "kukurutty", (test_method_type) w3ctest_testcycle ); */
 }
 
