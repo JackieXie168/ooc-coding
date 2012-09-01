@@ -494,7 +494,7 @@ checksym( XmlParser self, Symbol s )
 {
 	boolean retval = false;
 
-	if( sym == characters )
+	if( sym == characters || s == escapedLiteral )
 	{
 		switch( s ) {
 			case name :				retval = check_name( self );
@@ -520,9 +520,9 @@ static
 boolean
 accept( XmlParser self, Symbol s )
 {
-	boolean retval = true;
+	boolean retval;
 
-	if( sym == characters && s > characters )
+	if( sym == characters && s > characters || s == escapedLiteral )
 		retval = checksym( self, s );
 	else
 		retval = ( sym == s );
@@ -549,6 +549,14 @@ string( XmlParser self )
 		expect( self, self->string_delimiter = apos );
 	expect( self, escapedLiteral );
 	expect( self, self->string_delimiter );
+}
+
+static
+int
+acceptText( XmlParser self )
+{
+	self->string_delimiter = '\0';
+	return accept( self, escapedLiteral );
 }
 
 static
@@ -804,7 +812,7 @@ xmlElement( XmlParser self )
 			expect( self, commentStop );
 			reduceComment( self );
 		}
-		else if( accept( self, escapedLiteral ) ) {
+		else if( acceptText( self ) ) {
 			reduceText( self );
 		}
 		else

@@ -3,6 +3,7 @@
 #define OOC_XML_H
 
 #include <stdio.h>
+#include <string.h>
 
 #include <ooc/ooc.h>
 #include <ooc/exception.h>
