@@ -38,5 +38,6 @@ const char *	xmlnode_get_value( XmlNode );
 void			xmlnode_add_child( XmlNode, XmlNode child );
 void			xmlnode_set_children( XmlNode, List children );
 List			xmlnode_get_children( XmlNode );
+const char *	xmlnode_get_attrib( XmlNode, const char * name );
 
 #endif  /* XMLNODE_H */

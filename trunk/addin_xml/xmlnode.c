@@ -57,6 +57,7 @@ XmlNode_initialize( Class this )
 	XmlNodeVtable vtab = & XmlNodeVtableInstance;
 	
 	ooc_init_class( List );
+	ooc_init_class( XmlException );
 
 	XmlNode_populate( & vtab->Xml );
 }
@@ -201,6 +202,40 @@ xmlnode_get_children( XmlNode self )
 {
 	return self->children;
 }
+
+static
+int
+check_attrib_name( XmlNode child, const char * name )
+{
+	assert( ooc_isInstanceOf( child, XmlNode ) );
+
+	if( child->type == XML_NODE_ATTR && name != NULL )
+		return strcmp( child->name, (char*) name ) == 0;
+	else
+		return FALSE;
+}
+
+const char *
+xmlnode_get_attrib( XmlNode self, const char * name )
+{
+	XmlNode	 found_attrib;
+
+	assert( ooc_isInstanceOf( self, XmlNode ) );
+
+	if( self->type != XML_NODE_ELEMENT )
+		ooc_throw( xmlexception_new( XML_ERROR_NO_ATTRIBS ) );
+
+	found_attrib = (XmlNode) list_find_item( self->children, NULL, (list_item_checker) check_attrib_name, (void*) name );
+
+	if( found_attrib != NULL )
+	{
+		assert( ooc_isInstanceOf( found_attrib, XmlNode ) );
+		return found_attrib->value;
+	}
+	else
+		return NULL;
+}
+
 
 /* Xml interface callbacks
  */

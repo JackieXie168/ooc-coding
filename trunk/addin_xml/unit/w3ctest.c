@@ -45,7 +45,8 @@ ClassMembers( W3Ctest, TestCase )
 	XmlNode		testCaseXml;
 
 	/* Individual tests */
-	char *		testFileName;
+	const char *		testFileName;
+	const char *		testName;
 	char *		testable;
 	XmlNode		parsedXml;
 
@@ -174,12 +175,15 @@ static
 void
 w3ctest_before( W3Ctest self )
 {
+	char * 				fileName;
 	FILE *				testFile;
 	unsigned long int 	fileSize;
 	size_t				bytes_read;
 
 
-	testFile = fopen( self->testFileName, "rb" );
+	fileName = g_strconcat( "xmltest/", self->testFileName, NULL );
+	testFile = fopen( fileName, "rb" );
+	g_free( fileName );
 
 	assertNotNullMsg( testFile, "Can not open w3c XML test file.");
 	if( testFile != NULL )
@@ -199,7 +203,6 @@ w3ctest_before( W3Ctest self )
 			self->testable[bytes_read] = '\0';
 
 		}
-
 		fclose( ooc_pass( testFile ) );
 	}
 }
@@ -209,7 +212,6 @@ void
 w3ctest_after( W3Ctest self )
 {
 	ooc_free_and_null( (void**) & self->testable );
-	ooc_free_and_null( (void**) & self->testFileName );
 	ooc_delete_and_null( (Object*) & self->parsedXml );
 }
 
@@ -231,9 +233,38 @@ w3ctest_after_class( W3Ctest self )
 
 static
 void
-w3ctest_testcycle( W3Ctest self )
+w3ctest_test_well_formed( W3Ctest self )
 {
-	printf( "w3c test cycle is running\n");
+	XmlParser	parser;
+
+	parser = xmlparser_new_str( self->testable );
+
+	try
+		ooc_delete( (Object) xmlnode_parse( parser ) ) ;
+	catch( XmlException )
+		fail();
+	finally
+		ooc_delete( (Object) parser );
+	end_try;
+}
+
+static
+void
+w3ctest_test_not_well_formed( W3Ctest self )
+{
+	XmlParser	parser;
+
+	parser = xmlparser_new_str( self->testable );
+
+	try {
+		ooc_delete( (Object) xmlnode_parse( parser ) ) ;
+		fail();
+	}
+	catch( XmlException )
+		;
+	finally
+		ooc_delete( (Object) parser );
+	end_try;
 }
 
 static
@@ -244,7 +275,20 @@ w3ctest_run_child( XmlNode currentNode, W3Ctest testCase )
 	{
 		if( strcmp( xmlnode_get_name( currentNode ), "TEST" ) == 0 )
 		{
+			const char * test_type	= xmlnode_get_attrib( currentNode, "TYPE" );
+			testCase->testFileName	= xmlnode_get_attrib( currentNode, "URI" );
+			testCase->testName		= xmlnode_get_attrib( currentNode, "ID" );
 
+			assertNotNullMsg( test_type, "Test has no TYPE attribute!");
+			if( test_type )
+			{
+				if( strcmp( test_type, "valid") == 0 || strcmp( test_type, "invalid") == 0 )
+					testcase_run_test( (TestCase) testCase, testCase->testName, (test_method_type) w3ctest_test_well_formed );
+				else if( strcmp( test_type, "not-wf") == 0 )
+					testcase_run_test( (TestCase) testCase, testCase->testName, (test_method_type) w3ctest_test_not_well_formed );
+				else
+					printf("Test TYPE %s is not established.\n", test_type );
+			}
 		}
 		else
 			list_foreach( xmlnode_get_children( currentNode ), (list_item_executor) w3ctest_run_child, testCase );
@@ -260,7 +304,6 @@ w3ctest_run_all( W3Ctest self )
 	children = xmlnode_get_children( self->testCaseXml );
 
 	list_foreach( children, (list_item_executor) w3ctest_run_child, self );
-	/* testcase_run_test( (TestCase) self, "kukurutty", (test_method_type) w3ctest_testcycle ); */
 }
 
 /* Runs the test as an executable

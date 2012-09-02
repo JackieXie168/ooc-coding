@@ -496,3 +496,18 @@ vector_find_item_reverse( Vector self, VectorIndex from, vector_item_checker mat
 	return index != 0 ? index - 1 : self->number_of_items;
 }
 
+Class
+vector_get_type( Vector self )
+{
+	assert( ooc_isInstanceOf( self, Vector ) );
+
+	return self->type;
+}
+
+int
+vector_get_managed( Vector self )
+{
+	assert( ooc_isInstanceOf( self, Vector ) );
+
+	return self->destroy != NULL ? OOC_MANAGE : !OOC_MANAGE;
+}
