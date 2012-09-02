@@ -207,6 +207,9 @@ test_untyped( void )
 {
 	Vector vector = vector_new( 10, (vector_item_destroyer) ooc_delete );
 
+	assertNull( vector_get_type( vector ) );
+	assertTrue( vector_get_managed( vector ) == OOC_MANAGE );
+
 	/* Must NOT violate type safety
 	 */
 	vector_push_back( vector, bar_new( ) );
@@ -221,7 +224,10 @@ static
 void
 test_type_safety_I( void )
 {
-	Vector vector = vector_new_type( 10, Foo, TRUE );
+	Vector vector = vector_new_type( 10, Foo, OOC_MANAGE );
+
+	assertTrue( vector_get_type( vector ) == & FooClass );
+	assertTrue( vector_get_managed( vector ) == OOC_MANAGE );
 
 	/* Must violate type safety
 	 */
@@ -242,7 +248,10 @@ static
 void
 test_type_safety_II( void )
 {
-	Vector vector = vector_new_type( 10, Bar, TRUE );
+	Vector vector = vector_new_type( 10, Bar, OOC_MANAGE );
+
+	assertTrue( vector_get_type( vector ) == & BarClass );
+	assertTrue( vector_get_managed( vector ) == OOC_MANAGE );
 
 	/* Must NOT violate type safety
 	 */
@@ -258,7 +267,7 @@ test_type_safety_set_item( void )
 {
 	Vector vector;
 	
-	vector = vector_new_type( 10, Bar, TRUE );
+	vector = vector_new_type( 10, Bar, OOC_MANAGE );
 	vector_push_back( vector, bar_new( ) );
 	try {
 		vector_set_item( vector, 0, foo_new() );
@@ -282,7 +291,7 @@ test_type_safety_insert( void )
 {
 	Vector vector;
 	
-	vector = vector_new_type( 10, Bar, TRUE );
+	vector = vector_new_type( 10, Bar, OOC_MANAGE );
 	vector_push_back( vector, bar_new( ) );
 	try {
 		vector_insert( vector, 0, foo_new() );
@@ -325,6 +334,8 @@ test_from_table( void )
 	Vector vector = vector_new_from_table( &testData, sizeof(struct TestData), RECORDS );
 	int i;
 	
+	assertTrue( vector_get_managed( vector ) == !OOC_MANAGE );
+
 	assertTrue( vector_items( vector ) == RECORDS );
 	for( i = 0; i<RECORDS; i++ )
 		assertTrue( vector_get_item( vector, i ) == &testData[i] );
@@ -336,7 +347,7 @@ static
 void
 test_set_item( void )
 {
-	Vector vector = vector_new_type( 10, Foo, TRUE );
+	Vector vector = vector_new_type( 10, Foo, OOC_MANAGE );
 	int i;
 
 	#ifdef _OPENMP
@@ -363,7 +374,7 @@ static
 void
 test_insert( void )
 {
-	Vector vector = vector_new_type( 10, Foo, TRUE );
+	Vector vector = vector_new_type( 10, Foo, OOC_MANAGE );
 	int i;
 	
 	for(i=0; i<100; i++ )
@@ -386,7 +397,7 @@ static
 void
 test_delete( void )
 {
-	Vector vector = vector_new_type( 10, Foo, TRUE );
+	Vector vector = vector_new_type( 10, Foo, OOC_MANAGE );
 	VectorIndex i, j;
 	
 	for(i=0; i<100; i++ )
@@ -417,7 +428,7 @@ static
 void
 test_swap( void )
 {
-	Vector vector = vector_new_type( 10, Foo, TRUE );
+	Vector vector = vector_new_type( 10, Foo, OOC_MANAGE );
 	int i;
 	
 	for(i=0; i<50; i++ ) {
@@ -456,7 +467,7 @@ static
 void
 test_foreach( void )
 {
-	Vector vector = vector_new_type( 10, Foo, TRUE );
+	Vector vector = vector_new_type( 10, Foo, OOC_MANAGE );
 	int i;
 	
 	for(i=0; i<100; i++ )
@@ -494,7 +505,7 @@ static
 void
 test_foreach_until( void )
 {
-	Vector vector = vector_new_type( 10, Foo, TRUE );
+	Vector vector = vector_new_type( 10, Foo, OOC_MANAGE );
 	int i;
 	VectorIndex found;
 	
@@ -536,7 +547,7 @@ static
 void
 test_find_item( void )
 {
-	Vector vector = vector_new_type( 10, Foo, TRUE );
+	Vector vector = vector_new_type( 10, Foo, OOC_MANAGE );
 	int i;
 	VectorIndex found;
 	
@@ -562,7 +573,7 @@ static
 void
 test_find_item_reverse( void )
 {
-	Vector vector = vector_new_type( 10, Foo, TRUE );
+	Vector vector = vector_new_type( 10, Foo, OOC_MANAGE );
 	int i;
 	VectorIndex found;
 	
@@ -590,7 +601,7 @@ static
 void
 test_wrong_position_get_item( void )
 {
-	Vector vector = vector_new_type( 10, Foo, TRUE );
+	Vector vector = vector_new_type( 10, Foo, OOC_MANAGE );
 	int i;
 	
 	try {
@@ -628,7 +639,7 @@ static
 void
 test_wrong_position_set_item( void )
 {
-	Vector vector = vector_new_type( 10, Foo, TRUE );
+	Vector vector = vector_new_type( 10, Foo, OOC_MANAGE );
 	int i;
 	
 	try {
@@ -666,7 +677,7 @@ static
 void
 test_wrong_position_insert( void )
 {
-	Vector vector = vector_new_type( 10, Foo, TRUE );
+	Vector vector = vector_new_type( 10, Foo, OOC_MANAGE );
 	int i;
 	
 	try {
@@ -704,7 +715,7 @@ static
 void
 test_wrong_position_delete_item( void )
 {
-	Vector vector = vector_new_type( 10, Foo, TRUE );
+	Vector vector = vector_new_type( 10, Foo, OOC_MANAGE );
 	int i;
 	
 	try {
@@ -742,7 +753,7 @@ static
 void
 test_wrong_position_find_item( void )
 {
-	Vector vector = vector_new_type( 10, Foo, TRUE );
+	Vector vector = vector_new_type( 10, Foo, OOC_MANAGE );
 	int i;
 	
 	try {
@@ -780,7 +791,7 @@ static
 void
 test_wrong_position_find_item_reverse( void )
 {
-	Vector vector = vector_new_type( 10, Foo, TRUE );
+	Vector vector = vector_new_type( 10, Foo, OOC_MANAGE );
 	int i;
 	
 	try {

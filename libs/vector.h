@@ -319,4 +319,23 @@ VectorIndex		vector_find_item        ( Vector vector, VectorIndex index,  vector
 
 VectorIndex		vector_find_item_reverse( Vector vector, VectorIndex index,  vector_item_checker checker, void * param );
 
+/** Get the type of the vector.
+ * Returns the type of the vector in case of a typed vector.
+ * @param	vector	The vector
+ * @return	The Class pointer in case of a typed vector, otherwise NULL;
+ * @see 	vector_new_type()
+ */
+
+Class			vector_get_type( Vector vector );
+
+/** Check if the vector is managed.
+ * Check is the items in the vector are managed by the vector.
+ * @param	vector		The vector
+ * @return	OOC_MANAGE if managed vector, !OOC_MANAGE if not.
+ * @see		vector_new(), vector_new_type()
+ */
+
+int 			vector_get_managed( Vector vector );
+
+
 #endif /*VECTOR_H_*/

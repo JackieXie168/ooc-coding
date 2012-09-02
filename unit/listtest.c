@@ -240,30 +240,36 @@ constructor( ListTest self )
 	assertFalse( self->list->list_of_nodes );
 	assertNull( self->list->first );
 	assertNull( self->list->last );
+	assertTrue( list_get_managed( self->list ) == OOC_MANAGE );
 
 	assertTrue( self->foolist->destroy == (list_item_destroyer) ooc_delete );
 	assertTrue( self->foolist->type == &FooClass );
 	assertFalse( self->foolist->list_of_nodes );
 	assertNull( self->foolist->first );
 	assertNull( self->foolist->last );
+	assertTrue( list_get_managed( self->foolist ) == OOC_MANAGE );
 
 	assertTrue( self->foonodelist->destroy == (list_item_destroyer) ooc_delete );
 	assertTrue( self->foonodelist->type == &FooNodeClass );
 	assertTrue( self->foonodelist->list_of_nodes );
 	assertNull( self->foonodelist->first );
 	assertNull( self->foonodelist->last );
+	assertTrue( list_get_managed( self->foonodelist ) == OOC_MANAGE );
 
 	assertNull( self->list_um->destroy );
 	assertTrue( self->list_um->type == NULL );
 	assertFalse( self->list_um->list_of_nodes );
+	assertTrue( list_get_managed( self->list_um ) == !OOC_MANAGE );
 
 	assertNull( self->foolist_um->destroy );
 	assertTrue( self->foolist_um->type == &FooClass );
 	assertFalse( self->foolist_um->list_of_nodes );
+	assertTrue( list_get_managed( self->foolist_um ) == !OOC_MANAGE );
 
 	assertNull( self->foonodelist_um->destroy );
 	assertTrue( self->foonodelist_um->type == &FooNodeClass );
 	assertTrue( self->foonodelist_um->list_of_nodes );
+	assertTrue( list_get_managed( self->foonodelist_um ) == !OOC_MANAGE );
 }
 
 static
@@ -272,14 +278,17 @@ types( ListTest self )
 {
 	list_append( self->list, ooc_malloc( 100 ) );
 	assertTrue( ooc_isInstanceOf( self->list->first, ListNode ) );
+	assertNull( list_get_type( self->list ) );
 	
 	list_append( self->foolist, foo_new() );
 	assertTrue( ooc_isInstanceOf( self->foolist->first, ListNode ) );
 	assertTrue( ooc_isInstanceOf( list_get_item( list_first( self->foolist )), Foo ) );
+	assertTrue( list_get_type( self->foolist ) == & FooClass );
 	
 	list_append( self->foonodelist, foonode_new() );
 	assertTrue( ooc_isInstanceOf( self->foonodelist->first, FooNode ) );
 	assertTrue( ooc_isInstanceOf( list_get_item( list_first( self->foonodelist )), FooNode ) );
+	assertTrue( list_get_type( self->foonodelist ) == & FooNodeClass );
 }
 
 static
