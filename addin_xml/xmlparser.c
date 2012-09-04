@@ -373,12 +373,14 @@ static
 void
 error( const char * msg, ... )
 {
-	va_list 	args;
+/*	TODO: Add the message to the exception object
+ *
+ 	va_list 	args;
 
 	va_start( args, msg );
 	vprintf( msg, args );
 	va_end (args);
-
+*/
 	ooc_throw( xmlexception_new( XML_ERROR_SYNTAX ) );
 }
 
