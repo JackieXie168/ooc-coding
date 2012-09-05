@@ -47,6 +47,7 @@ enum _Symbol
 	name,
 	escapedLiteral,
 	comment,
+	piLiteral,
 
 	/* Symbols that resulted from a reduction.
 	 * These symbols have a corresponding value on the value stack
@@ -57,6 +58,11 @@ enum _Symbol
 	xmlAttribs, /*   */
 
 } Symbol;
+
+/* Processing instruction symbols look like XML declaration symbols */
+#define	xmlPIStart xmlDeclStart
+#define xmlPIStop xmlDeclStop
+
 
 typedef int boolean;
 #define false 0
@@ -345,7 +351,7 @@ vs_drop_top_n( XmlParser self, int n )
 
 	vsp -= n;
 							/* Should Objects be deleted ?
-							 * No. They are passed to other Objects or freed while reducing. */
+							 * No! They are passed to other Objects or freed while reducing. */
 }
 
 #define vs_drop_top( self ) vs_drop_top_n( self, 1 )
@@ -430,6 +436,24 @@ check_escapedLiteral( XmlParser self )
 
 static
 boolean
+check_piLiteral( XmlParser self )
+{
+	size_t len = 0;
+	const char * c = p;
+
+	/* PILiteral = (Char* - (Char* '?>' Char*)))? ; */
+
+	while( *c != '\0' && !( *c == '?' && *(c+1) == '>' ) )
+		len++, c++;
+
+	if( len )
+		vs_push_symbol( self, piLiteral, p, len );
+
+	return len != 0;
+}
+
+static
+boolean
 check_xmlDeclXML( XmlParser self )
 {
 	if( toupper(*p) == 'X' && toupper(*(p+1)) == 'M' && toupper(*(p+2)) == 'L' ) {
@@ -446,7 +470,7 @@ check_comment( XmlParser self )
 	char * c = p;
 	size_t	len = 0;
 
-	while( *c != '\0' && ( *c != '-' || *(c+1) != '-' || *(c+2) != '>' ) )
+	while( *c != '\0' && ( *c != '-' || *(c+1) != '-' ) )
 		c++, len++;
 
 	while( c != p && ( *(c-1) == ' ' || *(c-1) == '\t' || *(c-1) == '\n' || *(c-1) == '\r' ) )
@@ -505,6 +529,8 @@ checksym( XmlParser self, Symbol s )
 									break;
 			case xmlDeclXML :		retval = check_xmlDeclXML( self );
 									break;
+			case piLiteral : 		retval = check_piLiteral( self );
+									break;
 			case comment :			retval = check_comment( self );
 									break;
 			default :
@@ -524,7 +550,7 @@ accept( XmlParser self, Symbol s )
 {
 	boolean retval;
 
-	if( sym == characters && s > characters || s == escapedLiteral )
+	if( ( sym == characters &&  s > characters ) || s == escapedLiteral  )
 		retval = checksym( self, s );
 	else
 		retval = ( sym == s );
@@ -545,7 +571,7 @@ expect( XmlParser self, Symbol s )
 
 static
 void
-string( XmlParser self )
+expectString( XmlParser self )
 {
 	if( ! accept( self, self->string_delimiter = quot ) )
 		expect( self, self->string_delimiter = apos );
@@ -743,14 +769,47 @@ reduceEndElement( XmlParser self )
 
 static
 void
-attribList( XmlParser self )
+reduceProcessingInstruction( XmlParser self )
+{
+	assert( vs[vsp].symbol == name
+			|| ( vs[vsp-1].symbol == name && vs[vsp].symbol == piLiteral ) );
+
+	/* TODO: PI reduction here */
+	/* the name can not be XML case insensitive ! */
+
+	if( vs[vsp].symbol == name )
+		vs_drop_top( self );
+	else
+		vs_drop_top_n( self, 2 );
+}
+
+static
+int
+acceptPI( XmlParser self )
+{
+	int retval = false;
+
+	if( accept( self, xmlPIStart ) )
+	{
+		expect( self, name );
+		accept( self, space );
+		accept( self, piLiteral );
+		expect( self, xmlPIStop );
+		retval = true;
+	}
+	return retval;
+}
+
+static
+void
+acceptAttribList( XmlParser self )
 {
 	accept( self, space );
 	while( accept( self, name ) )
 	{
 									accept( self, space );
 		expect( self, eqSign ); 	accept( self, space );
-		string( self ); 			accept( self, space );
+		expectString( self ); 		accept( self, space );
 		reduceAttrib( self );
 	}
 	if( vs[vsp].symbol != xmlAttribs )
@@ -759,11 +818,11 @@ attribList( XmlParser self )
 
 static
 void
-xmlDecl( XmlParser self )
+acceptXmlDecl( XmlParser self )
 {
 	if( accept( self, xmlDeclStart ) ) {
 		expect( self, xmlDeclXML );
-		attribList( self );
+		acceptAttribList( self );
 		expect( self, xmlDeclStop );
 
 		/* TODO: reduction here */
@@ -775,11 +834,10 @@ xmlDecl( XmlParser self )
 
 static
 void
-prolog( XmlParser self )
+acceptProlog( XmlParser self )
 {
 	 accept( self, space );
-	 xmlDecl( self );
-	 accept( self, space );
+	 acceptXmlDecl( self );
 }
 
 static
@@ -793,7 +851,7 @@ xmlElement( XmlParser self )
 									accept( self, space );
 			expect( self, name );
 			reduceTagName( self );
-			attribList( self );
+			acceptAttribList( self );
 			reduceBeginElement( self );
 			if( accept( self, tagEmptyClose ) )
 				reduceEmptyEndElement( self );
@@ -814,6 +872,9 @@ xmlElement( XmlParser self )
 			expect( self, commentStop );
 			reduceComment( self );
 		}
+		else if( acceptPI( self ) ) {
+			reduceProcessingInstruction( self );
+		}
 		else if( acceptText( self ) ) {
 			reduceText( self );
 		}
@@ -828,7 +889,7 @@ xmlFile( XmlParser self )
 {
 	getsym( self );
 	accept( self, bom );
-	prolog( self );
+	acceptProlog( self );
 	xmlElement( self);
 	expect( self, end );
 }
