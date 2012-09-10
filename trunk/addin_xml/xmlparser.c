@@ -416,6 +416,85 @@ check_name( XmlParser self )
 		return false;
 }
 
+
+static
+size_t
+calc_charReference_len( XmlParser self, const char * c )
+{
+	/* [66]   	CharRef	   ::=   	'&#' [0-9]+ ';'
+									| '&#x' [0-9a-fA-F]+ ';'
+	*/
+
+	boolean hex;
+	size_t len = 2;
+
+	assert( *c == '&' && *(c+1) == '#' );
+
+	c += len;
+	if( *c == 'x' )
+		hex = true, len++, c++;
+	else
+		hex = false;
+
+	while( *c != '\0' && *c != ';' )
+		if( (!hex && isdigit( *c )) || (hex && isxdigit( *c )) )
+			len ++, c++;
+		else
+			return 0;
+
+	if( len > 2 && *c == ';' )
+		return len + 1;
+	else
+		return 0;
+}
+
+static
+size_t
+calc_name_len( XmlParser self, const char * c )
+{
+	/*
+	[4]   	NameStartChar	   ::=   	":" | [A-Z] | "_" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6] | [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] | [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF]
+	[4a]   	NameChar	   ::=   	NameStartChar | "-" | "." | [0-9] | #xB7 | [#x0300-#x036F] | [#x203F-#x2040]
+	[5]   	Name	   ::=   	NameStartChar (NameChar)*
+	*/
+
+	size_t len = 1;
+
+	assert( *c == '&' );
+
+	c += len;
+
+	while( *c != '\0' && *c != ';' )
+		if( isalnum( *c ) ) /* TODO: This is just a quick and  dirty test! */
+			len ++, c++;
+		else
+			return 0;
+
+	if( len > 1 && *c == ';' )
+		return len + 1;
+	else
+		return 0;
+
+
+	return 0;
+}
+
+static
+size_t
+calc_reference_len( XmlParser self, const char * c )
+{
+	/* [67]   	Reference	   ::=   	 EntityRef | CharRef
+	   [68]   	EntityRef	   ::=   	'&' Name ';'
+	 */
+
+	assert( *c == '&' );
+
+	if( *(c+1) == '#' )
+		return calc_charReference_len( self, c );
+	else
+		return calc_name_len( self, c );
+}
+
 static
 boolean
 check_escapedLiteral( XmlParser self )
@@ -426,7 +505,19 @@ check_escapedLiteral( XmlParser self )
 	/* escapedLiteral = [^<^>]* ; */
 
 	while( *c != self->string_delimiter && *c != '\0' && *c != '<' && *c != '>' )
-		len++, c++;
+		if( *c != '&' )
+			len++, c++;
+		else
+		{
+			size_t	reference_len = calc_reference_len( self, c );
+			if( reference_len == 0 )
+			{
+				len = 0;
+				break;
+			}
+			else
+				len += reference_len, c += reference_len;
+		};
 
 	if( len )
 		vs_push_symbol( self, escapedLiteral, p, len );
