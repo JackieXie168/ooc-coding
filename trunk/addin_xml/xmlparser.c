@@ -1,5 +1,13 @@
 
 /* This is a XmlParser class implementation file
+ *
+ * Extensible Markup Language (XML) 1.1 (Second Edition)
+ * W3C Recommendation 16 August 2006, edited in place 29 September 2006
+ * http://www.w3.org/TR/2006/REC-xml11-20060816/
+ *
+ * EBNF visualizer:
+ * http://railroad.my28msec.com/rr/ui
+ *
  */
 
 
@@ -503,6 +511,7 @@ check_escapedLiteral( XmlParser self )
 	const char * c = p;
 
 	/* escapedLiteral = [^<^>]* ; */
+	/* CharData	   ::=   	[^<&]* - ([^<&]* ']]>' [^<&]*) */
 
 	while( *c != self->string_delimiter && *c != '\0' && *c != '<' && *c != '>' )
 		if( *c != '&' )
