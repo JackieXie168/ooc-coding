@@ -1,6 +1,8 @@
-AM_LDFLAGS = `pkg-config --libs glib-2.0`
+# AM_LDFLAGS = `pkg-config --libs glib-2.0`
 AM_CFLAGS = `pkg-config --cflags glib-2.0`
 AM_CPPFLAGS = -DNDEBUG -DTEMPLATE_DIR='"$(pkgdatadir)/template"' 
+
+ooc_LDADD = -lglib-2.0
 
 bin_PROGRAMS=ooc
 ooc_SOURCES=main.c

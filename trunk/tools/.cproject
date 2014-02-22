@@ -33,9 +33,9 @@
 <option id="gnu.c.compiler.exe.debug.option.debugging.level.1906141932" name="Debug Level" superClass="gnu.c.compiler.exe.debug.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 <inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1792785408" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 </tool>
-<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1526092090" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug">
-<option id="gnu.c.link.option.libs.1167956335" name="Libraries (-l)" superClass="gnu.c.link.option.libs"/>
-<option id="gnu.c.link.option.paths.1985033819" name="Library search path (-L)" superClass="gnu.c.link.option.paths"/>
+<tool commandLinePattern="${COMMAND} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS} ${FLAGS} " id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1526092090" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug">
+<option id="gnu.c.link.option.libs.1167956335" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs"/>
+<option id="gnu.c.link.option.paths.1985033819" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths"/>
 <option id="gnu.c.link.option.ldflags.1668252360" name="Linker flags" superClass="gnu.c.link.option.ldflags" value="`pkg-config --libs glib-2.0`" valueType="string"/>
 <inputType id="cdt.managedbuild.tool.gnu.c.linker.input.220909361" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 <additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>

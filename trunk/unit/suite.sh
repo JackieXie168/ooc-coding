@@ -18,6 +18,13 @@ for i in *; do
  [[ $R != 0 ]] && RETURN=1
  [[ $R != 0 ]] && continue
 
+ # Display the current test name
+ echo $i
+
+ # Run the testcase
+ ./$i $ARGS ; R=$?
+ [[ $R != 0 ]] && RETURN=1
+
  # Filter out those executables that should not run in Valgrind
  [[ $i == "testcasetest" ]] && continue
 
