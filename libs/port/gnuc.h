@@ -36,8 +36,8 @@
  
 #include <setjmp.h>
 
-#define JMP_BUF					sigjmp_buf
-#define SETJMP(buff)			sigsetjmp ( buff, TRUE )
+#define JMP_BUF					jmp_buf /* TODO should be sigjmp_buf instead? */
+#define SETJMP(buff)			__sigsetjmp ( buff, TRUE )
 #define LONGJMP(env, val)		siglongjmp( env, val )
 
 
