@@ -251,6 +251,7 @@ w3ctest_print_text( XmlNode node )
 }
 
 static
+void
 w3ctest_print_diag( XmlNode test )
 {
 	const char * sections;
@@ -259,7 +260,7 @@ w3ctest_print_diag( XmlNode test )
 	assert( xmlnode_get_type( test ) == XML_NODE_ELEMENT );
 	assert( strcmp( xmlnode_get_name( test ), "TEST" ) == 0 );
 
-	if( sections = xmlnode_get_attrib( test, "SECTIONS" ) )
+	if( ( sections = xmlnode_get_attrib( test, "SECTIONS" ) ) )
 		printf( "\tSections %s\n", sections );
 
 	list_foreach( (List) xmlnode_get_children( test ), (list_item_executor) w3ctest_print_text, NULL );
@@ -304,8 +305,8 @@ w3ctest_test_not_well_formed( W3Ctest self )
 		fail();
 		w3ctest_print_diag( self->currentTest );
 	}
-	catch( XmlException )
-		;
+	catch( XmlException ) {
+	}
 	finally
 		ooc_delete( (Object) parser );
 	end_try;
