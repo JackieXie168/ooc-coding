@@ -36,10 +36,19 @@
  
 #include <setjmp.h>
 
-#define JMP_BUF					jmp_buf /* TODO should be sigjmp_buf instead? */
-#define SETJMP(buff)			__sigsetjmp ( buff, TRUE )
+#ifdef	__USE_POSIX
+
+#define JMP_BUF					sigjmp_buf
+#define SETJMP(buff)			sigsetjmp ( buff, TRUE )
 #define LONGJMP(env, val)		siglongjmp( env, val )
 
+#else
+
+#define JMP_BUF		jmp_buf
+#define SETJMP		setjmp
+#define LONGJMP		longjmp
+
+#endif
 
 /* implementing static inline */
 #if !defined( __NO_INLINE__ )

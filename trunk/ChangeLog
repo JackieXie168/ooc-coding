@@ -1,3 +1,7 @@
+1.3b
+sigsetjmp/siglongjmp for POSIXs
+
+
 1.3a
 Portable to 64 bit Linux versions (source can be compiled, still no 64bit libraries distributed)
 Valgrind check is skipped in make check, if Valgrind is not installed.
