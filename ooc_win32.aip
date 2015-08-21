@@ -9,10 +9,10 @@
     <ROW Property="ARPURLINFOABOUT" Value="http://ooc-coding.sourceforge.net/"/>
     <ROW Property="CTRLS" Value="1"/>
     <ROW Property="Manufacturer" Value="old_fashioned" ValueLocId="*"/>
-    <ROW Property="ProductCode" Value="1033:{705D1384-2750-4E40-8578-C63ED66CD819} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{2BFAF33C-34A3-4EAD-AEBC-080FE4BD4DD1} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="ooc" ValueLocId="*"/>
-    <ROW Property="ProductVersion" Value="1.3.1"/>
+    <ROW Property="ProductVersion" Value="1.3.2"/>
     <ROW Property="REBOOT" MultiBuildValue="DefaultBuild:ReallySuppress"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{CF565570-C73B-45C8-8B37-F8528F62C4E0}"/>
