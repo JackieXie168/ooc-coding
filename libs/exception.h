@@ -118,7 +118,7 @@ struct ooc_try_block {
 						if( ! SETJMP(TryContext.buffer) )
 #define		catch(ec)	else if( (exception = ooc_exception_caught( & ec ## Class ))) 
 #define		catch_any	else if( (exception = ooc_exception_caught( NULL )))
-#define		finally		exception = NULL;	/* Only for supressing "unused variable warning" with a pure try .. finallly ..end_try block */
+#define		finally		;
 #define		end_try		ooc_end_try(); }
 
 void		ooc_link_try_block( struct ooc_try_block * );

@@ -45,6 +45,9 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
 
+/* Define to 1 if your C compiler doesn't accept -c and -o together. */
+/* #undef NO_MINUS_C_MINUS_O */
+
 /* Name of package */
 #define PACKAGE "ooc"
 
@@ -55,7 +58,7 @@
 #define PACKAGE_NAME "Object Oriented C"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "Object Oriented C 1.3a"
+#define PACKAGE_STRING "Object Oriented C 1.3b"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "ooc"
@@ -64,13 +67,13 @@
 #define PACKAGE_URL "http://ooc-coding.sourceforge.net"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "1.3a"
+#define PACKAGE_VERSION "1.3b"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "1.3a"
+#define VERSION "1.3b"
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */
