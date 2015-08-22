@@ -22,6 +22,9 @@
 #ifndef GNUC_H_
 #define GNUC_H_
 
+/* we are in the GNU world */
+#define _GNU_SOURCE		1
+
 /* Inlcude standard headers */
 
 #include <stdlib.h>
