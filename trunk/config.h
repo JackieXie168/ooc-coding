@@ -58,7 +58,7 @@
 #define PACKAGE_NAME "Object Oriented C"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "Object Oriented C 1.3b"
+#define PACKAGE_STRING "Object Oriented C 1.3c"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "ooc"
@@ -67,13 +67,13 @@
 #define PACKAGE_URL "http://ooc-coding.sourceforge.net"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "1.3b"
+#define PACKAGE_VERSION "1.3c"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "1.3b"
+#define VERSION "1.3c"
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */
