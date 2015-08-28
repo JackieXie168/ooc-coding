@@ -571,9 +571,6 @@ static
 void
 signal_handler( int signum )
 {
-	signal( SIGSEGV, signal_handler );
-	signal( SIGFPE, signal_handler );
-	
 	switch( signum ) {
 		case SIGSEGV :	ooc_throw( (Exception) ooc_new( SegmentationFault, NULL ) );
 		case SIGFPE	 :	ooc_throw( (Exception) ooc_new( ArithmeticFault, NULL ) );
